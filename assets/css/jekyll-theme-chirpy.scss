@@ -1,16 +1,20 @@
 ---
-# -----------------------------------------------------------------------------
-#  "Sumi & Shu"  —  Edo-era sumi-e / woodblock retheme for Chirpy 7.x
+# =============================================================================
+#  "Yūrei-mura" (幽霊村 · the ghost village)
+#  Dark Feudal Japan retheme for Chirpy 7.x — an abandoned Kyoto village at
+#  midnight where a hacker-samurai documents exploit development.
 #
-#  This file SHADOWS the theme's own `assets/css/jekyll-theme-chirpy.scss`,
-#  so it must first reproduce the theme's Sass entry point (the two @use
-#  lines below) and then append our overrides. Nothing in the gem is edited.
+#  Non-destructive: this file SHADOWS the theme's own entry point, so it first
+#  reproduces the theme's Sass stub (the two @use lines) and then layers our
+#  design system on top by (a) re-declaring Chirpy CSS custom properties on the
+#  theme's own selectors and (b) adding component styles. No gem files edited.
 #
-#  Strategy: re-declare Chirpy's CSS custom properties on the very same
-#  selectors the theme binds them to (:root[data-bs-theme='light'|'dark'] and
-#  the auto :root:not([data-bs-theme]) + prefers-color-scheme block). Because
-#  our block is emitted after the theme's, our values win with no !important.
-# -----------------------------------------------------------------------------
+#  Structure:
+#    1. Design tokens (:root)          5. Base atmosphere + typography
+#    2. Midnight palette (dark)        6. Layout: temple sidebar, topbar, hero
+#    3. Dawn palette (light)           7. Components: cards, prompts, tables…
+#    4. Palette bindings               8. Code lacquer, footer shrine, cursor…
+# =============================================================================
 ---
 
 @use 'abstracts/variables' with (
@@ -24,437 +28,351 @@
 {%- endif -%}
 ';
 
-/* ======================================================================== *
- *  append custom style below
- * ======================================================================== */
+/* ========================================================================= *
+ *  1. DESIGN TOKENS  (mode-independent)
+ * ========================================================================= */
+:root {
+  /* purple scale — never neon */
+  --fj-purple: #8b5cf6;
+  --fj-purple-deep: #6d28d9;
+  --fj-purple-soft: #a78bfa;
+  --fj-glow: rgb(139 92 246 / 40%);
+  --fj-glow-strong: rgb(139 92 246 / 55%);
 
-/* -------------------------------------------------------------------------
- *  Palette mixins. Each mixin sets (a) Chirpy's own theme variables and
- *  (b) a handful of `--sumi-*` helper variables consumed by the visual
- *  detail rules further down, so those rules adapt to light/dark for free.
- * ------------------------------------------------------------------------- */
+  /* geometry */
+  --fj-radius: 10px;
+  --fj-radius-lg: 16px;
+  --fj-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --fj-ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
-@mixin sumi-dark {
-  /* --- Sumi & Shu semantic tokens (dark) ------------------------------- */
-  --sumi-ink:       #16130f;   /* 墨  sumi   — ink ground   */
-  --sumi-washi:     #e8dcc8;   /* 和紙 washi  — warm paper   */
-  --sumi-shu:       #d1362f;   /* 朱  shu    — vermillion   */
-  --sumi-shu-link:  #e24d43;   /* brightened vermillion, 4.74:1 on ink (AA) */
-  --sumi-kin:       #d8b24a;   /* 金  kin    — gold leaf    */
-  --sumi-ai:        #3a5a78;   /* 藍  ai     — indigo        */
-  --sumi-seal-fg:   #f0e6d2;   /* glyph colour inside the hanko seal */
-  --sumi-enso-ink:  rgb(232 220 200 / 55%);
-  --sumi-brush:     rgb(222 71 62 / 55%);   /* link brush-underline   */
-  --sumi-brush-hi:  rgb(216 178 74 / 92%);  /* gold ink-bleed on hover */
-  --sumi-rule:      rgb(222 71 62 / 60%);   /* vermillion accent rule  */
-  /* faint seigaiha (青海波) wave texture, gold ink, ~6% opacity */
-  --sumi-wave: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='72'%20height='36'%20viewBox='0%200%2072%2036'%3E%3Cg%20fill='none'%20stroke='%23d8b24a'%20stroke-opacity='0.06'%20stroke-width='1.2'%3E%3Ccircle%20cx='36'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='36'/%3E%3C/g%3E%3C/svg%3E");
+  /* reusable textures (subtle, GPU-cheap) */
+  --fj-wood-grain: repeating-linear-gradient(
+      92deg,
+      rgb(0 0 0 / 13%) 0 1px,
+      transparent 1px 4px,
+      rgb(255 255 255 / 2%) 4px 5px,
+      transparent 5px 9px
+    );
+  --fj-paper-grain: repeating-linear-gradient(
+      0deg,
+      rgb(0 0 0 / 2.5%) 0 1px,
+      transparent 1px 3px
+    );
 
-  /* --- Chirpy framework variables (dark) ------------------------------- */
-  --main-bg:                    #16130f;
-  --mask-bg:                    #2a241c;
-  --main-border-color:          #2a241c;
-
-  --text-color:                 #e8dcc8;
-  --text-muted-color:           #a89a83;
-  --text-muted-highlight-color: #d8c9ad;
-  --heading-color:              #f0e6d2;
-  --label-color:                #b8ab93;
-  --blockquote-border-color:    #3a5a78;
-  --blockquote-text-color:      #b8ab93;
-  --link-color:                 #e24d43;
-  --link-underline-color:       #6b3a34;
-  --button-bg:                  #1e1a14;
-  --btn-border-color:           #2e281f;
-  --btn-backtotop-color:        #e24d43;
-  --btn-backtotop-border-color: #2e281f;
-  --card-header-bg:             #211c15;
-  --checkbox-color:             #6b5f4d;
-  --checkbox-checked-color:     #e24d43;
-  --img-bg:                     radial-gradient(circle, rgb(30 26 20) 0%, rgb(22 19 15) 100%);
-  --shimmer-bg:                 linear-gradient(90deg, rgb(255 255 255 / 0%) 0%, rgb(201 162 39 / 12%) 50%, rgb(255 255 255 / 0%) 100%);
-
-  /* Sidebar */
-  --site-title-color:      #e8dcc8;
-  --site-subtitle-color:   #a89a83;
-  --sidebar-bg:            #12100c;
-  --sidebar-border-color:  #2a241c;
-  --sidebar-muted-color:   #a89a83;
-  --sidebar-active-color:  #d8b24a;
-  --sidebar-hover-bg:      rgb(201 162 39 / 12%);
-  --sidebar-btn-bg:        #1c1813;
-  --sidebar-btn-color:     #a89a83;
-  --avatar-border-color:   #c9a227;
-
-  /* Topbar */
-  --topbar-bg:                rgb(22 19 15 / 80%);
-  --topbar-text-color:        #e8dcc8;
-  --search-border-color:      #2e281f;
-  --search-icon-color:        #7a6f5c;
-  --input-focus-border-color: #c9a227;
-
-  /* Home / paginator */
-  --post-list-text-color:      #b8ab93;
-  --btn-patinator-text-color:  #b8ab93;
-  --btn-paginator-hover-color: #241f18;
-
-  /* Posts */
-  --toc-highlight:        #e24d43;
-  --toc-popup-border-color: #2e281f;
-  --btn-share-color:      #a89a83;
-  --btn-share-hover-color: #e24d43;
-  --card-bg:              #1c1813;
-  --card-hover-bg:        #241f18;
-  --card-shadow:          rgb(0 0 0 / 50%) 0 4px 14px 0, rgb(201 162 39 / 8%) 0 0 0 1px;
-  --footnote-target-bg:   rgb(58 90 120 / 35%);
-  --tb-odd-bg:            #1c1813;
-  --tb-even-bg:           #16130f;
-  --tb-border-color:      #2a241c;
-  --dash-color:           #3a332a;
-  --kbd-wrap-color:       #6b5f4d;
-  --kbd-text-color:       #e8dcc8;
-  --kbd-bg-color:         #241f18;
-  --prompt-text-color:    rgb(232 220 200 / 85%);
-  --prompt-tip-bg:        rgb(120 150 90 / 13%);
-  --prompt-tip-icon-color: #8faa5f;
-  --prompt-info-bg:       rgb(58 90 120 / 20%);
-  --prompt-info-icon-color: #6f9fce;
-  --prompt-warning-bg:    rgb(201 162 39 / 15%);
-  --prompt-warning-icon-color: #d8b24a;
-  --prompt-danger-bg:     rgb(209 54 47 / 16%);
-  --prompt-danger-icon-color: #e5514a;
-
-  /* Tags */
-  --tag-border:     #3a332a;
-  --tag-shadow:     #16130f;
-  --tag-hover:      rgb(201 162 39 / 14%);
-  --search-tag-bg:  #1c1813;
-
-  /* Categories */
-  --categories-border:           rgb(201 162 39 / 18%);
-  --categories-hover-bg:         #241f18;
-  --categories-icon-hover-color: #d8b24a;
-
-  /* Archive timeline */
-  --timeline-color:          #2e281f;
-  --timeline-node-bg:        #6b5f4d;
-  --timeline-year-dot-color: #d1362f;
-
-  /* Code frame (tokens left at theme defaults for readability) */
-  --language-border-color:  #2a241c;
-  --highlight-bg-color:     #12100c;
-  --highlighter-rouge-color: #c9def1;
-  --highlight-lineno-color: #6b5f4d;
-  --inline-code-bg:         rgb(201 162 39 / 10%);
-  --code-color:             #e8dcc8;
-  --code-header-text-color: #a89a83;
-  --code-header-muted-color: #2e281f;
-  --code-header-icon-color: #7a6f5c;
-  --clipboard-checked-color: #8faa5f;
-  --filepath-text-color:    #d8c9ad;
+  /* motion duration knobs (overridden to 0 under reduced-motion) */
+  --fj-fog-speed: 90s;
+  --fj-leaf-speed: 14s;
 }
 
-@mixin sumi-light {
-  /* --- Sumi & Shu semantic tokens (light) ------------------------------ */
-  --sumi-ink:       #201a14;
-  --sumi-washi:     #f3ead6;
-  --sumi-shu:       #b23a34;
-  --sumi-shu-link:  #b23a34;
-  --sumi-kin:       #a67c00;
-  --sumi-ai:        #2b4a63;
-  --sumi-seal-fg:   #f3ead6;
-  --sumi-enso-ink:  rgb(32 26 20 / 50%);
-  --sumi-brush:     rgb(178 58 52 / 42%);
-  --sumi-brush-hi:  rgb(166 124 0 / 85%);
-  --sumi-rule:      rgb(178 58 52 / 55%);
-  /* faint seigaiha wave texture, sumi ink, ~5% opacity */
-  --sumi-wave: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='72'%20height='36'%20viewBox='0%200%2072%2036'%3E%3Cg%20fill='none'%20stroke='%23201a14'%20stroke-opacity='0.05'%20stroke-width='1.2'%3E%3Ccircle%20cx='36'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='36'/%3E%3C/g%3E%3C/svg%3E");
+/* ========================================================================= *
+ *  2. MIDNIGHT PALETTE  (dark — the primary experience)
+ * ========================================================================= */
+@mixin fj-dark {
+  color-scheme: dark;
 
-  /* --- Chirpy framework variables (light) ------------------------------ */
-  --main-bg:                    #f3ead6;
-  --mask-bg:                    #cbbd9e;
-  --main-border-color:          #e0d3b8;
+  /* atmosphere / layer colours consumed by feudal.js SVG silhouettes */
+  --fj-sky-top: #0b0912;
+  --fj-sky-bottom: #09080d;
+  --fj-moon: #cfc6ef;
+  --fj-moon-glow: rgb(167 139 250 / 22%);
+  --fj-fog: rgb(167 139 250 / 5%);
+  --fj-mountain: #0f0d17;
+  --fj-mountain-far: #0c0a13;
+  --fj-house: #0a0810;
+  --fj-bamboo: #10131a;
+  --fj-torii: #17101f;
+  --fj-torii-edge: rgb(139 92 246 / 30%);
+  --fj-leaf: rgb(167 139 250 / 45%);
+  --fj-ember: rgb(167 139 250 / 55%);
+  --fj-wood: #17131f;
+  --fj-wood-2: #1d1727;
+  --fj-lacquer: #0a0910;
+  --fj-seal: #7c2d3a; /* wax-seal red-brown for tags */
+  --fj-seal-ink: #e7c9cf;
 
-  --text-color:                 #201a14;
-  --text-muted-color:           #6b5d47;
-  --text-muted-highlight-color: #201a14;
-  --heading-color:              #1a140e;
-  --label-color:                #5c4f3a;
-  --blockquote-border-color:    #2b4a63;
-  --blockquote-text-color:      #6b5d47;
-  --link-color:                 #b23a34;
-  --link-underline-color:       #d8b9a0;
-  --button-bg:                  #efe4cd;
-  --btn-border-color:           #ddd0b4;
-  --btn-backtotop-color:        #b23a34;
-  --btn-backtotop-border-color: #ddd0b4;
-  --checkbox-color:             #b0a284;
-  --checkbox-checked-color:     #b23a34;
-  --img-bg:                     radial-gradient(circle, rgb(247 239 221) 0%, rgb(236 224 198) 100%);
-  --shimmer-bg:                 linear-gradient(90deg, rgb(255 255 255 / 0%) 0%, rgb(166 124 0 / 12%) 50%, rgb(255 255 255 / 0%) 100%);
+  /* ---- Chirpy framework variables ---- */
+  --main-bg: #09080d;
+  --mask-bg: #050409;
+  --main-border-color: rgb(167 139 250 / 12%);
 
-  /* Sidebar */
-  --site-title-color:     #201a14;
-  --site-subtitle-color:  #6b5d47;
-  --sidebar-bg:           #ece0c6;
-  --sidebar-border-color: #ddd0b4;
-  --sidebar-muted-color:  #5c4f3a;
-  --sidebar-active-color: #b23a34;
-  --sidebar-hover-bg:     rgb(166 124 0 / 12%);
-  --sidebar-btn-bg:       #f3ead6;
-  --sidebar-btn-color:    #6b5d47;
-  --avatar-border-color:  #a67c00;
+  --text-color: #e8e3f7;
+  --text-muted-color: #c4b5fd;
+  --text-muted-highlight-color: #dcd2ff;
+  --heading-color: #f5f3ff;
+  --label-color: #b9a8ee;
+  --blockquote-border-color: var(--fj-purple-deep);
+  --blockquote-text-color: #c4b5fd;
+  --link-color: #a78bfa;
+  --link-underline-color: rgb(139 92 246 / 45%);
+  --button-bg: #17131f;
+  --btn-border-color: rgb(167 139 250 / 16%);
+  --btn-backtotop-color: #a78bfa;
+  --btn-backtotop-border-color: rgb(167 139 250 / 22%);
+  --card-header-bg: #16121e;
+  --checkbox-color: #6b5f86;
+  --checkbox-checked-color: #a78bfa;
+  --img-bg: radial-gradient(circle, rgb(20 17 28) 0%, rgb(9 8 13) 100%);
+  --shimmer-bg: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0%) 0%,
+    rgb(139 92 246 / 12%) 50%,
+    rgb(255 255 255 / 0%) 100%
+  );
+
+  /* Sidebar (temple) */
+  --site-title-color: #f5f3ff;
+  --site-subtitle-color: #c4b5fd;
+  --sidebar-bg: linear-gradient(180deg, #0d0a14 0%, #0a0810 100%);
+  --sidebar-border-color: rgb(167 139 250 / 12%);
+  --sidebar-muted-color: #b6a7e0;
+  --sidebar-active-color: #f5f3ff;
+  --sidebar-hover-bg: rgb(139 92 246 / 12%);
+  --sidebar-btn-bg: rgb(167 139 250 / 6%);
+  --sidebar-btn-color: #c4b5fd;
+  --avatar-border-color: rgb(167 139 250 / 55%);
 
   /* Topbar */
-  --topbar-bg:                rgb(243 234 214 / 82%);
-  --topbar-text-color:        #201a14;
-  --search-border-color:      #ddd0b4;
-  --search-icon-color:        #9a8a6c;
-  --input-focus-border-color: #a67c00;
+  --topbar-bg: rgb(9 8 13 / 72%);
+  --topbar-text-color: #e8e3f7;
+  --search-border-color: rgb(167 139 250 / 14%);
+  --search-icon-color: #8b7db3;
+  --input-focus-border-color: #8b5cf6;
 
   /* Home / paginator */
-  --post-list-text-color:      #4a4030;
-  --btn-patinator-text-color:  #4a4030;
-  --btn-paginator-hover-color: #ece0c6;
+  --post-list-text-color: #b8abd8;
+  --btn-patinator-text-color: #c4b5fd;
+  --btn-paginator-hover-color: #1a1524;
 
   /* Posts */
-  --toc-highlight:         #b23a34;
-  --toc-popup-border-color: #cbbd9e;
-  --btn-share-color:       #6b5d47;
-  --btn-share-hover-color: #b23a34;
-  --card-bg:               #f7efdd;
-  --card-hover-bg:         #f9f3e4;
-  --card-shadow:           rgb(90 70 30 / 10%) 0 2px 8px 0, rgb(166 124 0 / 14%) 0 0 0 1px;
-  --footnote-target-bg:    #e7ddc5;
-  --tb-odd-bg:             #efe4cd;
-  --tb-border-color:       #ddd0b4;
-  --dash-color:            #cbbd9e;
-  --kbd-wrap-color:        #b0a284;
-  --kbd-text-color:        #201a14;
-  --kbd-bg-color:          #f7efdd;
-  --prompt-text-color:     rgb(32 26 20 / 85%);
-  --prompt-tip-bg:         rgb(120 150 90 / 18%);
-  --prompt-tip-icon-color: #5f7a3a;
-  --prompt-info-bg:        rgb(43 74 99 / 14%);
-  --prompt-info-icon-color: #2b4a63;
-  --prompt-warning-bg:     rgb(166 124 0 / 16%);
-  --prompt-warning-icon-color: #a67c00;
-  --prompt-danger-bg:      rgb(178 58 52 / 14%);
+  --toc-highlight: #a78bfa;
+  --toc-popup-border-color: rgb(167 139 250 / 16%);
+  --btn-share-color: #b6a7e0;
+  --btn-share-hover-color: #a78bfa;
+  --card-bg: #141019;
+  --card-hover-bg: #1a1524;
+  --card-shadow: rgb(0 0 0 / 66%) 0 6px 20px 0, rgb(139 92 246 / 8%) 0 0 0 1px;
+  --footnote-target-bg: rgb(109 40 217 / 32%);
+  --tb-odd-bg: #131019;
+  --tb-even-bg: #0d0b12;
+  --tb-border-color: rgb(167 139 250 / 12%);
+  --dash-color: rgb(167 139 250 / 22%);
+  --kbd-wrap-color: #9d8fc9;
+  --kbd-text-color: #f5f3ff;
+  --kbd-bg-color: #1c1727;
+  --prompt-text-color: rgb(232 227 247 / 88%);
+  --prompt-tip-bg: rgb(46 92 74 / 32%);
+  --prompt-tip-icon-color: #57b98a;
+  --prompt-info-bg: rgb(109 40 217 / 26%);
+  --prompt-info-icon-color: #a78bfa;
+  --prompt-warning-bg: rgb(120 92 20 / 30%);
+  --prompt-warning-icon-color: #d8b24a;
+  --prompt-danger-bg: rgb(120 30 40 / 32%);
+  --prompt-danger-icon-color: #e06c78;
+
+  /* Tags */
+  --tag-border: rgb(167 139 250 / 18%);
+  --tag-shadow: #0a0810;
+  --tag-hover: rgb(139 92 246 / 20%);
+  --search-tag-bg: #16121e;
+
+  /* Categories */
+  --categories-border: rgb(167 139 250 / 16%);
+  --categories-hover-bg: #1a1524;
+  --categories-icon-hover-color: #a78bfa;
+
+  /* Archive timeline */
+  --timeline-color: rgb(167 139 250 / 16%);
+  --timeline-node-bg: #8b5cf6;
+  --timeline-year-dot-color: #a78bfa;
+
+  /* Code (frame; tokens retuned separately) */
+  --language-border-color: rgb(167 139 250 / 14%);
+  --highlight-bg-color: #0a0910;
+  --highlighter-rouge-color: #c4b5fd;
+  --highlight-lineno-color: #6f6390;
+  --inline-code-bg: rgb(139 92 246 / 13%);
+  --code-color: #e5dcff;
+  --code-header-text-color: #9d8fc9;
+  --code-header-muted-color: rgb(167 139 250 / 18%);
+  --code-header-icon-color: #8b7db3;
+  --clipboard-checked-color: #57b98a;
+  --filepath-text-color: #d8ccff;
+}
+
+/* ========================================================================= *
+ *  3. DAWN PALETTE  (light — a misty daytime version of the same village)
+ * ========================================================================= */
+@mixin fj-light {
+  color-scheme: light;
+
+  --fj-sky-top: #d9d3e6;
+  --fj-sky-bottom: #ece7db;
+  --fj-moon: #f3eec6;
+  --fj-moon-glow: rgb(180 150 90 / 20%);
+  --fj-fog: rgb(90 70 120 / 5%);
+  --fj-mountain: #b7aec9;
+  --fj-mountain-far: #cbc3d6;
+  --fj-house: #9c93ad;
+  --fj-bamboo: #a9b09c;
+  --fj-torii: #7a5b6a;
+  --fj-torii-edge: rgb(109 40 217 / 30%);
+  --fj-leaf: rgb(122 91 106 / 40%);
+  --fj-ember: rgb(109 40 217 / 30%);
+  --fj-wood: #e6dfcd;
+  --fj-wood-2: #ded5c0;
+  --fj-lacquer: #efe7f7; /* not used much in light; code stays dark below */
+  --fj-seal: #8a3b46;
+  --fj-seal-ink: #f6e7e9;
+
+  --main-bg: #ece7db;
+  --mask-bg: #c9c2d2;
+  --main-border-color: rgb(109 40 217 / 16%);
+
+  --text-color: #262030;
+  --text-muted-color: #5b5170;
+  --text-muted-highlight-color: #262030;
+  --heading-color: #1c1726;
+  --label-color: #4a4160;
+  --blockquote-border-color: var(--fj-purple-deep);
+  --blockquote-text-color: #5b5170;
+  --link-color: #6d28d9;
+  --link-underline-color: rgb(109 40 217 / 30%);
+  --button-bg: #e6dfcd;
+  --btn-border-color: rgb(109 40 217 / 18%);
+  --btn-backtotop-color: #6d28d9;
+  --btn-backtotop-border-color: rgb(109 40 217 / 20%);
+  --checkbox-color: #a99fc0;
+  --checkbox-checked-color: #6d28d9;
+  --img-bg: radial-gradient(circle, rgb(240 236 226) 0%, rgb(228 222 208) 100%);
+  --shimmer-bg: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0%) 0%,
+    rgb(109 40 217 / 12%) 50%,
+    rgb(255 255 255 / 0%) 100%
+  );
+
+  --site-title-color: #1c1726;
+  --site-subtitle-color: #5b5170;
+  --sidebar-bg: linear-gradient(180deg, #e4ddc9 0%, #dcd4bf 100%);
+  --sidebar-border-color: rgb(109 40 217 / 14%);
+  --sidebar-muted-color: #4a4160;
+  --sidebar-active-color: #6d28d9;
+  --sidebar-hover-bg: rgb(109 40 217 / 10%);
+  --sidebar-btn-bg: rgb(109 40 217 / 6%);
+  --sidebar-btn-color: #5b5170;
+  --avatar-border-color: rgb(109 40 217 / 45%);
+
+  --topbar-bg: rgb(236 231 219 / 82%);
+  --topbar-text-color: #262030;
+  --search-border-color: rgb(109 40 217 / 16%);
+  --search-icon-color: #8a7fa3;
+  --input-focus-border-color: #6d28d9;
+
+  --post-list-text-color: #4a4160;
+  --btn-patinator-text-color: #5b5170;
+  --btn-paginator-hover-color: #e0d8c5;
+
+  --toc-highlight: #6d28d9;
+  --toc-popup-border-color: rgb(109 40 217 / 18%);
+  --btn-share-color: #5b5170;
+  --btn-share-hover-color: #6d28d9;
+  --card-bg: #ece5d4;
+  --card-hover-bg: #f1ecdd;
+  --card-shadow: rgb(90 70 40 / 12%) 0 4px 14px 0, rgb(109 40 217 / 10%) 0 0 0 1px;
+  --footnote-target-bg: #e3d9c4;
+  --tb-odd-bg: #e6dfcd;
+  --tb-border-color: rgb(109 40 217 / 14%);
+  --dash-color: rgb(109 40 217 / 22%);
+  --kbd-wrap-color: #a99fc0;
+  --kbd-text-color: #262030;
+  --kbd-bg-color: #efe9db;
+  --prompt-text-color: rgb(38 32 48 / 88%);
+  --prompt-tip-bg: rgb(70 130 100 / 20%);
+  --prompt-tip-icon-color: #2f7a55;
+  --prompt-info-bg: rgb(109 40 217 / 14%);
+  --prompt-info-icon-color: #6d28d9;
+  --prompt-warning-bg: rgb(180 140 40 / 20%);
+  --prompt-warning-icon-color: #9a7b0f;
+  --prompt-danger-bg: rgb(178 58 52 / 16%);
   --prompt-danger-icon-color: #b23a34;
 
-  /* Tags */
-  --tag-border:    #ddd0b4;
-  --tag-shadow:    #ddd0b4;
-  --tag-hover:     rgb(166 124 0 / 16%);
-  --search-tag-bg: #efe4cd;
+  --tag-border: rgb(109 40 217 / 20%);
+  --tag-shadow: #ded5c0;
+  --tag-hover: rgb(109 40 217 / 16%);
+  --search-tag-bg: #e6dfcd;
 
-  /* Categories */
-  --categories-border:           rgb(90 70 30 / 18%);
-  --categories-hover-bg:         #efe4cd;
-  --categories-icon-hover-color: #b23a34;
+  --categories-border: rgb(109 40 217 / 16%);
+  --categories-hover-bg: #e6dfcd;
+  --categories-icon-hover-color: #6d28d9;
 
-  /* Archive timeline */
-  --timeline-color:          #ddd0b4;
-  --timeline-node-bg:        #b0a284;
-  --timeline-year-dot-color: #b23a34;
+  --timeline-color: rgb(109 40 217 / 18%);
+  --timeline-node-bg: #a99fc0;
+  --timeline-year-dot-color: #6d28d9;
 
-  /* Code frame (tokens left at theme defaults for readability) */
-  --language-border-color:  #e0d3b8;
-  --highlight-bg-color:     #f2ead4;
-  --highlighter-rouge-color: #7a3b1e;
-  --highlight-lineno-color: #9a8a6c;
-  --inline-code-bg:         rgb(166 124 0 / 12%);
-  --code-color:             #2e2519;
-  --code-header-text-color: #8a7a5c;
-  --code-header-muted-color: #ddd0b4;
-  --code-header-icon-color: #9a8a6c;
-  --clipboard-checked-color: #5f7a3a;
+  /* Code stays a dark lacquer box even in light mode (premium, high-contrast) */
+  --language-border-color: rgb(109 40 217 / 16%);
+  --highlight-bg-color: #14111c;
+  --highlighter-rouge-color: #6d28d9;
+  --highlight-lineno-color: #6f6390;
+  --inline-code-bg: rgb(109 40 217 / 12%);
+  --code-color: #e5dcff;
+  --code-header-text-color: #b6a7e0;
+  --code-header-muted-color: rgb(167 139 250 / 22%);
+  --code-header-icon-color: #b6a7e0;
+  --clipboard-checked-color: #57b98a;
 }
 
-/* Bind the palettes exactly the way Chirpy's _base.scss binds its own:
-   forced light, forced dark, and auto (system) via prefers-color-scheme. */
-:root[data-bs-theme='light'] { @include sumi-light; }
-:root[data-bs-theme='dark']  { @include sumi-dark; }
+/* ========================================================================= *
+ *  4. PALETTE BINDINGS  (mirror Chirpy's own light/dark/auto binding)
+ * ========================================================================= */
+:root[data-bs-theme='light'] { @include fj-light; }
+:root[data-bs-theme='dark']  { @include fj-dark; }
 :root:not([data-bs-theme]) {
-  @include sumi-light;
-  @media (prefers-color-scheme: dark) { @include sumi-dark; }
+  @include fj-dark; /* default to midnight when the system has no preference */
+  @media (prefers-color-scheme: light) { @include fj-light; }
 }
 
-/* -------------------------------------------------------------------------
- *  Typography — Japanese mincho headings, readable body, monospace code.
- *  Fonts loaded in _includes/metadata-hook.html. Chirpy sets fonts via SCSS
- *  `!default` vars we can't reach in the production bundle, so we target the
- *  concrete selectors; our rules come after the bundle and win.
- * ------------------------------------------------------------------------- */
+/* ========================================================================= *
+ *  5. BASE ATMOSPHERE + TYPOGRAPHY
+ * ========================================================================= */
+
+/* Immediate atmospheric ground so first paint is already the village night,
+   before feudal.js injects the rich parallax layers. */
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Zen Old Mincho', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
+  background-color: var(--fj-sky-bottom);
+  background-image:
+    radial-gradient(120% 80% at 78% -10%, var(--fj-moon-glow) 0%, transparent 42%),
+    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  letter-spacing: 0.005em;
 }
 
+/* Headings — historical mincho */
 h1, h2, h3, h4, h5, h6,
-.site-title,
-.post-title,
-#post-list .card-wrapper .post-preview h1 {
-  font-family: 'Shippori Mincho', 'Yu Mincho', 'Noto Serif JP', 'Times New Roman', serif;
+.post-title, .card-title, #post-list .card-title {
+  font-family: 'Shippori Mincho', 'Zen Old Mincho', Georgia, serif;
   letter-spacing: 0.01em;
 }
 
-/* Code must stay monospace and legible — frame only, never token colours. */
+/* Display / calligraphy — site title & hero */
+.site-title, #fj-hero .fj-hero-title {
+  font-family: 'Yuji Syuku', 'Shippori Mincho', serif;
+}
+
+/* Code — always monospace, legible */
 code, pre, kbd,
-.highlight, .highlighter-rouge,
-td.rouge-code, .code-header {
+.highlight, .highlighter-rouge, td.rouge-code, .code-header {
   font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Code',
-    'Source Code Pro', Consolas, 'Courier New', monospace;
+    'Source Code Pro', Consolas, monospace;
 }
 
-/* =========================================================================
- *  VISUAL DETAILS  —  sumi-e / shinobi flourishes (pure CSS + inline SVG)
- * ========================================================================= */
-
-/* Per-mode kamon (家紋) crest data-URIs for the footer signature.
-   CSS vars can't be interpolated into a url() string, so bind statically. */
-:root[data-bs-theme='light'],
-:root:not([data-bs-theme]) {
-  --sumi-kamon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Ccircle%20cx='12'%20cy='12'%20r='10.5'%20fill='none'%20stroke='%23201a14'%20stroke-width='1.3'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='3.2'%20fill='%23b23a34'/%3E%3Cg%20stroke='%23201a14'%20stroke-width='1.1'%3E%3Cline%20x1='12'%20y1='1.5'%20x2='12'%20y2='6'/%3E%3Cline%20x1='12'%20y1='18'%20x2='12'%20y2='22.5'/%3E%3Cline%20x1='1.5'%20y1='12'%20x2='6'%20y2='12'/%3E%3Cline%20x1='18'%20y1='12'%20x2='22.5'%20y2='12'/%3E%3C/g%3E%3C/svg%3E");
+/* Gentle page fade-in (respects reduced-motion via the query at file end) */
+@keyframes fj-page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
 }
-:root[data-bs-theme='dark'] {
-  --sumi-kamon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Ccircle%20cx='12'%20cy='12'%20r='10.5'%20fill='none'%20stroke='%23d8b24a'%20stroke-width='1.3'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='3.2'%20fill='%23d1362f'/%3E%3Cg%20stroke='%23d8b24a'%20stroke-width='1.1'%3E%3Cline%20x1='12'%20y1='1.5'%20x2='12'%20y2='6'/%3E%3Cline%20x1='12'%20y1='18'%20x2='12'%20y2='22.5'/%3E%3Cline%20x1='1.5'%20y1='12'%20x2='6'%20y2='12'/%3E%3Cline%20x1='18'%20y1='12'%20x2='22.5'%20y2='12'/%3E%3C/g%3E%3C/svg%3E");
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-bs-theme]) {
-    --sumi-kamon: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Ccircle%20cx='12'%20cy='12'%20r='10.5'%20fill='none'%20stroke='%23d8b24a'%20stroke-width='1.3'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='3.2'%20fill='%23d1362f'/%3E%3Cg%20stroke='%23d8b24a'%20stroke-width='1.1'%3E%3Cline%20x1='12'%20y1='1.5'%20x2='12'%20y2='6'/%3E%3Cline%20x1='12'%20y1='18'%20x2='12'%20y2='22.5'/%3E%3Cline%20x1='1.5'%20y1='12'%20x2='6'%20y2='12'/%3E%3Cline%20x1='18'%20y1='12'%20x2='22.5'%20y2='12'/%3E%3C/g%3E%3C/svg%3E");
-  }
-}
-
-/* --- Seigaiha (青海波) wave texture on the sidebar ----------------------- */
-#sidebar {
-  background-image: var(--sumi-wave);
-  background-repeat: repeat;
-  background-position: top center;
-}
-
-/* --- Enso (円相) ink ring around the avatar ----------------------------- */
-/* #avatar is <a> with overflow:hidden clipping the img to a circle, so the
-   ring is drawn with layered box-shadows (rendered outside the clip). */
-#avatar {
-  border: 0;
-  box-shadow:
-    0 0 0 3px var(--sidebar-bg),
-    0 0 0 4px var(--sumi-enso-ink),
-    0 0 0 6px rgb(201 162 39 / 32%),
-    0 2px 10px rgb(0 0 0 / 25%);
-  transition: box-shadow 0.3s ease;
-}
-#avatar:hover {
-  box-shadow:
-    0 0 0 3px var(--sidebar-bg),
-    0 0 0 4px var(--sumi-shu),
-    0 0 0 6px rgb(201 162 39 / 50%),
-    0 2px 12px rgb(0 0 0 / 30%);
-}
-
-/* --- Hanko (判子) vermillion seal beside the site title ------------------ */
-.site-title {
-  position: relative;
-}
-.site-title::after {
-  content: '忍'; /* shinobi — endurance / stealth */
-  display: inline-block;
-  margin-left: 0.4em;
-  padding: 0.1em 0.18em 0.04em;
-  font-family: 'Shippori Mincho', serif;
-  font-size: 0.4em;
-  font-weight: 700;
-  line-height: 1;
-  vertical-align: middle;
-  color: var(--sumi-seal-fg);
-  background: var(--sumi-shu);
-  border-radius: 3px;
-  transform: rotate(-4deg) translateY(-0.18em);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
-}
-
-/* --- Link hover: soft brush-underline / ink-bleed (post content) --------- */
-.content a:not(.anchor):not(.img-link):not(.tag) {
-  text-decoration: none;
-  border-bottom: 0;
-  background-image: linear-gradient(var(--sumi-brush), var(--sumi-brush));
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 100% 0.09em;
-  padding-bottom: 0.02em;
-  transition: background-size 0.25s ease, background-position 0.25s ease;
-}
-.content a:not(.anchor):not(.img-link):not(.tag):hover {
-  background-image: linear-gradient(var(--sumi-brush-hi), var(--sumi-brush-hi));
-  background-size: 100% 0.42em; /* ink bleeds upward */
-  background-position: 0 90%;
-}
-
-/* --- Vermillion accent rules & section marks ---------------------------- */
-#topbar-wrapper {
-  border-bottom: 1px solid var(--sumi-rule);
-}
-.content hr {
-  height: 2px;
-  border: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--sumi-rule) 15%,
-    var(--sumi-rule) 85%,
-    transparent
-  );
-}
-.content h2 {
-  padding-left: 0.6rem;
-  border-left: 3px solid var(--sumi-rule);
-}
-
-/* --- Callout / prompt boxes: clean washi-card frames -------------------- */
-blockquote[class^='prompt-'] {
-  border: 1px solid var(--main-border-color);
-  border-left-width: 4px;
-  border-radius: 2px;
-}
-.prompt-tip     { border-left-color: var(--prompt-tip-icon-color); }
-.prompt-info    { border-left-color: var(--prompt-info-icon-color); }
-.prompt-warning { border-left-color: var(--prompt-warning-icon-color); }
-.prompt-danger  { border-left-color: var(--prompt-danger-icon-color); }
-
-/* --- Enso "back to top" button ------------------------------------------ */
-#back-to-top {
-  color: var(--sumi-shu);
-  background: var(--button-bg);
-  border: 1.5px solid var(--sumi-kin);
-  box-shadow: 0 0 0 3px rgb(201 162 39 / 18%), 0 2px 8px rgb(0 0 0 / 25%);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, color 0.2s ease;
-}
-#back-to-top:hover {
-  color: var(--sumi-kin);
-  transform: translateY(-2px) rotate(-6deg);
-  box-shadow: 0 0 0 3px rgb(209 54 47 / 22%), 0 4px 12px rgb(0 0 0 / 30%);
-}
-
-/* --- Footer kamon (家紋) signature -------------------------------------- */
-/* Absolutely positioned so it centres above the footer in both the mobile
-   (flex-column) and desktop (flex-lg-row, justify-between) layouts without
-   becoming a stray flex item. */
-footer {
-  position: relative;
-  padding-top: 2.3rem;
-}
-footer::before {
-  content: '';
-  position: absolute;
-  top: 0.3rem;
-  left: 50%;
-  width: 24px;
-  height: 24px;
-  transform: translateX(-50%);
-  background: var(--sumi-kamon) center / contain no-repeat;
-  opacity: 0.85;
-  pointer-events: none;
-}
-
+#main-wrapper { animation: fj-page-in 0.7s var(--fj-ease-slow) both; }
