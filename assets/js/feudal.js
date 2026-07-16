@@ -71,25 +71,45 @@
       '</g></svg>';
     bg.appendChild(scene);
 
+    // Layer 8b — warm lantern halos flanking the village
+    var lpos = [[18, 24], [80, 20], [40, 30]];
+    lpos.forEach(function (p, i) {
+      var lan = el('div', 'fj-lantern');
+      lan.style.left = p[0] + '%';
+      lan.style.bottom = p[1] + 'vh';
+      lan.style.setProperty('--fj-flicker-dur', (4.5 + i * 1.3).toFixed(1) + 's');
+      lan.style.setProperty('--fj-leaf-delay', '-' + (i * 1.9).toFixed(1) + 's');
+      bg.appendChild(lan);
+    });
+
     document.body.insertBefore(bg, document.body.firstChild);
 
     if (!REDUCE) buildFalling(bg);
   }
 
-  // Drifting leaves + a few floating embers (pure-CSS animation once created)
+  // Drifting sakura petals + gold leaves + a few fireflies (pure-CSS once made)
   function buildFalling(bg) {
     var narrow = window.innerWidth < 760;
-    var leaves = narrow ? 6 : 12;
-    var embers = narrow ? 3 : 6;
+    var petals = narrow ? 6 : 11;
+    var leaves = narrow ? 3 : 6;
+    var embers = narrow ? 3 : 5;
     var i, n;
     var frag = document.createDocumentFragment();
+    for (i = 0; i < petals; i++) {
+      n = el('div', 'fj-petal');
+      n.style.left = (Math.round((i / petals) * 100) + (i % 3) * 3) + '%';
+      n.style.setProperty('--fj-leaf-dur', (14 + (i % 7) * 1.8).toFixed(1) + 's');
+      n.style.setProperty('--fj-leaf-delay', '-' + (i * 2.1).toFixed(1) + 's');
+      n.style.opacity = 0.55 + (i % 3) * 0.12;
+      frag.appendChild(n);
+    }
     for (i = 0; i < leaves; i++) {
       n = el('div', 'fj-leaf');
-      n.style.left = (Math.round((i / leaves) * 100) + (i % 3) * 4) + '%';
-      n.style.setProperty('--fj-leaf-dur', (11 + (i % 7) * 1.6).toFixed(1) + 's');
-      n.style.setProperty('--fj-leaf-delay', '-' + (i * 1.7).toFixed(1) + 's');
-      n.style.setProperty('--fj-leaf-drift', (i % 2 ? 1 : -1) * (30 + (i % 5) * 18) + 'px');
-      n.style.opacity = 0.5 + (i % 3) * 0.12;
+      n.style.left = (6 + Math.round((i / leaves) * 90)) + '%';
+      n.style.setProperty('--fj-leaf-dur', (12 + (i % 5) * 1.7).toFixed(1) + 's');
+      n.style.setProperty('--fj-leaf-delay', '-' + (i * 2.6).toFixed(1) + 's');
+      n.style.setProperty('--fj-leaf-drift', (i % 2 ? 1 : -1) * (34 + (i % 5) * 16) + 'px');
+      n.style.opacity = 0.45 + (i % 3) * 0.12;
       frag.appendChild(n);
     }
     for (i = 0; i < embers; i++) {
@@ -122,8 +142,9 @@
     window.addEventListener('mousemove', move, { passive: true });
     document.addEventListener('mouseleave', function () { glow.style.opacity = '0'; shown = false; });
 
-    // click particles
+    // click particles — a small burst of lavender / sakura / gold motes
     var live = 0;
+    var hues = ['var(--fj-purple-soft)', 'var(--fj-sakura)', 'var(--fj-gold)'];
     window.addEventListener('pointerdown', function (e) {
       if (live > 40) return;
       var count = 8, i, p, ang, dist;
@@ -131,6 +152,7 @@
         p = el('div', 'fj-particle');
         p.style.left = e.clientX + 'px';
         p.style.top = e.clientY + 'px';
+        p.style.background = hues[i % hues.length];
         document.body.appendChild(p);
         live++;
         ang = (Math.PI * 2 * i) / count + Math.random() * 0.5;

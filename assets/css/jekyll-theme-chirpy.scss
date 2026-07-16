@@ -857,6 +857,41 @@ figure.highlight:hover {
   100% { transform: translate3d(var(--fj-leaf-drift, -30px), -70vh, 0); opacity: 0; }
 }
 
+/* Sakura petals — drift down while swaying side to side */
+.fj-petal {
+  top: -6vh;
+  width: 9px;
+  height: 9px;
+  background: var(--fj-petal);
+  border-radius: 100% 0 100% 0;
+  will-change: transform, opacity;
+  animation: fj-petal-fall var(--fj-leaf-dur, 17s) ease-in-out var(--fj-leaf-delay, 0s) infinite;
+}
+@keyframes fj-petal-fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.9; }
+  30%  { transform: translate3d(26px, 32vh, 0) rotate(120deg); }
+  60%  { transform: translate3d(-20px, 64vh, 0) rotate(220deg); }
+  90%  { opacity: 0.9; }
+  100% { transform: translate3d(22px, 113vh, 0) rotate(380deg); opacity: 0; }
+}
+
+/* Lantern halos — warm, softly flickering glows near the village */
+.fj-lantern {
+  width: 96px;
+  height: 128px;
+  background: radial-gradient(circle at 50% 42%, var(--fj-lantern) 0%, transparent 60%);
+  filter: blur(3px);
+  will-change: opacity;
+  animation: fj-flicker var(--fj-flicker-dur, 5.5s) ease-in-out var(--fj-leaf-delay, 0s) infinite;
+}
+@keyframes fj-flicker {
+  0%, 100% { opacity: 0.72; }
+  42%      { opacity: 1; }
+  58%      { opacity: 0.58; }
+  72%      { opacity: 0.9; }
+}
+
 /* ========================================================================= *
  *  12. CUSTOM CURSOR + click particles
  * ========================================================================= */
