@@ -438,16 +438,23 @@ blockquote[class^='prompt-'] {
 }
 
 /* --- Footer kamon (家紋) signature -------------------------------------- */
+/* Absolutely positioned so it centres above the footer in both the mobile
+   (flex-column) and desktop (flex-lg-row, justify-between) layouts without
+   becoming a stray flex item. */
 footer {
   position: relative;
+  padding-top: 2.3rem;
 }
 footer::before {
   content: '';
-  display: block;
-  width: 26px;
-  height: 26px;
-  margin: 0 auto 0.7rem;
+  position: absolute;
+  top: 0.3rem;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translateX(-50%);
   background: var(--sumi-kamon) center / contain no-repeat;
   opacity: 0.85;
+  pointer-events: none;
 }
 
