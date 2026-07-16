@@ -32,16 +32,24 @@
  *  1. DESIGN TOKENS  (mode-independent)
  * ========================================================================= */
 :root {
-  /* purple scale — never neon */
-  --fj-purple: #8b5cf6;
-  --fj-purple-deep: #6d28d9;
-  --fj-purple-soft: #a78bfa;
-  --fj-glow: rgb(139 92 246 / 40%);
-  --fj-glow-strong: rgb(139 92 246 / 55%);
+  /* ---- accent palette — tasteful, never neon ------------------------------
+     Soft lavender is the primary voice; sakura / gold / bamboo / silver are
+     quiet complements used only for small, deliberate moments. */
+  --fj-purple: #a08adf;        /* soft lavender — primary accent */
+  --fj-purple-deep: #7361bd;   /* deeper lavender — rules, borders */
+  --fj-purple-soft: #c6b8f2;   /* pale lavender — text-on-dark accents */
+  --fj-sakura: #d7a0b3;        /* muted cherry-blossom pink */
+  --fj-gold: #cba86a;          /* muted gold — tiny details, hovers */
+  --fj-green: #93ac8c;         /* very subtle bamboo green */
+  --fj-silver: #c6cad4;        /* moonlight silver */
+  --fj-ivory: #ece5d6;         /* warm rice-paper ivory */
+  --fj-glow: rgb(160 138 223 / 34%);
+  --fj-glow-strong: rgb(160 138 223 / 50%);
+  --fj-gold-glow: rgb(203 168 106 / 34%);
 
   /* geometry */
-  --fj-radius: 10px;
-  --fj-radius-lg: 16px;
+  --fj-radius: 12px;
+  --fj-radius-lg: 18px;
   --fj-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --fj-ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
@@ -70,133 +78,136 @@
 @mixin fj-dark {
   color-scheme: dark;
 
-  /* atmosphere / layer colours consumed by feudal.js SVG silhouettes */
-  --fj-sky-top: #0b0912;
-  --fj-sky-bottom: #09080d;
-  --fj-moon: #cfc6ef;
-  --fj-moon-glow: rgb(167 139 250 / 22%);
-  --fj-fog: rgb(167 139 250 / 5%);
-  --fj-mountain: #0f0d17;
-  --fj-mountain-far: #0c0a13;
-  --fj-house: #0a0810;
-  --fj-bamboo: #10131a;
-  --fj-torii: #17101f;
-  --fj-torii-edge: rgb(139 92 246 / 30%);
-  --fj-leaf: rgb(167 139 250 / 45%);
-  --fj-ember: rgb(167 139 250 / 55%);
-  --fj-wood: #17131f;
-  --fj-wood-2: #1d1727;
-  --fj-lacquer: #0a0910;
-  --fj-seal: #7c2d3a; /* wax-seal red-brown for tags */
-  --fj-seal-ink: #e7c9cf;
+  /* atmosphere / layer colours consumed by feudal.js SVG silhouettes.
+     Warm dark greys — a moonlit garden, never pure black. */
+  --fj-sky-top: #1b1a22;
+  --fj-sky-bottom: #17161d;
+  --fj-moon: #e6e3ea;
+  --fj-moon-glow: rgb(206 202 224 / 16%);
+  --fj-fog: rgb(206 208 220 / 4%);
+  --fj-mountain: #1e1c27;
+  --fj-mountain-far: #1a1922;
+  --fj-house: #16141b;
+  --fj-bamboo: #191d1a;         /* silhouette bamboo (dark, faint green) */
+  --fj-torii: #211a22;
+  --fj-torii-edge: rgb(160 138 223 / 26%);
+  --fj-leaf: rgb(203 168 106 / 42%);   /* gold maple leaf */
+  --fj-ember: rgb(230 220 198 / 42%);  /* warm firefly */
+  --fj-petal: rgb(215 160 179 / 55%);  /* sakura petal */
+  --fj-lantern: rgb(203 168 106 / 26%);/* warm lantern halo */
+  --fj-wood: #221f2a;
+  --fj-wood-2: #2a2634;
+  --fj-lacquer: #141118;
+  --fj-seal: #7a3d48;          /* sakura-red wax seal for tags */
+  --fj-seal-ink: #ecd6da;
 
   /* ---- Chirpy framework variables ---- */
-  --main-bg: #09080d;
-  --mask-bg: #050409;
-  --main-border-color: rgb(167 139 250 / 12%);
+  --main-bg: #17161d;
+  --mask-bg: #0e0d12;
+  --main-border-color: rgb(198 190 224 / 12%);
 
-  --text-color: #e8e3f7;
-  --text-muted-color: #c4b5fd;
-  --text-muted-highlight-color: #dcd2ff;
-  --heading-color: #f5f3ff;
-  --label-color: #b9a8ee;
+  --text-color: #e7e1d3;                 /* warm ivory — easy on the eyes */
+  --text-muted-color: #b0aabf;           /* moonlight lavender-grey */
+  --text-muted-highlight-color: #d9d3e2;
+  --heading-color: #f4efe3;              /* brighter ivory */
+  --label-color: #c2b8dd;
   --blockquote-border-color: var(--fj-purple-deep);
-  --blockquote-text-color: #c4b5fd;
-  --link-color: #a78bfa;
-  --link-underline-color: rgb(139 92 246 / 45%);
-  --button-bg: #17131f;
-  --btn-border-color: rgb(167 139 250 / 16%);
-  --btn-backtotop-color: #a78bfa;
-  --btn-backtotop-border-color: rgb(167 139 250 / 22%);
-  --card-header-bg: #16121e;
-  --checkbox-color: #6b5f86;
-  --checkbox-checked-color: #a78bfa;
-  --img-bg: radial-gradient(circle, rgb(20 17 28) 0%, rgb(9 8 13) 100%);
+  --blockquote-text-color: #b8b1c6;
+  --link-color: #bcabf0;
+  --link-underline-color: rgb(160 138 223 / 42%);
+  --button-bg: #201d28;
+  --btn-border-color: rgb(198 190 224 / 16%);
+  --btn-backtotop-color: #c6b8f2;
+  --btn-backtotop-border-color: rgb(198 190 224 / 20%);
+  --card-header-bg: #1c1a24;
+  --checkbox-color: #6b6486;
+  --checkbox-checked-color: #bcabf0;
+  --img-bg: radial-gradient(circle, rgb(32 30 40) 0%, rgb(23 22 29) 100%);
   --shimmer-bg: linear-gradient(
     90deg,
     rgb(255 255 255 / 0%) 0%,
-    rgb(139 92 246 / 12%) 50%,
+    rgb(160 138 223 / 12%) 50%,
     rgb(255 255 255 / 0%) 100%
   );
 
   /* Sidebar (temple) */
-  --site-title-color: #f5f3ff;
-  --site-subtitle-color: #c4b5fd;
-  --sidebar-bg: linear-gradient(180deg, #0d0a14 0%, #0a0810 100%);
-  --sidebar-border-color: rgb(167 139 250 / 12%);
-  --sidebar-muted-color: #b6a7e0;
-  --sidebar-active-color: #f5f3ff;
-  --sidebar-hover-bg: rgb(139 92 246 / 12%);
-  --sidebar-btn-bg: rgb(167 139 250 / 6%);
-  --sidebar-btn-color: #c4b5fd;
-  --avatar-border-color: rgb(167 139 250 / 55%);
+  --site-title-color: #f4efe3;
+  --site-subtitle-color: #b0aabf;
+  --sidebar-bg: linear-gradient(180deg, #1d1b25 0%, #161520 100%);
+  --sidebar-border-color: rgb(198 190 224 / 12%);
+  --sidebar-muted-color: #beb7cc;
+  --sidebar-active-color: #f4efe3;
+  --sidebar-hover-bg: rgb(160 138 223 / 12%);
+  --sidebar-btn-bg: rgb(198 190 224 / 6%);
+  --sidebar-btn-color: #b0aabf;
+  --avatar-border-color: rgb(198 190 224 / 48%);
 
   /* Topbar */
-  --topbar-bg: rgb(9 8 13 / 72%);
-  --topbar-text-color: #e8e3f7;
-  --search-border-color: rgb(167 139 250 / 14%);
-  --search-icon-color: #8b7db3;
-  --input-focus-border-color: #8b5cf6;
+  --topbar-bg: rgb(23 22 29 / 78%);
+  --topbar-text-color: #e7e1d3;
+  --search-border-color: rgb(198 190 224 / 14%);
+  --search-icon-color: #948caf;
+  --input-focus-border-color: #a08adf;
 
   /* Home / paginator */
-  --post-list-text-color: #b8abd8;
-  --btn-patinator-text-color: #c4b5fd;
-  --btn-paginator-hover-color: #1a1524;
+  --post-list-text-color: #b6afc4;
+  --btn-patinator-text-color: #c6b8f2;
+  --btn-paginator-hover-color: #201d28;
 
   /* Posts */
-  --toc-highlight: #a78bfa;
-  --toc-popup-border-color: rgb(167 139 250 / 16%);
-  --btn-share-color: #b6a7e0;
-  --btn-share-hover-color: #a78bfa;
-  --card-bg: #141019;
-  --card-hover-bg: #1a1524;
-  --card-shadow: rgb(0 0 0 / 66%) 0 6px 20px 0, rgb(139 92 246 / 8%) 0 0 0 1px;
-  --footnote-target-bg: rgb(109 40 217 / 32%);
-  --tb-odd-bg: #131019;
-  --tb-even-bg: #0d0b12;
-  --tb-border-color: rgb(167 139 250 / 12%);
-  --dash-color: rgb(167 139 250 / 22%);
-  --kbd-wrap-color: #9d8fc9;
-  --kbd-text-color: #f5f3ff;
-  --kbd-bg-color: #1c1727;
-  --prompt-text-color: rgb(232 227 247 / 88%);
-  --prompt-tip-bg: rgb(46 92 74 / 32%);
-  --prompt-tip-icon-color: #57b98a;
-  --prompt-info-bg: rgb(109 40 217 / 26%);
-  --prompt-info-icon-color: #a78bfa;
-  --prompt-warning-bg: rgb(120 92 20 / 30%);
-  --prompt-warning-icon-color: #d8b24a;
-  --prompt-danger-bg: rgb(120 30 40 / 32%);
-  --prompt-danger-icon-color: #e06c78;
+  --toc-highlight: #bcabf0;
+  --toc-popup-border-color: rgb(198 190 224 / 16%);
+  --btn-share-color: #b0aabf;
+  --btn-share-hover-color: #bcabf0;
+  --card-bg: #1d1b24;
+  --card-hover-bg: #232030;
+  --card-shadow: rgb(0 0 0 / 45%) 0 8px 24px 0, rgb(160 138 223 / 8%) 0 0 0 1px;
+  --footnote-target-bg: rgb(113 96 189 / 30%);
+  --tb-odd-bg: #1c1a23;
+  --tb-even-bg: #17161d;
+  --tb-border-color: rgb(198 190 224 / 12%);
+  --dash-color: rgb(198 190 224 / 22%);
+  --kbd-wrap-color: #8f88a3;
+  --kbd-text-color: #f4efe3;
+  --kbd-bg-color: #232030;
+  --prompt-text-color: rgb(231 225 211 / 90%);
+  --prompt-tip-bg: rgb(120 150 110 / 16%);
+  --prompt-tip-icon-color: #93ac8c;
+  --prompt-info-bg: rgb(160 138 223 / 16%);
+  --prompt-info-icon-color: #bcabf0;
+  --prompt-warning-bg: rgb(203 168 106 / 16%);
+  --prompt-warning-icon-color: #cba86a;
+  --prompt-danger-bg: rgb(180 90 110 / 20%);
+  --prompt-danger-icon-color: #d98a9c;
 
   /* Tags */
-  --tag-border: rgb(167 139 250 / 18%);
-  --tag-shadow: #0a0810;
-  --tag-hover: rgb(139 92 246 / 20%);
-  --search-tag-bg: #16121e;
+  --tag-border: rgb(198 190 224 / 18%);
+  --tag-shadow: #141218;
+  --tag-hover: rgb(160 138 223 / 18%);
+  --search-tag-bg: #1c1a24;
 
   /* Categories */
-  --categories-border: rgb(167 139 250 / 16%);
-  --categories-hover-bg: #1a1524;
-  --categories-icon-hover-color: #a78bfa;
+  --categories-border: rgb(198 190 224 / 16%);
+  --categories-hover-bg: #232030;
+  --categories-icon-hover-color: #bcabf0;
 
   /* Archive timeline */
-  --timeline-color: rgb(167 139 250 / 16%);
-  --timeline-node-bg: #8b5cf6;
-  --timeline-year-dot-color: #a78bfa;
+  --timeline-color: rgb(198 190 224 / 16%);
+  --timeline-node-bg: #a08adf;
+  --timeline-year-dot-color: #bcabf0;
 
   /* Code (frame; tokens retuned separately) */
-  --language-border-color: rgb(167 139 250 / 14%);
-  --highlight-bg-color: #0a0910;
-  --highlighter-rouge-color: #c4b5fd;
-  --highlight-lineno-color: #6f6390;
-  --inline-code-bg: rgb(139 92 246 / 13%);
-  --code-color: #e5dcff;
-  --code-header-text-color: #9d8fc9;
-  --code-header-muted-color: rgb(167 139 250 / 18%);
-  --code-header-icon-color: #8b7db3;
-  --clipboard-checked-color: #57b98a;
-  --filepath-text-color: #d8ccff;
+  --language-border-color: rgb(198 190 224 / 14%);
+  --highlight-bg-color: #141118;
+  --highlighter-rouge-color: #c6b8f2;
+  --highlight-lineno-color: #6b6486;
+  --inline-code-bg: rgb(160 138 223 / 13%);
+  --code-color: #e7e1d3;
+  --code-header-text-color: #948caf;
+  --code-header-muted-color: rgb(198 190 224 / 18%);
+  --code-header-icon-color: #948caf;
+  --clipboard-checked-color: #93ac8c;
+  --filepath-text-color: #d9d3e2;
 }
 
 /* ========================================================================= *
@@ -205,22 +216,24 @@
 @mixin fj-light {
   color-scheme: light;
 
-  --fj-sky-top: #d9d3e6;
-  --fj-sky-bottom: #ece7db;
-  --fj-moon: #f3eec6;
-  --fj-moon-glow: rgb(180 150 90 / 20%);
-  --fj-fog: rgb(90 70 120 / 5%);
-  --fj-mountain: #b7aec9;
-  --fj-mountain-far: #cbc3d6;
-  --fj-house: #9c93ad;
+  --fj-sky-top: #ded7e4;
+  --fj-sky-bottom: #eee8dc;
+  --fj-moon: #f4efce;
+  --fj-moon-glow: rgb(190 160 100 / 18%);
+  --fj-fog: rgb(120 100 140 / 5%);
+  --fj-mountain: #bcb3ca;
+  --fj-mountain-far: #cfc7d8;
+  --fj-house: #a097ae;
   --fj-bamboo: #a9b09c;
-  --fj-torii: #7a5b6a;
-  --fj-torii-edge: rgb(109 40 217 / 30%);
-  --fj-leaf: rgb(122 91 106 / 40%);
-  --fj-ember: rgb(109 40 217 / 30%);
-  --fj-wood: #e6dfcd;
+  --fj-torii: #8a6b78;
+  --fj-torii-edge: rgb(115 97 189 / 32%);
+  --fj-leaf: rgb(170 130 80 / 38%);      /* gold maple leaf */
+  --fj-ember: rgb(150 120 170 / 30%);
+  --fj-petal: rgb(200 130 150 / 42%);    /* sakura petal */
+  --fj-lantern: rgb(190 150 90 / 26%);
+  --fj-wood: #e7e0ce;
   --fj-wood-2: #ded5c0;
-  --fj-lacquer: #efe7f7; /* not used much in light; code stays dark below */
+  --fj-lacquer: #efe7f7;
   --fj-seal: #8a3b46;
   --fj-seal-ink: #f6e7e9;
 
@@ -336,7 +349,7 @@
  *  5. BASE ATMOSPHERE + TYPOGRAPHY
  * ========================================================================= */
 
-/* Immediate atmospheric ground so first paint is already the village night,
+/* Immediate atmospheric ground so first paint is already the moonlit garden,
    before feudal.js injects the rich parallax layers. */
 html { scroll-behavior: smooth; }
 
@@ -344,12 +357,27 @@ body {
   font-family: 'Zen Old Mincho', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
   background-color: var(--fj-sky-bottom);
   background-image:
-    radial-gradient(120% 80% at 78% -10%, var(--fj-moon-glow) 0%, transparent 42%),
-    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 60%);
+    radial-gradient(120% 80% at 82% -12%, var(--fj-moon-glow) 0%, transparent 40%),
+    radial-gradient(90% 60% at 12% 108%, rgb(160 138 223 / 5%) 0%, transparent 55%),
+    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 58%);
   background-attachment: fixed;
   background-repeat: no-repeat;
   letter-spacing: 0.005em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Text selection — a soft lavender wash */
+::selection { background: rgb(160 138 223 / 32%); color: var(--heading-color); }
+::-moz-selection { background: rgb(160 138 223 / 32%); color: var(--heading-color); }
+
+/* Reading comfort: generous measure & rhythm for long technical posts */
+.content { font-size: 1.02rem; line-height: 1.85; }
+.content p, .content li { letter-spacing: 0.006em; }
+.content h1, .content h2, .content h3, .content h4 {
+  margin-top: 2.2rem; margin-bottom: 0.9rem; line-height: 1.3;
+}
+.content > p:first-of-type { color: var(--heading-color); }
 
 /* Headings — historical mincho */
 h1, h2, h3, h4, h5, h6,
@@ -717,24 +745,24 @@ figure.highlight:hover {
     background: var(--highlight-bg-color);
     color: var(--code-color);
 
-    .c, .ch, .cm, .cp, .cpf, .c1, .cs { color: #847aad; font-style: italic; } /* comments */
-    .err { color: #e06c78; }
-    .k, .kc, .kd, .kn, .kp, .kr { color: #b79cff; }                            /* keywords */
-    .kt, .nc, .nn, .no, .ne, .nb, .bp { color: #c4b5fd; }                       /* types/classes */
-    .nf, .fm, .py { color: #90c4f0; }                                          /* functions */
-    .nt { color: #b79cff; }                                                     /* html tags */
-    .na { color: #9ecf9a; }                                                     /* attributes */
-    .nd { color: #d7a8ff; }                                                     /* decorators */
-    .n, .nx, .nl, .nv, .vc, .vg, .vi, .vm { color: #dcd2ff; }                   /* names/vars */
-    .s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #9ecf9a; } /* strings */
-    .sr, .ss { color: #7fd6c2; }                                               /* regex/symbol */
-    .m, .mb, .mf, .mh, .mi, .mo, .il, .l, .ld { color: #d7a8ff; }              /* numbers */
-    .o, .ow, .pi { color: #c9a7ff; }                                           /* operators */
-    .p { color: #b3a7d6; }                                                      /* punctuation */
-    .gi { color: #9ecf9a; }                                                     /* diff + */
-    .gd { color: #e06c78; }                                                     /* diff - */
-    .gh, .gu { color: #b79cff; font-weight: 700; }
-    .gp { color: #847aad; }
+    .c, .ch, .cm, .cp, .cpf, .c1, .cs { color: #8f88a3; font-style: italic; } /* comments — silver */
+    .err { color: #d98a9c; }
+    .k, .kc, .kd, .kn, .kp, .kr { color: #bcabf0; }                            /* keywords — lavender */
+    .kt, .nc, .nn, .no, .ne, .nb, .bp { color: #c6b8f2; }                       /* types/classes */
+    .nf, .fm, .py { color: #cba86a; }                                          /* functions — gold */
+    .nt { color: #bcabf0; }                                                     /* html tags */
+    .na { color: #a6c39d; }                                                     /* attributes — bamboo */
+    .nd { color: #d7a0b3; }                                                     /* decorators — sakura */
+    .n, .nx, .nl, .nv, .vc, .vg, .vi, .vm { color: #ddd6e6; }                   /* names/vars */
+    .s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #a6c39d; } /* strings — bamboo */
+    .sr, .ss { color: #86c7ba; }                                               /* regex/symbol — teal */
+    .m, .mb, .mf, .mh, .mi, .mo, .il, .l, .ld { color: #d7a0b3; }              /* numbers — sakura */
+    .o, .ow, .pi { color: #c2a6ef; }                                           /* operators */
+    .p { color: #b3accb; }                                                      /* punctuation */
+    .gi { color: #a6c39d; }                                                     /* diff + */
+    .gd { color: #d98a9c; }                                                     /* diff - */
+    .gh, .gu { color: #bcabf0; font-weight: 700; }
+    .gp { color: #8f88a3; }
     .ge { font-style: italic; }
     .gs { font-weight: 700; }
     .gl, .go { color: var(--code-color); }
