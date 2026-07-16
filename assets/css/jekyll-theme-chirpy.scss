@@ -1,0 +1,309 @@
+---
+# -----------------------------------------------------------------------------
+#  "Sumi & Shu"  —  Edo-era sumi-e / woodblock retheme for Chirpy 7.x
+#
+#  This file SHADOWS the theme's own `assets/css/jekyll-theme-chirpy.scss`,
+#  so it must first reproduce the theme's Sass entry point (the two @use
+#  lines below) and then append our overrides. Nothing in the gem is edited.
+#
+#  Strategy: re-declare Chirpy's CSS custom properties on the very same
+#  selectors the theme binds them to (:root[data-bs-theme='light'|'dark'] and
+#  the auto :root:not([data-bs-theme]) + prefers-color-scheme block). Because
+#  our block is emitted after the theme's, our values win with no !important.
+# -----------------------------------------------------------------------------
+---
+
+@use 'abstracts/variables' with (
+  $theme: '{{ site.theme_mode }}'
+);
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* ======================================================================== *
+ *  append custom style below
+ * ======================================================================== */
+
+/* -------------------------------------------------------------------------
+ *  Palette mixins. Each mixin sets (a) Chirpy's own theme variables and
+ *  (b) a handful of `--sumi-*` helper variables consumed by the visual
+ *  detail rules further down, so those rules adapt to light/dark for free.
+ * ------------------------------------------------------------------------- */
+
+@mixin sumi-dark {
+  /* --- Sumi & Shu semantic tokens (dark) ------------------------------- */
+  --sumi-ink:       #16130f;   /* 墨  sumi   — ink ground   */
+  --sumi-washi:     #e8dcc8;   /* 和紙 washi  — warm paper   */
+  --sumi-shu:       #d1362f;   /* 朱  shu    — vermillion   */
+  --sumi-shu-link:  #de473e;   /* brightened vermillion, AA-safe on ink */
+  --sumi-kin:       #d8b24a;   /* 金  kin    — gold leaf    */
+  --sumi-ai:        #3a5a78;   /* 藍  ai     — indigo        */
+  --sumi-seal-fg:   #f0e6d2;   /* glyph colour inside the hanko seal */
+  --sumi-enso-ink:  rgb(232 220 200 / 55%);
+  --sumi-brush:     rgb(222 71 62 / 55%);   /* link brush-underline   */
+  --sumi-brush-hi:  rgb(216 178 74 / 92%);  /* gold ink-bleed on hover */
+  --sumi-rule:      rgb(222 71 62 / 60%);   /* vermillion accent rule  */
+  /* faint seigaiha (青海波) wave texture, gold ink, ~6% opacity */
+  --sumi-wave: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='72'%20height='36'%20viewBox='0%200%2072%2036'%3E%3Cg%20fill='none'%20stroke='%23d8b24a'%20stroke-opacity='0.06'%20stroke-width='1.2'%3E%3Ccircle%20cx='36'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='36'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* --- Chirpy framework variables (dark) ------------------------------- */
+  --main-bg:                    #16130f;
+  --mask-bg:                    #2a241c;
+  --main-border-color:          #2a241c;
+
+  --text-color:                 #e8dcc8;
+  --text-muted-color:           #a89a83;
+  --text-muted-highlight-color: #d8c9ad;
+  --heading-color:              #f0e6d2;
+  --label-color:                #b8ab93;
+  --blockquote-border-color:    #3a5a78;
+  --blockquote-text-color:      #b8ab93;
+  --link-color:                 #de473e;
+  --link-underline-color:       #6b3a34;
+  --button-bg:                  #1e1a14;
+  --btn-border-color:           #2e281f;
+  --btn-backtotop-color:        #de473e;
+  --btn-backtotop-border-color: #2e281f;
+  --card-header-bg:             #211c15;
+  --checkbox-color:             #6b5f4d;
+  --checkbox-checked-color:     #de473e;
+  --img-bg:                     radial-gradient(circle, rgb(30 26 20) 0%, rgb(22 19 15) 100%);
+  --shimmer-bg:                 linear-gradient(90deg, rgb(255 255 255 / 0%) 0%, rgb(201 162 39 / 12%) 50%, rgb(255 255 255 / 0%) 100%);
+
+  /* Sidebar */
+  --site-title-color:      #e8dcc8;
+  --site-subtitle-color:   #a89a83;
+  --sidebar-bg:            #12100c;
+  --sidebar-border-color:  #2a241c;
+  --sidebar-muted-color:   #a89a83;
+  --sidebar-active-color:  #d8b24a;
+  --sidebar-hover-bg:      rgb(201 162 39 / 12%);
+  --sidebar-btn-bg:        #1c1813;
+  --sidebar-btn-color:     #a89a83;
+  --avatar-border-color:   #c9a227;
+
+  /* Topbar */
+  --topbar-bg:                rgb(22 19 15 / 80%);
+  --topbar-text-color:        #e8dcc8;
+  --search-border-color:      #2e281f;
+  --search-icon-color:        #7a6f5c;
+  --input-focus-border-color: #c9a227;
+
+  /* Home / paginator */
+  --post-list-text-color:      #b8ab93;
+  --btn-patinator-text-color:  #b8ab93;
+  --btn-paginator-hover-color: #241f18;
+
+  /* Posts */
+  --toc-highlight:        #de473e;
+  --toc-popup-border-color: #2e281f;
+  --btn-share-color:      #a89a83;
+  --btn-share-hover-color: #de473e;
+  --card-bg:              #1c1813;
+  --card-hover-bg:        #241f18;
+  --card-shadow:          rgb(0 0 0 / 50%) 0 4px 14px 0, rgb(201 162 39 / 8%) 0 0 0 1px;
+  --footnote-target-bg:   rgb(58 90 120 / 35%);
+  --tb-odd-bg:            #1c1813;
+  --tb-even-bg:           #16130f;
+  --tb-border-color:      #2a241c;
+  --dash-color:           #3a332a;
+  --kbd-wrap-color:       #6b5f4d;
+  --kbd-text-color:       #e8dcc8;
+  --kbd-bg-color:         #241f18;
+  --prompt-text-color:    rgb(232 220 200 / 85%);
+  --prompt-tip-bg:        rgb(120 150 90 / 13%);
+  --prompt-tip-icon-color: #8faa5f;
+  --prompt-info-bg:       rgb(58 90 120 / 20%);
+  --prompt-info-icon-color: #6f9fce;
+  --prompt-warning-bg:    rgb(201 162 39 / 15%);
+  --prompt-warning-icon-color: #d8b24a;
+  --prompt-danger-bg:     rgb(209 54 47 / 16%);
+  --prompt-danger-icon-color: #e5514a;
+
+  /* Tags */
+  --tag-border:     #3a332a;
+  --tag-shadow:     #16130f;
+  --tag-hover:      rgb(201 162 39 / 14%);
+  --search-tag-bg:  #1c1813;
+
+  /* Categories */
+  --categories-border:           rgb(201 162 39 / 18%);
+  --categories-hover-bg:         #241f18;
+  --categories-icon-hover-color: #d8b24a;
+
+  /* Archive timeline */
+  --timeline-color:          #2e281f;
+  --timeline-node-bg:        #6b5f4d;
+  --timeline-year-dot-color: #d1362f;
+
+  /* Code frame (tokens left at theme defaults for readability) */
+  --language-border-color:  #2a241c;
+  --highlight-bg-color:     #12100c;
+  --highlighter-rouge-color: #c9def1;
+  --highlight-lineno-color: #6b5f4d;
+  --inline-code-bg:         rgb(201 162 39 / 10%);
+  --code-color:             #e8dcc8;
+  --code-header-text-color: #a89a83;
+  --code-header-muted-color: #2e281f;
+  --code-header-icon-color: #7a6f5c;
+  --clipboard-checked-color: #8faa5f;
+  --filepath-text-color:    #d8c9ad;
+}
+
+@mixin sumi-light {
+  /* --- Sumi & Shu semantic tokens (light) ------------------------------ */
+  --sumi-ink:       #201a14;
+  --sumi-washi:     #f3ead6;
+  --sumi-shu:       #b23a34;
+  --sumi-shu-link:  #b23a34;
+  --sumi-kin:       #a67c00;
+  --sumi-ai:        #2b4a63;
+  --sumi-seal-fg:   #f3ead6;
+  --sumi-enso-ink:  rgb(32 26 20 / 50%);
+  --sumi-brush:     rgb(178 58 52 / 42%);
+  --sumi-brush-hi:  rgb(166 124 0 / 85%);
+  --sumi-rule:      rgb(178 58 52 / 55%);
+  /* faint seigaiha wave texture, sumi ink, ~5% opacity */
+  --sumi-wave: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='72'%20height='36'%20viewBox='0%200%2072%2036'%3E%3Cg%20fill='none'%20stroke='%23201a14'%20stroke-opacity='0.05'%20stroke-width='1.2'%3E%3Ccircle%20cx='36'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='36'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='0'%20cy='36'%20r='36'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='9'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='18'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='27'/%3E%3Ccircle%20cx='72'%20cy='36'%20r='36'/%3E%3C/g%3E%3C/svg%3E");
+
+  /* --- Chirpy framework variables (light) ------------------------------ */
+  --main-bg:                    #f3ead6;
+  --mask-bg:                    #cbbd9e;
+  --main-border-color:          #e0d3b8;
+
+  --text-color:                 #201a14;
+  --text-muted-color:           #6b5d47;
+  --text-muted-highlight-color: #201a14;
+  --heading-color:              #1a140e;
+  --label-color:                #5c4f3a;
+  --blockquote-border-color:    #2b4a63;
+  --blockquote-text-color:      #6b5d47;
+  --link-color:                 #b23a34;
+  --link-underline-color:       #d8b9a0;
+  --button-bg:                  #efe4cd;
+  --btn-border-color:           #ddd0b4;
+  --btn-backtotop-color:        #b23a34;
+  --btn-backtotop-border-color: #ddd0b4;
+  --checkbox-color:             #b0a284;
+  --checkbox-checked-color:     #b23a34;
+  --img-bg:                     radial-gradient(circle, rgb(247 239 221) 0%, rgb(236 224 198) 100%);
+  --shimmer-bg:                 linear-gradient(90deg, rgb(255 255 255 / 0%) 0%, rgb(166 124 0 / 12%) 50%, rgb(255 255 255 / 0%) 100%);
+
+  /* Sidebar */
+  --site-title-color:     #201a14;
+  --site-subtitle-color:  #6b5d47;
+  --sidebar-bg:           #ece0c6;
+  --sidebar-border-color: #ddd0b4;
+  --sidebar-muted-color:  #5c4f3a;
+  --sidebar-active-color: #b23a34;
+  --sidebar-hover-bg:     rgb(166 124 0 / 12%);
+  --sidebar-btn-bg:       #f3ead6;
+  --sidebar-btn-color:    #6b5d47;
+  --avatar-border-color:  #a67c00;
+
+  /* Topbar */
+  --topbar-bg:                rgb(243 234 214 / 82%);
+  --topbar-text-color:        #201a14;
+  --search-border-color:      #ddd0b4;
+  --search-icon-color:        #9a8a6c;
+  --input-focus-border-color: #a67c00;
+
+  /* Home / paginator */
+  --post-list-text-color:      #4a4030;
+  --btn-patinator-text-color:  #4a4030;
+  --btn-paginator-hover-color: #ece0c6;
+
+  /* Posts */
+  --toc-highlight:         #b23a34;
+  --toc-popup-border-color: #cbbd9e;
+  --btn-share-color:       #6b5d47;
+  --btn-share-hover-color: #b23a34;
+  --card-bg:               #f7efdd;
+  --card-hover-bg:         #f9f3e4;
+  --card-shadow:           rgb(90 70 30 / 10%) 0 2px 8px 0, rgb(166 124 0 / 14%) 0 0 0 1px;
+  --footnote-target-bg:    #e7ddc5;
+  --tb-odd-bg:             #efe4cd;
+  --tb-border-color:       #ddd0b4;
+  --dash-color:            #cbbd9e;
+  --kbd-wrap-color:        #b0a284;
+  --kbd-text-color:        #201a14;
+  --kbd-bg-color:          #f7efdd;
+  --prompt-text-color:     rgb(32 26 20 / 85%);
+  --prompt-tip-bg:         rgb(120 150 90 / 18%);
+  --prompt-tip-icon-color: #5f7a3a;
+  --prompt-info-bg:        rgb(43 74 99 / 14%);
+  --prompt-info-icon-color: #2b4a63;
+  --prompt-warning-bg:     rgb(166 124 0 / 16%);
+  --prompt-warning-icon-color: #a67c00;
+  --prompt-danger-bg:      rgb(178 58 52 / 14%);
+  --prompt-danger-icon-color: #b23a34;
+
+  /* Tags */
+  --tag-border:    #ddd0b4;
+  --tag-shadow:    #ddd0b4;
+  --tag-hover:     rgb(166 124 0 / 16%);
+  --search-tag-bg: #efe4cd;
+
+  /* Categories */
+  --categories-border:           rgb(90 70 30 / 18%);
+  --categories-hover-bg:         #efe4cd;
+  --categories-icon-hover-color: #b23a34;
+
+  /* Archive timeline */
+  --timeline-color:          #ddd0b4;
+  --timeline-node-bg:        #b0a284;
+  --timeline-year-dot-color: #b23a34;
+
+  /* Code frame (tokens left at theme defaults for readability) */
+  --language-border-color:  #e0d3b8;
+  --highlight-bg-color:     #f2ead4;
+  --highlighter-rouge-color: #7a3b1e;
+  --highlight-lineno-color: #9a8a6c;
+  --inline-code-bg:         rgb(166 124 0 / 12%);
+  --code-color:             #2e2519;
+  --code-header-text-color: #8a7a5c;
+  --code-header-muted-color: #ddd0b4;
+  --code-header-icon-color: #9a8a6c;
+  --clipboard-checked-color: #5f7a3a;
+}
+
+/* Bind the palettes exactly the way Chirpy's _base.scss binds its own:
+   forced light, forced dark, and auto (system) via prefers-color-scheme. */
+:root[data-bs-theme='light'] { @include sumi-light; }
+:root[data-bs-theme='dark']  { @include sumi-dark; }
+:root:not([data-bs-theme]) {
+  @include sumi-light;
+  @media (prefers-color-scheme: dark) { @include sumi-dark; }
+}
+
+/* -------------------------------------------------------------------------
+ *  Typography — Japanese mincho headings, readable body, monospace code.
+ *  Fonts loaded in _includes/metadata-hook.html. Chirpy sets fonts via SCSS
+ *  `!default` vars we can't reach in the production bundle, so we target the
+ *  concrete selectors; our rules come after the bundle and win.
+ * ------------------------------------------------------------------------- */
+
+body {
+  font-family: 'Zen Kaku Gothic New', 'Noto Sans JP', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.site-title,
+.post-title,
+#post-list .card-wrapper .post-preview h1 {
+  font-family: 'Shippori Mincho', 'Yu Mincho', 'Noto Serif JP', 'Times New Roman', serif;
+  letter-spacing: 0.01em;
+}
+
+/* Code must stay monospace and legible — frame only, never token colours. */
+code, pre, kbd,
+.highlight, .highlighter-rouge,
+td.rouge-code, .code-header {
+  font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Code',
+    'Source Code Pro', Consolas, 'Courier New', monospace;
+}
