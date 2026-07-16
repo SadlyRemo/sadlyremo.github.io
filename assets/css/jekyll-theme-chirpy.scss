@@ -376,3 +376,307 @@ code, pre, kbd,
   to   { opacity: 1; transform: none; }
 }
 #main-wrapper { animation: fj-page-in 0.7s var(--fj-ease-slow) both; }
+
+/* ========================================================================= *
+ *  6. LAYOUT — temple sidebar, topbar beam, navigation
+ * ========================================================================= */
+
+/* Sidebar as a weathered wooden temple panel */
+#sidebar {
+  background: var(--sidebar-bg);
+  background-image: var(--fj-wood-grain), var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border-color);
+  box-shadow: inset -1px 0 0 rgb(139 92 246 / 8%), 6px 0 24px rgb(0 0 0 / 35%);
+}
+/* Engraved temple-eave accent along the sidebar top */
+#sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--fj-purple-deep) 30%,
+    var(--fj-purple) 50%,
+    var(--fj-purple-deep) 70%,
+    transparent
+  );
+  opacity: 0.5;
+}
+
+/* Avatar — a hanging lantern glow */
+#avatar {
+  border: 0;
+  box-shadow:
+    0 0 0 2px var(--fj-sky-bottom),
+    0 0 0 3px var(--avatar-border-color),
+    0 0 18px 2px var(--fj-glow);
+  transition: box-shadow 0.4s var(--fj-ease), transform 0.4s var(--fj-ease);
+}
+#avatar:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 2px var(--fj-sky-bottom),
+    0 0 0 3px var(--fj-purple-soft),
+    0 0 26px 4px var(--fj-glow-strong);
+}
+
+/* Engraved site title */
+.site-title {
+  text-shadow: 0 1px 0 rgb(0 0 0 / 60%), 0 0 18px var(--fj-glow);
+  letter-spacing: 0.04em;
+}
+
+/* Navigation — elegant, with a glowing purple active underline */
+#sidebar .nav-link {
+  position: relative;
+  transition: color 0.3s var(--fj-ease), background-color 0.3s var(--fj-ease);
+}
+#sidebar .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: 0.35rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--fj-purple), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0;
+  transition: transform 0.35s var(--fj-ease), opacity 0.35s var(--fj-ease);
+}
+#sidebar .nav-item.active .nav-link::after,
+#sidebar .nav-link:hover::after {
+  transform: scaleX(1);
+  opacity: 1;
+  box-shadow: 0 0 10px var(--fj-glow);
+}
+#sidebar .nav-item.active .nav-link {
+  text-shadow: 0 0 14px var(--fj-glow);
+}
+
+/* Topbar — a wooden lintel beam */
+#topbar-wrapper {
+  background: var(--topbar-bg);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--main-border-color);
+  box-shadow: 0 2px 14px rgb(0 0 0 / 30%);
+}
+
+/* ========================================================================= *
+ *  7. COMPONENTS — cards, seals, blockquotes, tables, images
+ * ========================================================================= */
+
+/* Blog cards as old wooden information tablets */
+#post-list .card-wrapper {
+  position: relative;
+  border: 1px solid var(--main-border-color);
+  border-radius: var(--fj-radius-lg);
+  background-color: var(--card-bg);
+  background-image: var(--fj-wood-grain);
+  overflow: hidden;
+  transition: transform 0.4s var(--fj-ease), box-shadow 0.4s var(--fj-ease),
+    border-color 0.4s var(--fj-ease);
+}
+/* Carved bevel + lantern light sweep on hover */
+#post-list .card-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    120% 90% at 85% -10%,
+    var(--fj-glow) 0%,
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 0.5s var(--fj-ease);
+}
+#post-list .card-wrapper:hover {
+  transform: translateY(-6px);
+  border-color: rgb(167 139 250 / 35%);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 55%), 0 0 0 1px var(--fj-glow),
+    0 0 30px -6px var(--fj-glow);
+}
+#post-list .card-wrapper:hover::after { opacity: 1; }
+#post-list .card-title {
+  color: var(--heading-color);
+  text-shadow: 0 1px 0 rgb(0 0 0 / 50%);
+}
+
+/* Carved-wood buttons */
+.btn,
+#back-to-top {
+  transition: transform 0.25s var(--fj-ease), box-shadow 0.25s var(--fj-ease),
+    color 0.25s var(--fj-ease), background-color 0.25s var(--fj-ease);
+}
+#back-to-top {
+  color: var(--fj-purple-soft);
+  background: var(--button-bg);
+  background-image: var(--fj-wood-grain);
+  border: 1px solid var(--btn-border-color);
+  box-shadow: 0 0 0 3px rgb(139 92 246 / 12%), 0 6px 16px rgb(0 0 0 / 45%);
+}
+#back-to-top:hover {
+  color: var(--fj-purple-soft);
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 3px var(--fj-glow), 0 10px 22px rgb(0 0 0 / 55%),
+    0 0 24px -4px var(--fj-glow);
+}
+
+/* Tags as wax seals */
+.post-tags .tag,
+.tags .tag,
+#tags .tag,
+a.tag,
+.post-meta .post-tag {
+  border-radius: 999px;
+  border: 1px solid var(--tag-border) !important;
+  background: linear-gradient(180deg, var(--fj-wood-2), var(--fj-wood)) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 1px 3px rgb(0 0 0 / 40%);
+  transition: transform 0.25s var(--fj-ease), box-shadow 0.25s var(--fj-ease),
+    color 0.25s var(--fj-ease);
+}
+.post-tags .tag:hover,
+.tags .tag:hover,
+#tags .tag:hover,
+a.tag:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  color: var(--fj-purple-soft) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 0 14px var(--fj-glow);
+}
+
+/* Blockquotes — an unrolled paper scroll with an ink-brush edge */
+.content blockquote:not([class^='prompt-']) {
+  border-left: 3px solid var(--fj-purple-deep);
+  border-radius: 0 var(--fj-radius) var(--fj-radius) 0;
+  background: linear-gradient(90deg, rgb(139 92 246 / 8%), transparent 60%);
+  padding: 0.6rem 1.1rem;
+  box-shadow: inset 1px 0 0 var(--fj-glow);
+}
+
+/* Callout / prompt boxes — clean lacquer cards with semantic edge */
+blockquote[class^='prompt-'] {
+  border: 1px solid var(--main-border-color);
+  border-left-width: 4px;
+  border-radius: var(--fj-radius);
+  backdrop-filter: blur(2px);
+}
+.prompt-tip     { border-left-color: var(--prompt-tip-icon-color); }
+.prompt-info    { border-left-color: var(--prompt-info-icon-color); }
+.prompt-warning { border-left-color: var(--prompt-warning-icon-color); }
+.prompt-danger  { border-left-color: var(--prompt-danger-icon-color); }
+
+/* Tables — lacquer header, alternating rows */
+.content table {
+  border-radius: var(--fj-radius);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--main-border-color), 0 6px 18px rgb(0 0 0 / 35%);
+}
+.content table thead {
+  background: linear-gradient(180deg, var(--fj-wood-2), var(--fj-wood));
+  border-bottom: 2px solid var(--fj-purple-deep);
+}
+.content table thead th { color: var(--heading-color); }
+
+/* Images — rounded, soft-shadowed, elegant border, gentle zoom */
+.content img:not(.emoji) {
+  border-radius: var(--fj-radius);
+  border: 1px solid var(--main-border-color);
+  box-shadow: 0 8px 26px rgb(0 0 0 / 45%);
+  transition: transform 0.5s var(--fj-ease-slow), box-shadow 0.5s var(--fj-ease-slow);
+}
+.content img:not(.emoji):hover {
+  transform: scale(1.015);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 55%), 0 0 22px -6px var(--fj-glow);
+}
+
+/* Post-content links — brush underline that bleeds into a purple glow */
+.content a:not(.anchor):not(.img-link):not(.tag) {
+  text-decoration: none;
+  border-bottom: 0;
+  background-image: linear-gradient(var(--link-underline-color), var(--link-underline-color));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.08em;
+  transition: background-size 0.3s var(--fj-ease), color 0.3s var(--fj-ease),
+    text-shadow 0.3s var(--fj-ease);
+}
+.content a:not(.anchor):not(.img-link):not(.tag):hover {
+  background-image: linear-gradient(var(--fj-glow), var(--fj-glow));
+  background-size: 100% 0.5em;
+  background-position: 0 92%;
+  text-shadow: 0 0 12px var(--fj-glow);
+}
+
+/* Section rules & headings */
+.content hr {
+  height: 2px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--fj-purple-deep) 20%,
+    var(--fj-purple) 50%, var(--fj-purple-deep) 80%, transparent);
+  opacity: 0.55;
+}
+.content h2 {
+  padding-left: 0.7rem;
+  border-left: 3px solid var(--fj-purple-deep);
+  box-shadow: -1px 0 10px -4px var(--fj-glow);
+}
+
+/* ========================================================================= *
+ *  8. SCROLLBAR — dark wood track, purple-wood thumb, glow on hover
+ * ========================================================================= */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--fj-purple-deep) var(--fj-sky-bottom);
+}
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, #0a0810, #100c18);
+  background-image: var(--fj-wood-grain);
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-color: var(--fj-purple-deep);
+  box-shadow: inset 0 0 0 1px rgb(167 139 250 / 30%);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--fj-purple);
+  box-shadow: inset 0 0 0 1px var(--fj-purple-soft), 0 0 10px var(--fj-glow);
+}
+
+/* ========================================================================= *
+ *  9. FOOTER — a mountain shrine with a torii gate & pattern divider
+ * ========================================================================= */
+footer {
+  position: relative;
+  margin-top: 2rem;
+  padding-top: 3.6rem;
+  /* seigaiha (青海波) wave divider along the top */
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='60'%20height='30'%20viewBox='0%200%2060%2030'%3E%3Cg%20fill='none'%20stroke='%238b5cf6'%20stroke-opacity='0.22'%20stroke-width='1.1'%3E%3Ccircle%20cx='30'%20cy='30'%20r='7.5'/%3E%3Ccircle%20cx='30'%20cy='30'%20r='15'/%3E%3Ccircle%20cx='30'%20cy='30'%20r='22.5'/%3E%3Ccircle%20cx='30'%20cy='30'%20r='30'/%3E%3Ccircle%20cx='0'%20cy='30'%20r='7.5'/%3E%3Ccircle%20cx='0'%20cy='30'%20r='15'/%3E%3Ccircle%20cx='0'%20cy='30'%20r='22.5'/%3E%3Ccircle%20cx='0'%20cy='30'%20r='30'/%3E%3Ccircle%20cx='60'%20cy='30'%20r='7.5'/%3E%3Ccircle%20cx='60'%20cy='30'%20r='15'/%3E%3Ccircle%20cx='60'%20cy='30'%20r='22.5'/%3E%3Ccircle%20cx='60'%20cy='30'%20r='30'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: top center;
+  background-size: 60px auto;
+}
+/* torii gate, lit from behind by a soft lantern glow */
+footer::before {
+  content: '';
+  position: absolute;
+  top: 1.2rem;
+  left: 50%;
+  width: 42px;
+  height: 34px;
+  transform: translateX(-50%);
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2048%2040'%3E%3Cg%20fill='%238b5cf6'%3E%3Cpath%20d='M1%208%20h46%20l-3.5%204.5%20h-39%20z'/%3E%3Crect%20x='6'%20y='9.5'%20width='36'%20height='2'%20fill='%23a78bfa'/%3E%3Crect%20x='7'%20y='16'%20width='34'%20height='3'/%3E%3Crect%20x='12'%20y='12.5'%20width='4.5'%20height='26'/%3E%3Crect%20x='31.5'%20y='12.5'%20width='4.5'%20height='26'/%3E%3C/g%3E%3C/svg%3E")
+    center / contain no-repeat;
+  filter: drop-shadow(0 0 10px var(--fj-glow));
+  opacity: 0.9;
+  pointer-events: none;
+}
+
