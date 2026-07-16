@@ -175,6 +175,33 @@
     }, { passive: true });
   }
 
+  // Slim top loading bar: a brief fill flourish on load, and a progress
+  // sweep while navigating away.
+  function initProgress() {
+    if (REDUCE) return;
+    var bar = el('div');
+    bar.id = 'fj-progress';
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bar);
+    requestAnimationFrame(function () {
+      bar.classList.add('on');
+      bar.style.width = '100%';
+      setTimeout(function () {
+        bar.classList.remove('on');
+        setTimeout(function () { bar.style.width = '0'; }, 320);
+      }, 480);
+    });
+    window.addEventListener('beforeunload', function () {
+      bar.style.transition = 'none';
+      bar.style.width = '0';
+      bar.classList.add('on');
+      requestAnimationFrame(function () {
+        bar.style.transition = 'width 8s cubic-bezier(0.1,0.7,0.1,1)';
+        bar.style.width = '88%';
+      });
+    });
+  }
+
   // brief rotating-shuriken cursor while a navigation is in flight
   function initLoadingCursor() {
     window.addEventListener('beforeunload', function () {
@@ -276,6 +303,7 @@
   function init() {
     buildBackground();
     if (FINE && !REDUCE) initCursor();
+    initProgress();
     initLoadingCursor();
     initAmbient();
   }
