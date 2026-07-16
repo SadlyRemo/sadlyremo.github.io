@@ -712,6 +712,9 @@ figure.highlight:hover {
    so keywords/strings/numbers stay clearly distinguishable — readability first. */
 @mixin fj-syntax {
   .highlight {
+    /* Chirpy's Rouge dump hardcodes .highlight{background:#151515} at this same
+       specificity; re-assert the lacquer background here so ours wins by order. */
+    background: var(--highlight-bg-color);
     color: var(--code-color);
 
     .c, .ch, .cm, .cp, .cpf, .c1, .cs { color: #7b6ea3; font-style: italic; } /* comments */
@@ -740,4 +743,258 @@ figure.highlight:hover {
 :root[data-bs-theme='dark']  { @include fj-syntax; }
 :root[data-bs-theme='light'] { @include fj-syntax; }
 :root:not([data-bs-theme])   { @include fj-syntax; }
+
+/* ========================================================================= *
+ *  11. ATMOSPHERE — layered animated background (built by feudal.js)
+ *  All decorative, aria-hidden, pointer-events:none, behind content.
+ * ========================================================================= */
+.fj-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.fj-bg > * { position: absolute; }
+
+/* Layer 7 — moon (pale sun in light mode) */
+.fj-moon {
+  top: 6vh;
+  right: 9vw;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, var(--fj-moon) 0%, var(--fj-moon) 42%, transparent 64%);
+  box-shadow: 0 0 90px 30px var(--fj-moon-glow), 0 0 160px 60px var(--fj-moon-glow);
+  opacity: 0.9;
+}
+
+/* Layer 2 — drifting fog bands */
+.fj-fog {
+  left: -60%;
+  width: 220%;
+  height: 42vh;
+  background: radial-gradient(60% 100% at 30% 100%, var(--fj-fog) 0%, transparent 70%),
+    radial-gradient(50% 100% at 70% 100%, var(--fj-fog) 0%, transparent 70%);
+  will-change: transform;
+}
+.fj-fog--1 { bottom: 8vh; animation: fj-fog-drift var(--fj-fog-speed) linear infinite; }
+.fj-fog--2 { bottom: 22vh; opacity: 0.7; animation: fj-fog-drift calc(var(--fj-fog-speed) * 1.6) linear infinite reverse; }
+@keyframes fj-fog-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(18%, 0, 0); }
+}
+
+/* Layers 3-6 — mountains / houses / bamboo / torii silhouettes */
+.fj-silhouette {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 58vh;
+  min-height: 320px;
+}
+.fj-silhouette svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
+.fj-far   { opacity: 0.9; }
+.fj-torii-bg { opacity: 0.5; filter: drop-shadow(0 0 14px var(--fj-torii-edge)); }
+
+/* Layer 8 — drifting leaves + floating embers (elements added by JS) */
+.fj-leaf, .fj-ember {
+  top: -6vh;
+  width: 10px;
+  height: 10px;
+  will-change: transform, opacity;
+}
+.fj-leaf {
+  background: var(--fj-leaf);
+  border-radius: 0 100% 0 100%;
+  animation: fj-fall var(--fj-leaf-dur, 15s) linear var(--fj-leaf-delay, 0s) infinite;
+}
+.fj-ember {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--fj-ember);
+  box-shadow: 0 0 8px 2px var(--fj-ember);
+  top: auto; bottom: -4vh;
+  animation: fj-rise var(--fj-leaf-dur, 16s) ease-in var(--fj-leaf-delay, 0s) infinite;
+}
+@keyframes fj-fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translate3d(var(--fj-leaf-drift, 40px), 112vh, 0) rotate(320deg); opacity: 0; }
+}
+@keyframes fj-rise {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  15%  { opacity: 0.9; }
+  100% { transform: translate3d(var(--fj-leaf-drift, -30px), -70vh, 0); opacity: 0; }
+}
+
+/* ========================================================================= *
+ *  12. CUSTOM CURSOR + click particles
+ * ========================================================================= */
+/* Reliable base: static SVG weapon cursors (no JS needed). feudal.js adds a
+   glow-trail and click particles as progressive enhancement on fine pointers. */
+@media (pointer: fine) {
+  html {
+    cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2024%2024'%3E%3Cg%20stroke='%232a1a3f'%20stroke-width='0.6'%3E%3Cpath%20d='M3%203%20L13%209%20L9%2013%20Z'%20fill='%23a78bfa'/%3E%3Crect%20x='10.5'%20y='10.5'%20width='7'%20height='2.4'%20rx='1'%20transform='rotate(45%2010.5%2010.5)'%20fill='%236d28d9'/%3E%3Ccircle%20cx='19'%20cy='19'%20r='2.4'%20fill='none'%20stroke='%238b5cf6'%20stroke-width='1.6'/%3E%3C/g%3E%3C/svg%3E") 3 3, auto;
+  }
+  a, button, .btn, [role='button'], .nav-link, label[for], summary,
+  input[type='submit'], .post-tag, .tag {
+    cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%204%20Q14%208%2020%2018'%20fill='none'%20stroke='%23a78bfa'%20stroke-width='2.2'%20stroke-linecap='round'/%3E%3Cpath%20d='M3%204%20Q13%207%2018%2015'%20fill='none'%20stroke='%23ece8fb'%20stroke-width='0.7'/%3E%3Crect%20x='16.5'%20y='15.5'%20width='5.5'%20height='2'%20rx='1'%20transform='rotate(45%2016.5%2015.5)'%20fill='%236d28d9'/%3E%3C/svg%3E") 3 3, pointer;
+  }
+  html.fj-loading, html.fj-loading * {
+    cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202%20L14%2010%20L22%2012%20L14%2014%20L12%2022%20L10%2014%20L2%2012%20L10%2010%20Z'%20fill='%238b5cf6'%20stroke='%232a1a3f'%20stroke-width='0.5'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='1.6'%20fill='%230a0910'/%3E%3C/svg%3E") 12 12, progress;
+  }
+}
+
+/* Soft purple glow that trails the cursor (JS-positioned) */
+.fj-cursor-glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 26px; height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--fj-glow-strong) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 2147483000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+
+/* Click particles */
+.fj-particle {
+  position: fixed;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--fj-purple-soft);
+  box-shadow: 0 0 6px var(--fj-glow-strong);
+  pointer-events: none;
+  z-index: 2147483001;
+  will-change: transform, opacity;
+}
+
+/* ========================================================================= *
+ *  13. HOME HERO — cinematic landing (added via home.html override)
+ * ========================================================================= */
+#fj-hero {
+  position: relative;
+  margin: -0.5rem 0 2.4rem;
+  padding: clamp(3rem, 12vh, 7rem) 1.2rem clamp(2.4rem, 8vh, 4.5rem);
+  text-align: center;
+  overflow: hidden;
+  border-radius: var(--fj-radius-lg);
+  border: 1px solid var(--main-border-color);
+  background:
+    radial-gradient(60% 90% at 50% -10%, var(--fj-moon-glow) 0%, transparent 55%),
+    linear-gradient(180deg, rgb(139 92 246 / 6%), transparent 70%),
+    linear-gradient(180deg, var(--fj-sky-top), var(--fj-sky-bottom));
+}
+#fj-hero .fj-hero-moon {
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  width: 150px; height: 150px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, var(--fj-moon) 0%, var(--fj-moon) 44%, transparent 66%);
+  box-shadow: 0 0 80px 24px var(--fj-moon-glow);
+  pointer-events: none;
+}
+#fj-hero .fj-hero-title {
+  position: relative;
+  margin: 0;
+  font-size: clamp(2.6rem, 8vw, 5rem);
+  line-height: 1.05;
+  color: var(--heading-color);
+  text-shadow: 0 2px 30px var(--fj-glow), 0 0 2px rgb(0 0 0 / 60%);
+  letter-spacing: 0.06em;
+}
+#fj-hero .fj-hero-sub {
+  position: relative;
+  margin: 1rem auto 0;
+  max-width: 46ch;
+  font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+  color: var(--text-muted-color);
+  line-height: 1.8;
+}
+#fj-hero .fj-hero-rule {
+  width: 120px; height: 2px; margin: 1.4rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--fj-purple), transparent);
+  box-shadow: 0 0 12px var(--fj-glow);
+}
+#fj-hero .fj-hero-kicker {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.3rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fj-purple-soft);
+  border: 1px solid var(--main-border-color);
+  border-radius: 999px;
+  background: rgb(139 92 246 / 8%);
+}
+
+/* ========================================================================= *
+ *  14. AMBIENT SOUND toggle (built by feudal.js; off by default)
+ * ========================================================================= */
+#fj-ambient {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1080;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  color: var(--fj-purple-soft);
+  background: var(--button-bg);
+  background-image: var(--fj-wood-grain);
+  border: 1px solid var(--btn-border-color);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 45%);
+  cursor: pointer;
+  transition: box-shadow 0.3s var(--fj-ease), transform 0.3s var(--fj-ease), color 0.3s var(--fj-ease);
+}
+#fj-ambient:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--fj-glow), 0 6px 16px rgb(0 0 0 / 55%); }
+#fj-ambient:focus-visible { outline: 2px solid var(--fj-purple-soft); outline-offset: 3px; }
+#fj-ambient[aria-pressed='true'] {
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--fj-glow-strong), 0 0 22px -2px var(--fj-glow);
+}
+#fj-ambient[aria-pressed='true'] .fj-ambient-wave { animation: fj-ambient-pulse 2.4s ease-in-out infinite; }
+@keyframes fj-ambient-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+#fj-ambient svg { width: 20px; height: 20px; }
+
+/* ========================================================================= *
+ *  15. RESPONSIVE + ACCESSIBILITY guards
+ * ========================================================================= */
+@media (max-width: 850px) {
+  .fj-moon { width: 110px; height: 110px; top: 4vh; right: 6vw; }
+  .fj-silhouette { height: 42vh; }
+  #fj-ambient { width: 40px; height: 40px; right: 0.75rem; bottom: 0.75rem; }
+}
+
+/* Honour reduced-motion: freeze all ambient motion, keep the static scene */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .fj-fog, .fj-leaf, .fj-ember { display: none; }
+  #main-wrapper { animation: none; }
+}
+
+/* Never sacrifice keyboard focus visibility */
+a:focus-visible, button:focus-visible, .nav-link:focus-visible,
+input:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--fj-purple-soft);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
 
