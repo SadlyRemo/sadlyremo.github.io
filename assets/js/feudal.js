@@ -27,64 +27,159 @@
     var bg = el('div', 'fj-bg');
     bg.setAttribute('aria-hidden', 'true');
 
-    // Layer 7 — moon
-    bg.appendChild(el('div', 'fj-moon'));
+    // Decorative Japanese clouds — slow horizontal drift near the dusk sky
+    [['6%', 8, 62, 0.5, '38s'], ['58%', 4, 50, 0.42, '52s'], ['34%', 13, 72, 0.34, '66s']]
+      .forEach(function (c, i) {
+        var cl = el('div', 'fj-cloud');
+        cl.style.left = c[0]; cl.style.top = c[1] + '%'; cl.style.width = c[2] + 'px';
+        cl.style.opacity = c[3];
+        cl.style.setProperty('--fj-cloud-dur', c[4]);
+        cl.style.setProperty('--fj-leaf-delay', '-' + i * 9 + 's');
+        bg.appendChild(cl);
+      });
 
-    // Layer 2 — fog bands
+    // Layer A — far mountains + a distant torii lost in the haze (slow parallax)
+    var far = el('div', 'fj-layer fj-far');
+    far.style.setProperty('--p', '0.03');
+    far.innerHTML =
+      "<svg viewBox='0 0 1600 520' preserveAspectRatio='xMidYMax slice'>" +
+      "<path style='fill:var(--fj-mountain-far)' d='M0,520 L0,300 L200,182 L360,272 L560,150 L780,250 L980,140 L1220,252 L1420,170 L1600,250 L1600,520Z'/>" +
+      "<path style='fill:var(--fj-mountain)' d='M0,520 L0,384 L240,286 L470,372 L700,272 L940,360 L1180,288 L1420,372 L1600,322 L1600,520Z'/>" +
+      "<g style='fill:var(--fj-torii)' opacity='0.75'>" +
+      "<path d='M735,300 h132 l-9,11 h-114 z'/><rect x='752' y='316' width='98' height='6'/>" +
+      "<rect x='762' y='311' width='11' height='58'/><rect x='828' y='311' width='11' height='58'/></g>" +
+      '</svg>';
+    bg.appendChild(far);
+
+    // Mist between the ridges and the village
     bg.appendChild(el('div', 'fj-fog fj-fog--1'));
+
+    // Layer B — the village itself (medium parallax)
+    var village = el('div', 'fj-layer fj-village');
+    village.style.setProperty('--p', '0.07');
+    village.innerHTML = villageSVG();
+    bg.appendChild(village);
+
+    // Foreground drifting mist
     bg.appendChild(el('div', 'fj-fog fj-fog--2'));
 
-    // Layer 6 — big faint torii, behind the ridge
-    var torii = el('div', 'fj-torii-bg');
-    torii.style.cssText =
-      'left:50%;bottom:16vh;width:min(320px,46vw);height:38vh;transform:translateX(-50%)';
-    torii.innerHTML =
-      "<svg viewBox='0 0 200 200' preserveAspectRatio='xMidYMax meet' style='width:100%;height:100%'>" +
-      "<g fill='none' stroke='var(--fj-torii-edge)' stroke-width='4'>" +
-      "<path d='M10 44 L190 44 L176 58 L24 58 Z' fill='var(--fj-torii)'/>" +
-      "<rect x='30' y='68' width='140' height='9' fill='var(--fj-torii)'/>" +
-      "<rect x='52' y='58' width='16' height='132' fill='var(--fj-torii)'/>" +
-      "<rect x='132' y='58' width='16' height='132' fill='var(--fj-torii)'/>" +
-      '</g></svg>';
-    bg.appendChild(torii);
-
-    // Layers 3-5 — mountains, houses, bamboo
-    var scene = el('div', 'fj-silhouette');
-    scene.innerHTML =
-      "<svg viewBox='0 0 1440 600' preserveAspectRatio='xMidYMax slice'>" +
-      // far ridge
-      "<path style='fill:var(--fj-mountain-far)' d='M0,600 L0,360 L180,250 L340,330 L520,206 L700,300 L880,196 L1080,292 L1260,220 L1440,300 L1440,600 Z'/>" +
-      // near ridge
-      "<path style='fill:var(--fj-mountain)' d='M0,600 L0,452 L220,330 L430,430 L640,318 L860,420 L1080,338 L1300,430 L1440,382 L1440,600 Z'/>" +
-      // village houses (pitched roofs w/ upturned eaves) sitting on the near ridge
-      "<g style='fill:var(--fj-house)'>" +
-      "<path d='M560,470 q54,-40 108,0 l-12,7 q-42,-26 -84,0 Z'/>" +
-      "<path d='M636,486 q46,-34 92,0 l-10,6 q-36,-22 -72,0 Z'/>" +
-      "<path d='M700,462 q60,-44 120,0 l-13,7 q-47,-28 -94,0 Z'/>" +
-      "<rect x='592' y='474' width='44' height='34'/>" +
-      "<rect x='726' y='466' width='60' height='42'/>" +
-      '</g>' +
-      // bamboo, left & right edges
-      "<g style='fill:var(--fj-bamboo)' opacity='0.85'>" +
-      "<rect x='24' y='120' width='7' height='480'/><rect x='44' y='170' width='6' height='430'/><rect x='62' y='96' width='7' height='504'/>" +
-      "<rect x='1372' y='140' width='7' height='460'/><rect x='1392' y='100' width='6' height='500'/><rect x='1410' y='180' width='7' height='420'/>" +
-      '</g></svg>';
-    bg.appendChild(scene);
-
-    // Layer 8b — warm lantern halos flanking the village
-    var lpos = [[18, 24], [80, 20], [40, 30]];
-    lpos.forEach(function (p, i) {
-      var lan = el('div', 'fj-lantern');
-      lan.style.left = p[0] + '%';
-      lan.style.bottom = p[1] + 'vh';
-      lan.style.setProperty('--fj-flicker-dur', (4.5 + i * 1.3).toFixed(1) + 's');
-      lan.style.setProperty('--fj-leaf-delay', '-' + (i * 1.9).toFixed(1) + 's');
+    // Layer C — near: hanging paper lanterns (warm, flickering) + a swinging sign
+    [[12, 21], [26, 16], [72, 18], [87, 14]].forEach(function (p, i) {
+      var lan = el('div', 'fj-lantern-paper');
+      lan.style.left = p[0] + '%'; lan.style.bottom = p[1] + 'vh';
+      lan.style.setProperty('--fj-flicker-dur', (3.8 + i * 0.9).toFixed(1) + 's');
+      lan.style.setProperty('--fj-leaf-delay', '-' + (i * 1.5).toFixed(1) + 's');
       bg.appendChild(lan);
     });
+    var sign = el('div', 'fj-sign');
+    sign.style.left = '46%'; sign.style.bottom = '25vh';
+    sign.innerHTML = "<span class='fj-sign-rope'></span><span class='fj-sign-board'>村</span>";
+    bg.appendChild(sign);
 
     document.body.insertBefore(bg, document.body.firstChild);
 
-    if (!REDUCE) buildFalling(bg);
+    if (!REDUCE) { buildFalling(bg); initBirds(bg); initParallax(bg); }
+  }
+
+  // The village skyline — an Edo street of rooftops, a pagoda, an arched bridge,
+  // a cherry & a maple, and a wooden fence, all assembled from primitives.
+  function villageSVG() {
+    var base = 520, s = '';
+    // sloping street of houses (varying width / height / roof)
+    var houses = [
+      [40, 150, 96, 40], [150, 176, 120, 52], [286, 138, 104, 44],
+      [402, 200, 150, 60], [566, 120, 90, 40], [980, 130, 96, 42],
+      [1088, 188, 150, 58], [1252, 150, 110, 48], [1378, 210, 140, 56],
+      [1520, 120, 92, 40]
+    ];
+    var bodies = '', roofs = '', wins = '';
+    houses.forEach(function (h) {
+      var x = h[0], w = h[1], ht = h[2], rh = h[3], by = base - ht, e = 12, rw = 15;
+      bodies += "<rect x='" + x + "' y='" + by + "' width='" + w + "' height='" + ht + "'/>";
+      roofs += "<path d='M" + (x - e) + "," + by + " L" + (x + w + e) + "," + by +
+        " L" + (x + w - rw) + "," + (by - rh) + " L" + (x + rw) + "," + (by - rh) + " Z'/>";
+      roofs += "<rect x='" + (x + rw - 5) + "' y='" + (by - rh - 3) + "' width='" + (w - 2 * rw + 10) + "' height='4'/>";
+      wins += "<rect class='fj-win' x='" + (x + w * 0.3).toFixed(0) + "' y='" + (by + ht * 0.34).toFixed(0) +
+        "' width='" + (w * 0.4).toFixed(0) + "' height='" + (ht * 0.3).toFixed(0) + "' rx='2'/>";
+    });
+    // a two-tier pagoda / shrine
+    var px = 690, pb = base;
+    var pagoda =
+      "<rect x='" + (px + 26) + "' y='" + (pb - 120) + "' width='36' height='120'/>" +
+      "<path d='M" + (px - 6) + "," + (pb - 118) + " L" + (px + 94) + "," + (pb - 118) + " L" + (px + 70) + "," + (pb - 150) + " L" + (px + 18) + "," + (pb - 150) + " Z'/>" +
+      "<path d='M" + (px + 4) + "," + (pb - 150) + " L" + (px + 84) + "," + (pb - 150) + " L" + (px + 64) + "," + (pb - 182) + " L" + (px + 24) + "," + (pb - 182) + " Z'/>" +
+      "<rect class='fj-win' x='" + (px + 36) + "' y='" + (pb - 96) + "' width='16' height='22' rx='2'/>";
+    // arched wooden bridge over a hint of river
+    var bx = 812, bw = 150;
+    var bridge =
+      "<path d='M" + bx + "," + base + " Q" + (bx + bw / 2) + "," + (base - 46) + " " + (bx + bw) + "," + base +
+      "' style='fill:none;stroke:var(--fj-house)' stroke-width='10'/>" +
+      "<path d='M" + (bx + 10) + "," + (base - 12) + " Q" + (bx + bw / 2) + "," + (base - 52) + " " + (bx + bw - 10) + "," + (base - 12) +
+      "' style='fill:none;stroke:var(--fj-house)' stroke-width='3'/>";
+    // trees — cherry (left) and maple (right), silhouette canopies
+    function tree(cx, cls, blobs) {
+      var t = "<rect x='" + (cx - 4) + "' y='" + (base - 92) + "' width='8' height='92' style='fill:var(--fj-tree)'/>";
+      blobs.forEach(function (b) {
+        t += "<circle class='" + cls + "' cx='" + (cx + b[0]) + "' cy='" + (base - 96 + b[1]) + "' r='" + b[2] + "'/>";
+      });
+      return t;
+    }
+    var cherry = tree(636, 'fj-cherry', [[0, -14, 26], [-20, -2, 20], [20, 0, 22], [-8, -26, 18], [12, -24, 16]]);
+    var maple = tree(1470, 'fj-maple', [[0, -12, 24], [-18, 2, 18], [18, -2, 20], [-6, -24, 16], [10, -22, 15]]);
+    // wooden fence along the very front
+    var fence = "<g style='fill:var(--fj-house)'>";
+    for (var fx = 0; fx <= 1600; fx += 46) fence += "<rect x='" + fx + "' y='" + (base - 34) + "' width='6' height='34'/>";
+    fence += "<rect x='0' y='" + (base - 30) + "' width='1600' height='4'/><rect x='0' y='" + (base - 16) + "' width='1600' height='4'/></g>";
+
+    s += "<svg viewBox='0 0 1600 520' preserveAspectRatio='xMidYMax slice'>";
+    s += "<rect x='0' y='" + (base - 10) + "' width='1600' height='10' style='fill:var(--fj-street)'/>";
+    s += cherry + maple;
+    s += "<g style='fill:var(--fj-roof)'>" + bodies + pagoda + "</g>";
+    s += "<g style='fill:var(--fj-house)'>" + roofs + "</g>";
+    s += bridge + fence;
+    s += "<g class='fj-wins'>" + wins + "</g>";
+    s += '</svg>';
+    return s;
+  }
+
+  // Tiny birds occasionally crossing the dusk sky
+  function initBirds(bg) {
+    function flock() {
+      var n = 2 + Math.floor(Math.abs(Math.sin(bg.childElementCount * 12.9898) * 43758.5) % 3);
+      var top = 8 + (Date.now() % 22);
+      var wrap = el('div', 'fj-birds');
+      wrap.style.top = top + '%';
+      var dir = (Date.now() % 2) ? 1 : -1;
+      wrap.style.setProperty('--fj-bird-dir', dir);
+      var inner = '';
+      for (var i = 0; i < n; i++) {
+        inner += "<span class='fj-bird' style='margin-left:" + (i * 16) + "px;animation-delay:" + (i * 0.12) + "s'></span>";
+      }
+      wrap.innerHTML = inner;
+      bg.appendChild(wrap);
+      setTimeout(function () { wrap.remove(); }, 14000);
+      setTimeout(flock, 22000 + (Date.now() % 20000));
+    }
+    setTimeout(flock, 6000);
+  }
+
+  // Subtle scroll parallax — distant layers lag behind nearer ones
+  function initParallax(bg) {
+    var layers = bg.querySelectorAll('.fj-layer');
+    var ticking = false;
+    function update() {
+      var y = window.scrollY || window.pageYOffset;
+      for (var i = 0; i < layers.length; i++) {
+        var p = parseFloat(layers[i].style.getPropertyValue('--p')) || 0;
+        // subtle & bounded: nearer layers rise a touch more, but never leave view
+        var shift = Math.max(-46, Math.min(46, y * p));
+        layers[i].style.transform = 'translate3d(0,' + (-shift).toFixed(1) + 'px,0)';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
   }
 
   // Drifting sakura petals + gold leaves + a few fireflies (pure-CSS once made)
@@ -209,6 +304,72 @@
     });
   }
 
+  // Reading progress as an ink brush stroke down the right margin
+  function initScrollBrush() {
+    if (REDUCE) return;
+    var wrap = el('div');
+    wrap.id = 'fj-scroll';
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.innerHTML = "<span class='fj-scroll-fill'></span><span class='fj-scroll-tip'></span>";
+    document.body.appendChild(wrap);
+    var fill = wrap.querySelector('.fj-scroll-fill');
+    var tip = wrap.querySelector('.fj-scroll-tip');
+    var ticking = false;
+    function update() {
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - doc.clientHeight;
+      var pct = max > 0 ? Math.min(1, (window.scrollY || 0) / max) : 0;
+      fill.style.transform = 'scaleY(' + pct.toFixed(4) + ')';
+      tip.style.top = (pct * 100) + '%';
+      wrap.style.opacity = pct > 0.01 && pct < 0.995 ? '1' : '0';
+      ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
+
+  // Shoji (sliding paper-door) reveal: two paper panels part on each arrival.
+  // Runs early (before idle) so the panels cover before first paint.
+  function initShoji() {
+    if (REDUCE || document.getElementById('fj-shoji')) return;
+    var sh = el('div');
+    sh.id = 'fj-shoji';
+    sh.setAttribute('aria-hidden', 'true');
+    sh.innerHTML = "<span class='fj-shoji-panel fj-shoji-l'></span><span class='fj-shoji-panel fj-shoji-r'></span>";
+    document.body.appendChild(sh);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        sh.classList.add('open');
+        setTimeout(function () { sh.parentNode && sh.remove(); }, 760);
+      });
+    });
+  }
+
+  // Intro loader — a brush paints an ensō (円相) once per session, then fades
+  function initIntro() {
+    if (REDUCE) return;
+    try { if (sessionStorage.getItem('fj-seen')) return; sessionStorage.setItem('fj-seen', '1'); }
+    catch (e) {}
+    var intro = el('div');
+    intro.id = 'fj-intro';
+    intro.setAttribute('aria-hidden', 'true');
+    intro.innerHTML =
+      "<svg viewBox='0 0 120 120'><path class='fj-enso' d='M92 32 A44 44 0 1 0 96 74' " +
+      "fill='none' stroke='var(--fj-purple-soft)' stroke-width='7' stroke-linecap='round'/></svg>";
+    document.body.appendChild(intro);
+    var done = false;
+    function finish() {
+      if (done) return; done = true;
+      intro.classList.add('fade');
+      setTimeout(function () { intro.remove(); }, 700);
+    }
+    requestAnimationFrame(function () { intro.classList.add('draw'); });
+    setTimeout(finish, 1500);
+    window.addEventListener('load', function () { setTimeout(finish, 400); });
+  }
+
   /* ---------------------------------------------------------------------- *
    *  3. Optional ambient mode — procedural wind + distant bell (Web Audio).
    *     Muted by default, never autoplays: only starts on the user's click.
@@ -304,10 +465,14 @@
     buildBackground();
     if (FINE && !REDUCE) initCursor();
     initProgress();
+    initScrollBrush();
     initLoadingCursor();
     initAmbient();
   }
   function boot() {
+    // visual transitions run immediately (before idle) so they cover first paint
+    initShoji();
+    initIntro();
     var ric = window.requestIdleCallback || function (f) { return setTimeout(f, 250); };
     ric(init, { timeout: 1500 });
   }

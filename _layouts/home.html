@@ -55,11 +55,26 @@ layout: default
 
 {% if paginator.page == 1 %}
   <section id="fj-hero" aria-label="Introduction">
-    <span class="fj-hero-moon" aria-hidden="true"></span>
+    <span class="fj-hero-lantern fj-hero-lantern--l" aria-hidden="true"></span>
+    <span class="fj-hero-lantern fj-hero-lantern--r" aria-hidden="true"></span>
     <span class="fj-hero-kicker">忍 · exploit dev · red team</span>
     <h1 class="fj-hero-title">{{ site.title }}</h1>
     <p class="fj-hero-sub">{{ site.tagline | default: site.description }}</p>
     <div class="fj-hero-rule" aria-hidden="true"></div>
+    <div class="fj-hero-roofs" aria-hidden="true">
+      <svg viewBox="0 0 1200 60" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <g fill="var(--fj-roof)">
+          <path d="M40 60 L40 34 L28 34 L70 12 L112 34 L100 34 L100 60 Z"/>
+          <path d="M150 60 L150 40 L140 40 L184 18 L228 40 L218 40 L218 60 Z"/>
+          <path d="M300 60 L300 30 L286 30 L332 8 L378 30 L364 30 L364 60 Z"/>
+          <path d="M470 60 L470 42 L462 42 L500 22 L538 42 L530 42 L530 60 Z"/>
+          <path d="M640 60 L640 34 L628 34 L670 12 L712 34 L700 34 L700 60 Z"/>
+          <path d="M800 60 L800 40 L790 40 L834 18 L878 40 L868 40 L868 60 Z"/>
+          <path d="M950 60 L950 30 L936 30 L982 8 L1028 30 L1014 30 L1014 60 Z"/>
+          <path d="M1110 60 L1110 42 L1102 42 L1140 22 L1178 42 L1170 42 L1170 60 Z"/>
+        </g>
+      </svg>
+    </div>
   </section>
 {% endif %}
 

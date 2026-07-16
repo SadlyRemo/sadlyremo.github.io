@@ -95,6 +95,14 @@
   --fj-ember: rgb(230 220 198 / 42%);  /* warm firefly */
   --fj-petal: rgb(215 160 179 / 55%);  /* sakura petal */
   --fj-lantern: rgb(203 168 106 / 26%);/* warm lantern halo */
+  --fj-roof: #15131a;                  /* village roofs (silhouette) */
+  --fj-window: rgb(232 180 108 / 78%); /* warm lit paper window */
+  --fj-street: #131218;
+  --fj-tree: #191720;
+  --fj-cloud: rgb(150 140 170 / 9%);   /* decorative dusk cloud */
+  --fj-cherry: rgb(215 160 179 / 30%); /* cherry-blossom canopy */
+  --fj-maple: rgb(203 168 106 / 28%);  /* maple canopy */
+  --fj-lantern-body: #b8703a;          /* paper-lantern warm skin */
   --fj-wood: #221f2a;
   --fj-wood-2: #2a2634;
   --fj-lacquer: #141118;
@@ -231,6 +239,14 @@
   --fj-ember: rgb(150 120 170 / 30%);
   --fj-petal: rgb(200 130 150 / 42%);    /* sakura petal */
   --fj-lantern: rgb(190 150 90 / 26%);
+  --fj-roof: #8b8397;
+  --fj-window: rgb(196 146 66 / 62%);
+  --fj-street: #b8afc6;
+  --fj-tree: #9a92aa;
+  --fj-cloud: rgb(120 110 140 / 9%);
+  --fj-cherry: rgb(200 130 150 / 34%);
+  --fj-maple: rgb(180 140 80 / 30%);
+  --fj-lantern-body: #c88a4a;
   --fj-wood: #e7e0ce;
   --fj-wood-2: #ded5c0;
   --fj-lacquer: #efe7f7;
@@ -357,9 +373,9 @@ body {
   font-family: 'Zen Old Mincho', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
   background-color: var(--fj-sky-bottom);
   background-image:
-    radial-gradient(120% 80% at 82% -12%, var(--fj-moon-glow) 0%, transparent 40%),
-    radial-gradient(90% 60% at 12% 108%, rgb(160 138 223 / 5%) 0%, transparent 55%),
-    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 58%);
+    radial-gradient(130% 70% at 50% 120%, rgb(198 138 88 / 10%) 0%, transparent 52%),
+    radial-gradient(100% 80% at 84% -6%, rgb(120 110 170 / 8%) 0%, transparent 48%),
+    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 60%);
   background-attachment: fixed;
   background-repeat: no-repeat;
   letter-spacing: 0.005em;
@@ -367,9 +383,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Text selection — a soft lavender wash */
-::selection { background: rgb(160 138 223 / 32%); color: var(--heading-color); }
-::-moz-selection { background: rgb(160 138 223 / 32%); color: var(--heading-color); }
+/* Text selection — soft ink soaking into rice paper */
+::selection { background: rgb(126 114 162 / 34%); color: var(--heading-color); }
+::-moz-selection { background: rgb(126 114 162 / 34%); color: var(--heading-color); }
 
 /* Reading comfort: generous measure & rhythm for long technical posts */
 .content { font-size: 1.02rem; line-height: 1.85; }
@@ -786,45 +802,116 @@ figure.highlight:hover {
 }
 .fj-bg > * { position: absolute; }
 
-/* Layer 7 — moon (pale sun in light mode) */
-.fj-moon {
-  top: 6vh;
-  right: 9vw;
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 38%, var(--fj-moon) 0%, var(--fj-moon) 42%, transparent 64%);
-  box-shadow: 0 0 90px 30px var(--fj-moon-glow), 0 0 160px 60px var(--fj-moon-glow);
-  opacity: 0.9;
+/* Parallax layers — full-width, bottom-anchored SVG scenes */
+.fj-layer { left: 0; bottom: 0; width: 100%; will-change: transform; }
+.fj-layer svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; display: block; }
+.fj-far     { height: 62vh; min-height: 340px; opacity: 0.92; }
+.fj-village { height: 46vh; min-height: 300px; }
+.fj-village .fj-win { fill: var(--fj-window); }
+.fj-village .fj-cherry { fill: var(--fj-cherry); }
+.fj-village .fj-maple  { fill: var(--fj-maple); }
+.fj-village .fj-wins { animation: fj-win-glow 7s ease-in-out infinite; }
+@keyframes fj-win-glow { 0%, 100% { opacity: 0.82; } 50% { opacity: 1; } }
+
+/* Decorative Japanese clouds — slow horizontal drift near the dusk sky */
+.fj-cloud {
+  height: 20px;
+  border-radius: 40px;
+  background: var(--fj-cloud);
+  box-shadow:
+    18px 6px 0 -3px var(--fj-cloud), 40px 2px 0 -5px var(--fj-cloud),
+    -18px 5px 0 -4px var(--fj-cloud);
+  filter: blur(1px);
+  will-change: transform;
+  animation: fj-cloud-drift var(--fj-cloud-dur, 50s) linear var(--fj-leaf-delay, 0s) infinite;
+}
+@keyframes fj-cloud-drift {
+  from { transform: translate3d(-16vw, 0, 0); }
+  to   { transform: translate3d(116vw, 0, 0); }
 }
 
-/* Layer 2 — drifting fog bands */
+/* Drifting mist bands between the ridges and the houses */
 .fj-fog {
   left: -60%;
   width: 220%;
-  height: 42vh;
+  height: 40vh;
   background: radial-gradient(60% 100% at 30% 100%, var(--fj-fog) 0%, transparent 70%),
     radial-gradient(50% 100% at 70% 100%, var(--fj-fog) 0%, transparent 70%);
   will-change: transform;
 }
-.fj-fog--1 { bottom: 8vh; animation: fj-fog-drift var(--fj-fog-speed) linear infinite; }
-.fj-fog--2 { bottom: 22vh; opacity: 0.7; animation: fj-fog-drift calc(var(--fj-fog-speed) * 1.6) linear infinite reverse; }
+.fj-fog--1 { bottom: 20vh; animation: fj-fog-drift var(--fj-fog-speed) linear infinite; }
+.fj-fog--2 { bottom: 6vh; opacity: 0.8; animation: fj-fog-drift calc(var(--fj-fog-speed) * 1.6) linear infinite reverse; }
 @keyframes fj-fog-drift {
   from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(18%, 0, 0); }
+  to   { transform: translate3d(16%, 0, 0); }
 }
 
-/* Layers 3-6 — mountains / houses / bamboo / torii silhouettes */
-.fj-silhouette {
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 58vh;
-  min-height: 320px;
+/* Hanging paper lanterns — warm light, gently flickering, on a thin cord */
+.fj-lantern-paper {
+  width: 18px;
+  height: 26px;
+  border-radius: 46% 46% 50% 50% / 40% 40% 60% 60%;
+  background:
+    radial-gradient(circle at 50% 42%, rgb(255 214 150 / 92%) 0%, var(--fj-lantern-body) 62%, rgb(120 60 30 / 90%) 100%);
+  box-shadow: 0 0 26px 8px var(--fj-lantern), inset 0 -3px 4px rgb(90 40 20 / 60%);
+  will-change: opacity;
+  animation: fj-flicker var(--fj-flicker-dur, 4.6s) ease-in-out var(--fj-leaf-delay, 0s) infinite;
 }
-.fj-silhouette svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; }
-.fj-far   { opacity: 0.9; }
-.fj-torii-bg { opacity: 0.5; filter: drop-shadow(0 0 14px var(--fj-torii-edge)); }
+.fj-lantern-paper::before { /* cord */
+  content: ''; position: absolute; left: 50%; top: -14px;
+  width: 1px; height: 14px; background: rgb(160 150 170 / 40%); transform: translateX(-50%);
+}
+.fj-lantern-paper::after { /* bottom tassel */
+  content: ''; position: absolute; left: 50%; bottom: -5px;
+  width: 2px; height: 5px; background: var(--fj-lantern-body); transform: translateX(-50%);
+}
+
+/* A wooden calligraphy sign swinging softly in the wind */
+.fj-sign {
+  width: 30px; height: 34px;
+  transform-origin: 50% -6px;
+  animation: fj-sway 6s ease-in-out infinite;
+}
+.fj-sign-rope { position: absolute; left: 50%; top: -12px; width: 1px; height: 12px; background: rgb(160 150 170 / 45%); transform: translateX(-50%); }
+.fj-sign-board {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Yuji Syuku', serif; font-size: 18px; line-height: 1;
+  color: var(--fj-ivory);
+  background: linear-gradient(180deg, var(--fj-wood-2), var(--fj-wood));
+  border: 1px solid rgb(0 0 0 / 40%); border-radius: 3px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 45%);
+}
+@keyframes fj-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+
+/* Tiny birds occasionally crossing the sky */
+.fj-birds {
+  left: 0;
+  will-change: transform;
+  animation: fj-bird-cross 13s linear forwards;
+}
+@keyframes fj-bird-cross {
+  from { transform: translate3d(calc(-10vw * var(--fj-bird-dir, 1)), 0, 0); }
+  to   { transform: translate3d(calc(112vw * var(--fj-bird-dir, 1)), -6vh, 0); }
+}
+.fj-bird {
+  position: relative;
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-top: 1.5px solid var(--fj-silver);
+  border-right: 1.5px solid var(--fj-silver);
+  opacity: 0.5;
+  transform: rotate(-45deg);
+  border-radius: 60% 0 0 0;
+  animation: fj-flap 0.9s ease-in-out infinite;
+}
+@keyframes fj-flap {
+  0%, 100% { transform: rotate(-45deg) scaleY(1); }
+  50%      { transform: rotate(-45deg) scaleY(0.55); }
+}
 
 /* Layer 8 — drifting leaves + floating embers (elements added by JS) */
 .fj-leaf, .fj-ember {
@@ -949,21 +1036,27 @@ figure.highlight:hover {
   border-radius: var(--fj-radius-lg);
   border: 1px solid var(--main-border-color);
   background:
-    radial-gradient(60% 90% at 50% -10%, var(--fj-moon-glow) 0%, transparent 55%),
-    linear-gradient(180deg, rgb(139 92 246 / 6%), transparent 70%),
+    radial-gradient(120% 82% at 50% 120%, rgb(198 138 88 / 14%) 0%, transparent 54%),
+    linear-gradient(180deg, rgb(120 110 170 / 8%), transparent 58%),
     linear-gradient(180deg, var(--fj-sky-top), var(--fj-sky-bottom));
 }
-#fj-hero .fj-hero-moon {
-  position: absolute;
-  top: -46px;
-  left: 50%;
-  width: 150px; height: 150px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, var(--fj-moon) 0%, var(--fj-moon) 44%, transparent 66%);
-  box-shadow: 0 0 80px 24px var(--fj-moon-glow);
+/* two warm paper lanterns hanging in the hero corners */
+#fj-hero .fj-hero-lantern {
+  position: absolute; top: 20px;
+  width: 20px; height: 28px; border-radius: 46% 46% 50% 50% / 40% 40% 60% 60%;
+  background: radial-gradient(circle at 50% 42%, rgb(255 214 150 / 92%) 0%, var(--fj-lantern-body) 62%, rgb(120 60 30 / 90%) 100%);
+  box-shadow: 0 0 30px 10px var(--fj-lantern);
+  animation: fj-flicker 4.4s ease-in-out infinite;
   pointer-events: none;
 }
+#fj-hero .fj-hero-lantern--l { left: 12%; }
+#fj-hero .fj-hero-lantern--r { right: 12%; animation-delay: -2s; }
+/* an Edo rooftop skyline resting along the hero base */
+#fj-hero .fj-hero-roofs {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 58px;
+  pointer-events: none; opacity: 0.9;
+}
+#fj-hero .fj-hero-roofs svg { display: block; width: 100%; height: 100%; }
 #fj-hero .fj-hero-title {
   position: relative;
   margin: 0;
@@ -1036,8 +1129,8 @@ figure.highlight:hover {
  *  15. RESPONSIVE + ACCESSIBILITY guards
  * ========================================================================= */
 @media (max-width: 850px) {
-  .fj-moon { width: 110px; height: 110px; top: 4vh; right: 6vw; }
-  .fj-silhouette { height: 42vh; }
+  .fj-far { height: 48vh; }
+  .fj-village { height: 38vh; }
   #fj-ambient { width: 40px; height: 40px; right: 0.75rem; bottom: 0.75rem; }
 }
 
@@ -1049,10 +1142,10 @@ figure.highlight:hover {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .fj-fog, .fj-leaf, .fj-ember, .fj-petal { display: none; }
-  .fj-lantern { animation: none; }
+  .fj-fog, .fj-leaf, .fj-ember, .fj-petal, .fj-cloud, .fj-birds { display: none; }
+  .fj-lantern, .fj-lantern-paper, .fj-sign, .fj-village .fj-wins { animation: none; }
   #main-wrapper { animation: none; }
-  #fj-progress { display: none; }
+  #fj-progress, #fj-scroll, #fj-shoji, #fj-intro { display: none; }
 }
 
 /* Never sacrifice keyboard focus visibility */
@@ -1163,4 +1256,84 @@ input:focus, textarea:focus, select:focus {
   transition: transform 0.25s var(--fj-ease), box-shadow 0.25s var(--fj-ease);
 }
 #fj-404 .fj-404-home:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--fj-glow), 0 8px 20px rgb(0 0 0 / 45%); }
+
+/* ========================================================================= *
+ *  17. SIGNATURE MOTIONS — brush scroll · shoji doors · ensō intro loader
+ * ========================================================================= */
+
+/* Reading progress as an ink brush stroke down the right margin */
+#fj-scroll {
+  position: fixed;
+  top: 12vh; right: 12px;
+  width: 8px; height: 76vh;
+  z-index: 1050;
+  opacity: 0;
+  transition: opacity 0.4s var(--fj-ease);
+  pointer-events: none;
+}
+#fj-scroll::before { /* faint track, like unpainted paper */
+  content: ''; position: absolute; inset: 0; left: 3px; width: 2px;
+  background: var(--main-border-color); border-radius: 2px;
+}
+.fj-scroll-fill {
+  position: absolute; top: 0; left: 1px; width: 6px; height: 100%;
+  transform-origin: top; transform: scaleY(0);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--fj-purple-soft), var(--fj-purple) 55%, var(--fj-purple-deep));
+  box-shadow: 0 0 10px var(--fj-glow);
+  /* brush-tapered edges */
+  clip-path: polygon(30% 0, 70% 0, 100% 4%, 85% 100%, 15% 100%, 0 4%);
+}
+.fj-scroll-tip {
+  position: absolute; left: 50%; width: 12px; height: 12px;
+  margin: -6px 0 0 -6px; border-radius: 50%;
+  background: radial-gradient(circle, var(--fj-purple-soft) 0%, transparent 70%);
+  box-shadow: 0 0 10px var(--fj-glow-strong);
+}
+
+/* Shoji sliding paper doors — part on each arrival */
+#fj-shoji {
+  position: fixed; inset: 0; z-index: 2147483040; pointer-events: none;
+  display: block;
+}
+.fj-shoji-panel {
+  position: absolute; top: 0; height: 100%; width: 50.5%;
+  background: linear-gradient(180deg, #efe7d6, #e4dac6);
+  /* washi paper with a wooden lattice */
+  background-image:
+    linear-gradient(rgb(120 96 60 / 22%) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgb(120 96 60 / 22%) 1.5px, transparent 1.5px);
+  background-size: 33.33% 20%;
+  box-shadow: 0 0 40px rgb(0 0 0 / 45%);
+  transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.fj-shoji-l { left: 0; border-right: 2px solid rgb(90 66 40 / 55%); transform: translateX(0); }
+.fj-shoji-r { right: 0; border-left: 2px solid rgb(90 66 40 / 55%); transform: translateX(0); }
+#fj-shoji.open .fj-shoji-l { transform: translateX(-100%); }
+#fj-shoji.open .fj-shoji-r { transform: translateX(100%); }
+
+/* Intro loader — a brush paints an ensō, once per session */
+#fj-intro {
+  position: fixed; inset: 0; z-index: 2147483045;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--fj-sky-bottom);
+  transition: opacity 0.6s var(--fj-ease);
+}
+#fj-intro.fade { opacity: 0; }
+#fj-intro svg { width: 128px; height: 128px; }
+#fj-intro .fj-enso {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  filter: drop-shadow(0 0 8px var(--fj-glow));
+}
+#fj-intro.draw .fj-enso {
+  animation: fj-enso-draw 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+@keyframes fj-enso-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 850px) {
+  #fj-scroll { display: none; }
+}
 
