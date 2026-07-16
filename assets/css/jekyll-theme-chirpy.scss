@@ -680,3 +680,64 @@ footer::before {
   pointer-events: none;
 }
 
+/* ========================================================================= *
+ *  10. CODE — black-lacquer boxes with a purple-tinted, legible palette
+ * ========================================================================= */
+
+/* Frame: rounded lacquer box, subtle top sheen, glow on hover.
+   Header (filename / copy button / dots) and line numbers keep working. */
+div[class^='language-'],
+figure.highlight,
+.highlighter-rouge {
+  border-radius: var(--fj-radius);
+  overflow: hidden;
+  transition: box-shadow 0.3s var(--fj-ease);
+}
+div[class^='language-']:hover,
+figure.highlight:hover {
+  box-shadow: var(--language-border-color) 0 0 0 1px,
+    0 0 22px -4px var(--fj-glow), 0 10px 26px rgb(0 0 0 / 45%);
+}
+.highlight {
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 3%), transparent 72px);
+}
+.code-header {
+  background: linear-gradient(180deg, #14111c, #0d0b13);
+  border-bottom: 1px solid var(--main-border-color);
+}
+
+/* Rouge token palette — applied at the same specificity Chirpy binds its own
+   tokens (:root[data-bs-theme=…] .highlight .x) so ours win in both modes.
+   Mostly purples with a sage green for strings and a periwinkle for functions,
+   so keywords/strings/numbers stay clearly distinguishable — readability first. */
+@mixin fj-syntax {
+  .highlight {
+    color: var(--code-color);
+
+    .c, .ch, .cm, .cp, .cpf, .c1, .cs { color: #7b6ea3; font-style: italic; } /* comments */
+    .err { color: #e06c78; }
+    .k, .kc, .kd, .kn, .kp, .kr { color: #b79cff; }                            /* keywords */
+    .kt, .nc, .nn, .no, .ne, .nb, .bp { color: #c4b5fd; }                       /* types/classes */
+    .nf, .fm, .py { color: #90c4f0; }                                          /* functions */
+    .nt { color: #b79cff; }                                                     /* html tags */
+    .na { color: #9ecf9a; }                                                     /* attributes */
+    .nd { color: #d7a8ff; }                                                     /* decorators */
+    .n, .nx, .nl, .nv, .vc, .vg, .vi, .vm { color: #dcd2ff; }                   /* names/vars */
+    .s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #9ecf9a; } /* strings */
+    .sr, .ss { color: #7fd6c2; }                                               /* regex/symbol */
+    .m, .mb, .mf, .mh, .mi, .mo, .il, .l, .ld { color: #d7a8ff; }              /* numbers */
+    .o, .ow, .pi { color: #c9a7ff; }                                           /* operators */
+    .p { color: #b3a7d6; }                                                      /* punctuation */
+    .gi { color: #9ecf9a; }                                                     /* diff + */
+    .gd { color: #e06c78; }                                                     /* diff - */
+    .gh, .gu { color: #b79cff; font-weight: 700; }
+    .gp { color: #7b6ea3; }
+    .ge { font-style: italic; }
+    .gs { font-weight: 700; }
+    .gl, .go { color: var(--code-color); }
+  }
+}
+:root[data-bs-theme='dark']  { @include fj-syntax; }
+:root[data-bs-theme='light'] { @include fj-syntax; }
+:root:not([data-bs-theme])   { @include fj-syntax; }
+
