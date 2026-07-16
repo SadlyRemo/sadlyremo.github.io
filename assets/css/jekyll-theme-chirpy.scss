@@ -39,7 +39,7 @@
   --sumi-ink:       #16130f;   /* 墨  sumi   — ink ground   */
   --sumi-washi:     #e8dcc8;   /* 和紙 washi  — warm paper   */
   --sumi-shu:       #d1362f;   /* 朱  shu    — vermillion   */
-  --sumi-shu-link:  #de473e;   /* brightened vermillion, AA-safe on ink */
+  --sumi-shu-link:  #e24d43;   /* brightened vermillion, 4.74:1 on ink (AA) */
   --sumi-kin:       #d8b24a;   /* 金  kin    — gold leaf    */
   --sumi-ai:        #3a5a78;   /* 藍  ai     — indigo        */
   --sumi-seal-fg:   #f0e6d2;   /* glyph colour inside the hanko seal */
@@ -62,15 +62,15 @@
   --label-color:                #b8ab93;
   --blockquote-border-color:    #3a5a78;
   --blockquote-text-color:      #b8ab93;
-  --link-color:                 #de473e;
+  --link-color:                 #e24d43;
   --link-underline-color:       #6b3a34;
   --button-bg:                  #1e1a14;
   --btn-border-color:           #2e281f;
-  --btn-backtotop-color:        #de473e;
+  --btn-backtotop-color:        #e24d43;
   --btn-backtotop-border-color: #2e281f;
   --card-header-bg:             #211c15;
   --checkbox-color:             #6b5f4d;
-  --checkbox-checked-color:     #de473e;
+  --checkbox-checked-color:     #e24d43;
   --img-bg:                     radial-gradient(circle, rgb(30 26 20) 0%, rgb(22 19 15) 100%);
   --shimmer-bg:                 linear-gradient(90deg, rgb(255 255 255 / 0%) 0%, rgb(201 162 39 / 12%) 50%, rgb(255 255 255 / 0%) 100%);
 
@@ -99,10 +99,10 @@
   --btn-paginator-hover-color: #241f18;
 
   /* Posts */
-  --toc-highlight:        #de473e;
+  --toc-highlight:        #e24d43;
   --toc-popup-border-color: #2e281f;
   --btn-share-color:      #a89a83;
-  --btn-share-hover-color: #de473e;
+  --btn-share-hover-color: #e24d43;
   --card-bg:              #1c1813;
   --card-hover-bg:        #241f18;
   --card-shadow:          rgb(0 0 0 / 50%) 0 4px 14px 0, rgb(201 162 39 / 8%) 0 0 0 1px;
