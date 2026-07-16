@@ -55,6 +55,7 @@ layout: default
 
 {% if paginator.page == 1 %}
   <section id="fj-hero" aria-label="Introduction">
+    <span class="fj-hero-vert" aria-hidden="true">参道</span>
     <span class="fj-hero-lantern fj-hero-lantern--l" aria-hidden="true"></span>
     <span class="fj-hero-lantern fj-hero-lantern--r" aria-hidden="true"></span>
     <span class="fj-hero-kicker">忍 · exploit dev · red team</span>
@@ -62,40 +63,44 @@ layout: default
     <p class="fj-hero-sub">{{ site.tagline | default: site.description }}</p>
     <div class="fj-hero-rule" aria-hidden="true"></div>
     <div class="fj-hero-scene" aria-hidden="true">
-      <svg viewBox="0 0 1000 300" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-        <!-- pagoda dissolving in the far mist -->
-        <g style="fill:var(--fj-mountain)" opacity="0.85">
-          <path d="M474 152 L526 152 L514 136 L486 136 Z"/>
-          <path d="M482 136 L518 136 L508 122 L492 122 Z"/>
-          <rect x="495" y="152" width="10" height="40"/>
-        </g>
-        <!-- houses framing the street (left / right, angled toward the centre) -->
+      <svg viewBox="0 0 1000 340" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <!-- buildings flanking the approach -->
         <g style="fill:var(--fj-house)">
-          <path d="M0 138 L214 166 L214 300 L0 300 Z"/>
-          <path d="M1000 138 L786 166 L786 300 L1000 300 Z"/>
+          <path d="M0 158 L150 176 L150 340 L0 340 Z"/>
+          <path d="M1000 158 L850 176 L850 340 L1000 340 Z"/>
         </g>
-        <path style="fill:var(--fj-roof)" d="M-10 128 L236 154 L204 112 L-10 84 Z"/>
-        <path style="fill:var(--fj-roof)" d="M1010 128 L764 154 L796 112 L1010 84 Z"/>
-        <g class="fj-hero-win"><rect x="120" y="196" width="34" height="26" rx="2"/><rect x="846" y="196" width="34" height="26" rx="2"/></g>
-        <!-- stone path receding toward the pagoda -->
-        <path style="fill:var(--fj-street)" d="M430 300 L570 300 L522 152 L478 152 Z"/>
-        <g style="stroke:var(--fj-mountain-far);stroke-width:1.4" opacity="0.5">
-          <line x1="450" y1="272" x2="550" y2="272"/><line x1="459" y1="242" x2="541" y2="242"/>
-          <line x1="466" y1="214" x2="534" y2="214"/><line x1="472" y1="188" x2="528" y2="188"/>
+        <path style="fill:var(--fj-roof)" d="M-10 158 L172 176 L150 132 L-10 116 Z"/>
+        <path style="fill:var(--fj-roof)" d="M1010 158 L828 176 L850 132 L1010 116 Z"/>
+        <g class="fj-hero-win"><rect x="86" y="206" width="30" height="24" rx="2"/><rect x="884" y="206" width="30" height="24" rx="2"/></g>
+        <!-- the two-tier temple gate (sanmon), warm-lit within -->
+        <path style="fill:var(--fj-roof)" d="M424 120 L576 120 L548 94 Q500 82 452 94 Z"/>
+        <rect class="fj-lit" x="468" y="120" width="64" height="20" rx="1" opacity="0.75"/>
+        <path style="fill:var(--fj-roof)" d="M398 154 L602 154 L566 124 Q500 110 434 124 Z"/>
+        <g style="fill:var(--fj-house)"><rect x="440" y="154" width="12" height="52"/><rect x="548" y="154" width="12" height="52"/></g>
+        <rect class="fj-lit" x="460" y="160" width="80" height="46" rx="1"/>
+        <!-- stone steps up to the gate -->
+        <g style="fill:var(--fj-street)"><rect x="472" y="206" width="56" height="4"/><rect x="468" y="212" width="64" height="4"/><rect x="463" y="218" width="74" height="4"/></g>
+        <!-- the wet stone approach, one-point perspective -->
+        <path style="fill:var(--fj-street)" d="M392 340 L608 340 L536 222 L464 222 Z"/>
+        <g style="stroke:var(--fj-mountain-far);stroke-width:1.4" opacity="0.4">
+          <line x1="436" y1="302" x2="564" y2="302"/><line x1="447" y1="274" x2="553" y2="274"/>
+          <line x1="456" y1="250" x2="544" y2="250"/><line x1="461" y1="232" x2="539" y2="232"/>
         </g>
-        <!-- stone lanterns flanking the path -->
-        <g style="fill:var(--fj-tree)"><rect x="402" y="236" width="11" height="42"/><rect x="587" y="236" width="11" height="42"/></g>
-        <!-- the lone wanderer; his sash is the only warmth -->
+        <!-- red chōchin lanterns flanking, shrinking with distance -->
+        <g class="fj-chochin">
+          <ellipse cx="414" cy="252" rx="11" ry="15"/><ellipse cx="586" cy="252" rx="11" ry="15"/>
+          <ellipse cx="440" cy="228" rx="8" ry="11"/><ellipse cx="560" cy="228" rx="8" ry="11"/>
+          <ellipse cx="458" cy="210" rx="6" ry="8"/><ellipse cx="542" cy="210" rx="6" ry="8"/>
+        </g>
+        <!-- a lone figure walking the approach -->
         <g style="fill:var(--fj-samurai)">
-          <path d="M488 214 q12 -15 24 0 z"/>
-          <ellipse cx="500" cy="214" rx="19" ry="6"/>
-          <path d="M492 218 L508 218 L512 270 L488 270 Z"/>
-          <rect x="493" y="270" width="5" height="24"/><rect x="502" y="270" width="5" height="24"/>
+          <ellipse cx="500" cy="252" rx="10" ry="4"/>
+          <path d="M494 254 L506 254 L509 290 L491 290 Z"/>
+          <rect x="495" y="290" width="4.5" height="16"/><rect x="501" y="290" width="4.5" height="16"/>
         </g>
-        <line x1="513" y1="234" x2="530" y2="282" style="fill:none;stroke:var(--fj-samurai);stroke-width:3"/>
-        <rect x="495" y="242" width="10" height="4" style="fill:var(--fj-ember-warm)"/>
       </svg>
     </div>
+    <div class="fj-hero-wet" aria-hidden="true"></div>
     <div class="fj-hero-fog" aria-hidden="true"></div>
   </section>
 {% endif %}

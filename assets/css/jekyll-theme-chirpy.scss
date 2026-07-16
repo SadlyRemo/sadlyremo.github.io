@@ -38,14 +38,18 @@
   --fj-purple: #a08adf;        /* soft lavender — primary accent */
   --fj-purple-deep: #7361bd;   /* deeper lavender — rules, borders */
   --fj-purple-soft: #c6b8f2;   /* pale lavender — text-on-dark accents */
-  --fj-sakura: #d7a0b3;        /* muted cherry-blossom pink */
+  --fj-sakura: #e0a8be;        /* cherry-blossom pink (image 1) */
   --fj-gold: #cba86a;          /* muted gold — tiny details, hovers */
   --fj-green: #93ac8c;         /* very subtle bamboo green */
   --fj-silver: #c6cad4;        /* moonlight silver */
   --fj-ivory: #ece5d6;         /* warm rice-paper ivory */
+  --fj-vermillion: #d1503f;    /* torii / lantern red (image 2) */
+  --fj-amber: #e0904a;         /* warm lantern light */
+  --fj-teal: #4f8f8a;          /* muted temple-roof teal */
   --fj-glow: rgb(160 138 223 / 34%);
   --fj-glow-strong: rgb(160 138 223 / 50%);
   --fj-gold-glow: rgb(203 168 106 / 34%);
+  --fj-amber-glow: rgb(224 144 74 / 40%);
 
   /* geometry */
   --fj-radius: 12px;
@@ -79,30 +83,30 @@
   color-scheme: dark;
 
   /* atmosphere / layer colours consumed by feudal.js SVG silhouettes.
-     Cold, fog-drenched grey-blue — a misty samurai village, never pure black. */
-  --fj-sky-top: #191d27;
-  --fj-sky-bottom: #14161d;
+     "Sandō" blue hour — indigo-violet twilight warmed by lantern light. */
+  --fj-sky-top: #171a2e;               /* deep indigo twilight (image 1 top) */
+  --fj-sky-bottom: #131521;
   --fj-moon: #e6e3ea;
   --fj-moon-glow: rgb(206 202 224 / 16%);
-  --fj-fog: rgb(178 192 214 / 9%);     /* luminous cool mist — the signature */
-  --fj-fog-bright: rgb(190 202 222 / 16%);
-  --fj-mountain: #1b2029;
-  --fj-mountain-far: #171b24;
-  --fj-house: #13161d;
-  --fj-bamboo: #171d1e;         /* silhouette bamboo (dark, cool) */
-  --fj-torii: #191620;
-  --fj-torii-edge: rgb(160 138 223 / 26%);
-  --fj-leaf: rgb(170 186 206 / 40%);   /* cool drifting leaf */
-  --fj-ember: rgb(206 214 228 / 40%);  /* cool dust firefly */
-  --fj-petal: rgb(205 175 190 / 48%);  /* muted sakura petal */
-  --fj-lantern: rgb(208 148 88 / 20%); /* rare warm lantern — the only heat */
-  --fj-ember-warm: #c8703a;            /* lone warm accent (the sash) */
-  --fj-samurai: #0e1117;               /* the wanderer's silhouette */
-  --fj-roof: #101319;                  /* village roofs (silhouette) */
-  --fj-window: rgb(196 210 230 / 30%); /* cold lit paper window */
-  --fj-street: #1b1f28;                /* wet stone path (lighter than base) */
-  --fj-tree: #161b23;
-  --fj-cloud: rgb(184 196 216 / 11%);  /* cool drifting cloud */
+  --fj-fog: rgb(160 152 202 / 8%);     /* lavender-blue mist */
+  --fj-fog-bright: rgb(182 174 216 / 15%);
+  --fj-mountain: #1c1e31;
+  --fj-mountain-far: #181a2b;
+  --fj-house: #14151f;
+  --fj-bamboo: #171e1c;
+  --fj-torii: #1c1624;
+  --fj-torii-edge: rgb(160 138 223 / 30%);
+  --fj-leaf: rgb(196 176 176 / 42%);   /* dusk-tinted leaf */
+  --fj-ember: rgb(226 200 176 / 44%);  /* warm dust firefly */
+  --fj-petal: rgb(224 168 190 / 55%);  /* sakura petal (image 1) */
+  --fj-lantern: rgb(226 128 74 / 30%); /* warm vermillion lantern halo */
+  --fj-ember-warm: #e08a4a;            /* warm lantern-light accent */
+  --fj-samurai: #0d0e18;               /* the wanderer's silhouette */
+  --fj-roof: #111220;                  /* roofs / dark teal-slate tiles */
+  --fj-window: rgb(234 172 102 / 55%); /* warm amber lit paper (image 2 gate) */
+  --fj-street: #1b1d2b;                /* wet stone approach (reflective) */
+  --fj-tree: #171927;
+  --fj-cloud: rgb(180 170 212 / 11%);  /* lavender twilight cloud */
   --fj-cherry: rgb(205 175 190 / 28%); /* muted cherry-blossom canopy */
   --fj-maple: rgb(176 190 210 / 26%);  /* cool maple canopy */
   --fj-lantern-body: #c07a44;          /* paper-lantern warm skin */
@@ -113,8 +117,8 @@
   --fj-seal-ink: #ecd6da;
 
   /* ---- Chirpy framework variables ---- */
-  --main-bg: #14161d;
-  --mask-bg: #0d0f14;
+  --main-bg: #131521;
+  --mask-bg: #0c0d16;
   --main-border-color: rgb(198 190 224 / 12%);
 
   --text-color: #e7e1d3;                 /* warm ivory — easy on the eyes */
@@ -376,9 +380,9 @@ body {
   font-family: 'Zen Old Mincho', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
   background-color: var(--fj-sky-bottom);
   background-image:
-    radial-gradient(90% 60% at 50% 6%, rgb(184 198 220 / 12%) 0%, transparent 46%),
-    radial-gradient(120% 70% at 50% 122%, rgb(120 132 160 / 7%) 0%, transparent 52%),
-    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 62%);
+    radial-gradient(95% 62% at 50% -4%, rgb(150 128 210 / 13%) 0%, transparent 46%),
+    radial-gradient(120% 66% at 50% 120%, rgb(224 144 74 / 11%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--fj-sky-top) 0%, var(--fj-sky-bottom) 60%);
   background-attachment: fixed;
   background-repeat: no-repeat;
   letter-spacing: 0.005em;
@@ -1144,18 +1148,48 @@ figure.highlight:hover {
     radial-gradient(80% 66% at 50% 14%, var(--fj-fog-bright) 0%, transparent 52%),
     linear-gradient(180deg, var(--fj-sky-top), var(--fj-sky-bottom));
 }
-/* the misty samurai-village scene fills the hero behind the title */
+/* the lantern-lit gate approach fills the hero behind the title */
 #fj-hero .fj-hero-scene {
-  position: absolute; inset: 0; z-index: 0; opacity: 0.92; pointer-events: none;
+  position: absolute; inset: 0; z-index: 0; opacity: 0.94; pointer-events: none;
 }
 #fj-hero .fj-hero-scene svg { display: block; width: 100%; height: 100%; }
-#fj-hero .fj-hero-scene .fj-hero-win { fill: var(--fj-window); }
-/* luminous fog veiling the scene + a bottom scrim to keep the title crisp */
+#fj-hero .fj-hero-scene .fj-hero-win,
+#fj-hero .fj-hero-scene .fj-lit { fill: var(--fj-window); }
+#fj-hero .fj-hero-scene .fj-lit { filter: drop-shadow(0 0 10px var(--fj-amber-glow)); }
+#fj-hero .fj-hero-scene .fj-chochin ellipse {
+  fill: var(--fj-vermillion);
+  filter: drop-shadow(0 0 6px var(--fj-lantern));
+  animation: fj-flicker 5s ease-in-out infinite;
+}
+/* vertical calligraphy — 縦書き signature down the hero's edge */
+#fj-hero .fj-hero-vert {
+  position: absolute; top: 1.3rem; right: 1.5rem; z-index: 2;
+  writing-mode: vertical-rl; text-orientation: upright;
+  font-family: 'Yuji Syuku', 'Shippori Mincho', serif;
+  font-size: clamp(1.1rem, 3.4vw, 1.9rem); letter-spacing: 0.22em;
+  color: var(--fj-purple-soft); opacity: 0.55;
+  text-shadow: 0 0 14px var(--fj-glow);
+}
+/* wet-stone reflection: warm lantern light pooling down the approach */
+#fj-hero .fj-hero-wet {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 44%; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(38% 96% at 50% 0%, var(--fj-amber-glow) 0%, transparent 62%),
+    radial-gradient(14% 80% at 41.5% 0%, var(--fj-lantern) 0%, transparent 58%),
+    radial-gradient(14% 80% at 58.5% 0%, var(--fj-lantern) 0%, transparent 58%);
+  filter: blur(5px);
+  opacity: 0.55;
+  -webkit-mask: linear-gradient(180deg, #000 0%, transparent 86%);
+  mask: linear-gradient(180deg, #000 0%, transparent 86%);
+  animation: fj-wet-shimmer 6.5s ease-in-out infinite;
+}
+@keyframes fj-wet-shimmer { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.68; } }
+/* luminous fog veiling the scene + a scrim to keep the title crisp */
 #fj-hero .fj-hero-fog {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
-    radial-gradient(56% 62% at 50% 42%, var(--fj-fog-bright) 0%, transparent 62%),
-    linear-gradient(180deg, rgb(20 22 29 / 30%) 0%, transparent 34%, rgb(20 22 29 / 40%) 100%);
+    radial-gradient(54% 58% at 50% 34%, var(--fj-fog-bright) 0%, transparent 64%),
+    linear-gradient(180deg, rgb(19 21 33 / 28%) 0%, transparent 32%, rgb(19 21 33 / 34%) 100%);
   animation: fj-fog-breathe 22s ease-in-out infinite;
 }
 /* two stone lanterns glowing warm in the hero corners */
