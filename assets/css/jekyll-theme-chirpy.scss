@@ -596,11 +596,24 @@ a.tag:hover {
 
 /* Blockquotes — an unrolled paper scroll with an ink-brush edge */
 .content blockquote:not([class^='prompt-']) {
+  position: relative;
   border-left: 3px solid var(--fj-purple-deep);
   border-radius: 0 var(--fj-radius) var(--fj-radius) 0;
-  background: linear-gradient(90deg, rgb(139 92 246 / 8%), transparent 60%);
-  padding: 0.6rem 1.1rem;
+  background: linear-gradient(90deg, rgb(160 138 223 / 8%), transparent 62%);
+  padding: 0.7rem 1.2rem 0.7rem 2.5rem;
   box-shadow: inset 1px 0 0 var(--fj-glow);
+  font-style: italic;
+  color: var(--blockquote-text-color);
+}
+/* an ink brush quotation mark */
+.content blockquote:not([class^='prompt-'])::before {
+  content: '\201C';
+  position: absolute;
+  left: 0.55rem; top: 0.15rem;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 2.3rem; line-height: 1;
+  color: var(--fj-purple);
+  opacity: 0.5;
 }
 
 /* Callout / prompt boxes — clean lacquer cards with semantic edge */
@@ -658,18 +671,51 @@ blockquote[class^='prompt-'] {
 }
 
 /* Section rules & headings */
+/* Section divider — an ink rule crossed by a small kamon diamond */
 .content hr {
-  height: 2px;
+  height: 1px;
   border: 0;
-  background: linear-gradient(90deg, transparent, var(--fj-purple-deep) 20%,
-    var(--fj-purple) 50%, var(--fj-purple-deep) 80%, transparent);
+  margin: 2.8rem 0;
+  overflow: visible;
+  position: relative;
+  background: linear-gradient(90deg, transparent, var(--fj-purple-deep) 22%,
+    var(--fj-purple-deep) 78%, transparent);
   opacity: 0.55;
+}
+.content hr::before {
+  content: '';
+  position: absolute; left: 50%; top: 50%;
+  width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  background: var(--fj-purple); transform: rotate(45deg);
+  box-shadow: 0 0 10px var(--fj-glow), 0 0 0 5px var(--main-bg);
+}
+.content hr::after {
+  content: '';
+  position: absolute; left: 50%; top: 50%;
+  width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px;
+  background: var(--fj-ivory); transform: rotate(45deg); z-index: 1;
 }
 .content h2 {
   padding-left: 0.7rem;
   border-left: 3px solid var(--fj-purple-deep);
   box-shadow: -1px 0 10px -4px var(--fj-glow);
 }
+
+/* Lists — ink-diamond bullets, calligraphic ordered markers */
+.content ul { list-style: none; padding-left: 1.5em; }
+.content ul > li { position: relative; }
+.content ul > li::before {
+  content: '';
+  position: absolute; left: -1.15em; top: 0.62em;
+  width: 6px; height: 6px;
+  background: var(--fj-purple); transform: rotate(45deg); border-radius: 1px;
+  box-shadow: 0 0 6px var(--fj-glow);
+}
+.content ul > li.task-list-item::before,
+.content ul > li:has(> input)::before { display: none; }
+.content ol > li::marker { color: var(--fj-purple); font-weight: 700; }
+.content li { margin: 0.34em 0; }
+.content li::marker { color: var(--fj-purple); }
 
 /* ========================================================================= *
  *  8. SCROLLBAR — dark wood track, purple-wood thumb, glow on hover
@@ -979,6 +1025,51 @@ figure.highlight:hover {
   72%      { opacity: 0.9; }
 }
 
+/* Floating dust motes — fine specks catching the last light */
+.fj-dust {
+  width: 2px; height: 2px; border-radius: 50%;
+  background: var(--fj-ember);
+  box-shadow: 0 0 4px 1px var(--fj-ember);
+  opacity: 0.5;
+  will-change: transform;
+  animation: fj-dust-float var(--fj-leaf-dur, 26s) ease-in-out var(--fj-leaf-delay, 0s) infinite;
+}
+@keyframes fj-dust-float {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  20%  { opacity: 0.55; }
+  50%  { transform: translate3d(var(--fj-leaf-drift, 20px), -22vh, 0); }
+  80%  { opacity: 0.4; }
+  100% { transform: translate3d(calc(var(--fj-leaf-drift, 20px) * -0.6), -44vh, 0); opacity: 0; }
+}
+
+/* Gentle bamboo sway (applied to the bamboo group inside the village SVG) */
+.fj-village .fj-bamboo-grp {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: fj-bamboo-sway 7s ease-in-out infinite;
+}
+@keyframes fj-bamboo-sway {
+  0%, 100% { transform: rotate(-1.1deg); }
+  50%      { transform: rotate(1.1deg); }
+}
+
+/* Custom Japanese nav icons (SVG injected into the sidebar by feudal.js) */
+#sidebar .nav-link .fj-navicon {
+  display: inline-flex; align-items: center; justify-content: center;
+}
+#sidebar .nav-link .fj-navicon svg {
+  width: 1.05em; height: 1.05em;
+  vertical-align: -0.15em;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+  transition: filter 0.3s var(--fj-ease), transform 0.3s var(--fj-ease);
+}
+#sidebar .nav-item.active .nav-link .fj-navicon svg,
+#sidebar .nav-link:hover .fj-navicon svg {
+  filter: drop-shadow(0 0 6px var(--fj-glow));
+  transform: translateY(-1px);
+}
+
 /* ========================================================================= *
  *  12. CUSTOM CURSOR + click particles
  * ========================================================================= */
@@ -1142,8 +1233,8 @@ figure.highlight:hover {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .fj-fog, .fj-leaf, .fj-ember, .fj-petal, .fj-cloud, .fj-birds { display: none; }
-  .fj-lantern, .fj-lantern-paper, .fj-sign, .fj-village .fj-wins { animation: none; }
+  .fj-fog, .fj-leaf, .fj-ember, .fj-petal, .fj-cloud, .fj-birds, .fj-dust { display: none; }
+  .fj-lantern, .fj-lantern-paper, .fj-sign, .fj-village .fj-wins, .fj-village .fj-bamboo-grp { animation: none; }
   #main-wrapper { animation: none; }
   #fj-progress, #fj-scroll, #fj-shoji, #fj-intro { display: none; }
 }

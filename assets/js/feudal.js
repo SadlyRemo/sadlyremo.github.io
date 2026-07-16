@@ -126,6 +126,20 @@
     }
     var cherry = tree(636, 'fj-cherry', [[0, -14, 26], [-20, -2, 20], [20, 0, 22], [-8, -26, 18], [12, -24, 16]]);
     var maple = tree(1470, 'fj-maple', [[0, -12, 24], [-18, 2, 18], [18, -2, 20], [-6, -24, 16], [10, -22, 15]]);
+    // bamboo grove — one swaying group per side (each rotates about its own base)
+    function grove(stalks, delay) {
+      var g = "<g class='fj-bamboo-grp' style='fill:var(--fj-tree);animation-delay:" + delay + "'>";
+      stalks.forEach(function (b) {
+        var x = b[0], h = b[1], top = base - h;
+        g += "<rect x='" + x + "' y='" + top + "' width='7' height='" + h + "' rx='3'/>";
+        for (var ny = top + 44; ny < base - 10; ny += 54) g += "<rect x='" + (x - 1) + "' y='" + ny + "' width='9' height='2'/>";
+        g += "<path d='M" + (x + 6) + "," + (top + 14) + " q24,-6 32,-22 q-20,4 -32,14 z'/>";
+        g += "<path d='M" + x + "," + (top + 30) + " q-24,-6 -32,-20 q20,3 32,12 z'/>";
+      });
+      return g + '</g>';
+    }
+    var bamboo = grove([[30, 300], [50, 348], [70, 288]], '0s') +
+      grove([[1522, 300], [1544, 350], [1566, 286]], '-3.5s');
     // wooden fence along the very front
     var fence = "<g style='fill:var(--fj-house)'>";
     for (var fx = 0; fx <= 1600; fx += 46) fence += "<rect x='" + fx + "' y='" + (base - 34) + "' width='6' height='34'/>";
@@ -133,7 +147,7 @@
 
     s += "<svg viewBox='0 0 1600 520' preserveAspectRatio='xMidYMax slice'>";
     s += "<rect x='0' y='" + (base - 10) + "' width='1600' height='10' style='fill:var(--fj-street)'/>";
-    s += cherry + maple;
+    s += bamboo + cherry + maple;
     s += "<g style='fill:var(--fj-roof)'>" + bodies + pagoda + "</g>";
     s += "<g style='fill:var(--fj-house)'>" + roofs + "</g>";
     s += bridge + fence;
@@ -215,7 +229,41 @@
       n.style.setProperty('--fj-leaf-drift', (i % 2 ? 1 : -1) * (20 + i * 8) + 'px');
       frag.appendChild(n);
     }
+    // fine floating dust motes, spread across the scene
+    var dust = narrow ? 5 : 9;
+    for (i = 0; i < dust; i++) {
+      n = el('div', 'fj-dust');
+      n.style.left = (4 + (i * 37) % 92) + '%';
+      n.style.bottom = (6 + (i * 29) % 66) + 'vh';
+      n.style.setProperty('--fj-leaf-dur', (20 + (i % 6) * 4) + 's');
+      n.style.setProperty('--fj-leaf-delay', '-' + (i * 3.3).toFixed(1) + 's');
+      n.style.setProperty('--fj-leaf-drift', (i % 2 ? 1 : -1) * (12 + i * 3) + 'px');
+      frag.appendChild(n);
+    }
     bg.appendChild(frag);
+  }
+
+  // Replace the sidebar's generic icons with hand-drawn Japanese line icons
+  function initNavIcons() {
+    var TORII = "<svg viewBox='0 0 24 24'><path d='M3 6h18M4.5 9h15M6.5 6v13M17.5 6v13M3 6c1.5-1.2 3-1.2 4.5 0M16.5 6c1.5-1.2 3-1.2 4.5 0'/></svg>";
+    var SCROLL = "<svg viewBox='0 0 24 24'><path d='M7 4h8a3 3 0 0 1 3 3v11a2 2 0 0 0 2 2H9a3 3 0 0 1-3-3V6M6 6a2 2 0 1 0 0 4M10 9h5M10 13h5'/></svg>";
+    var TAG = "<svg viewBox='0 0 24 24'><path d='M4 4h7l9 9-7 7-9-9z'/><circle cx='8' cy='8' r='1.2'/></svg>";
+    var TEMPLE = "<svg viewBox='0 0 24 24'><path d='M3 9l9-5 9 5M4 9v10M20 9v10M9 9v10M15 9v10M3 21h18M6.5 9v10M17.5 9v10'/></svg>";
+    var LANTERN = "<svg viewBox='0 0 24 24'><ellipse cx='12' cy='12' rx='5' ry='6.5'/><path d='M9 5.6h6M9 18.4h6M12 3.6v2M12 18.4v2M7.5 12h9'/></svg>";
+    var map = [
+      { re: /categor/i, svg: SCROLL },
+      { re: /tags/i, svg: TAG },
+      { re: /archive/i, svg: TEMPLE },
+      { re: /about/i, svg: LANTERN },
+      { re: /^\/(index\.html)?$/, svg: TORII }
+    ];
+    var links = document.querySelectorAll('#sidebar .nav-link');
+    for (var j = 0; j < links.length; j++) {
+      var a = links[j], href = a.getAttribute('href') || '', hit = null;
+      for (var k = 0; k < map.length; k++) { if (map[k].re.test(href)) { hit = map[k]; break; } }
+      var ico = a.querySelector('i');
+      if (hit && ico) { ico.className = 'fj-navicon'; ico.innerHTML = hit.svg; }
+    }
   }
 
   /* ---------------------------------------------------------------------- *
@@ -463,6 +511,7 @@
   /* ---------------------------------------------------------------------- */
   function init() {
     buildBackground();
+    initNavIcons();
     if (FINE && !REDUCE) initCursor();
     initProgress();
     initScrollBrush();
