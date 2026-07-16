@@ -60,6 +60,9 @@
     village.innerHTML = villageSVG();
     bg.appendChild(village);
 
+    // Luminous mist swallowing the village centre (pagoda dissolves into it)
+    bg.appendChild(el('div', 'fj-fog fj-fog--3'));
+
     // Foreground drifting mist
     bg.appendChild(el('div', 'fj-fog fj-fog--2'));
 
@@ -102,8 +105,8 @@
       wins += "<rect class='fj-win' x='" + (x + w * 0.3).toFixed(0) + "' y='" + (by + ht * 0.34).toFixed(0) +
         "' width='" + (w * 0.4).toFixed(0) + "' height='" + (ht * 0.3).toFixed(0) + "' rx='2'/>";
     });
-    // a two-tier pagoda / shrine
-    var px = 690, pb = base;
+    // a two-tier pagoda / shrine, centred in the far mist
+    var px = 756, pb = base;
     var pagoda =
       "<rect x='" + (px + 26) + "' y='" + (pb - 120) + "' width='36' height='120'/>" +
       "<path d='M" + (px - 6) + "," + (pb - 118) + " L" + (px + 94) + "," + (pb - 118) + " L" + (px + 70) + "," + (pb - 150) + " L" + (px + 18) + "," + (pb - 150) + " Z'/>" +
@@ -145,12 +148,32 @@
     for (var fx = 0; fx <= 1600; fx += 46) fence += "<rect x='" + fx + "' y='" + (base - 34) + "' width='6' height='34'/>";
     fence += "<rect x='0' y='" + (base - 30) + "' width='1600' height='4'/><rect x='0' y='" + (base - 16) + "' width='1600' height='4'/></g>";
 
+    // central stone path receding toward the misty pagoda
+    var path = "<path style='fill:var(--fj-street)' d='M718,520 L882,520 L836,318 L764,318 Z'/>";
+    var pave = "<g style='stroke:var(--fj-mountain-far);stroke-width:1.4' opacity='0.55'>";
+    for (var pv = 1; pv < 7; pv++) {
+      var yy = 520 - pv * 32, half = 82 - pv * 11;
+      pave += "<line x1='" + (800 - half) + "' y1='" + yy + "' x2='" + (800 + half) + "' y2='" + yy + "'/>";
+    }
+    pave += "</g>";
+    // the lone wanderer — kasa hat, cloak, sword; a single warm sash is the only heat
+    var samurai =
+      "<g style='fill:var(--fj-samurai)'>" +
+      "<path d='M788,452 q12,-15 24,0 z'/>" +
+      "<ellipse cx='800' cy='452' rx='19' ry='6'/>" +
+      "<path d='M792,456 L808,456 L811,502 L789,502 Z'/>" +
+      "<rect x='794' y='502' width='4.5' height='16'/><rect x='801.5' y='502' width='4.5' height='16'/>" +
+      "</g>" +
+      "<line x1='812' y1='468' x2='828' y2='510' style='fill:none;stroke:var(--fj-samurai);stroke-width:3'/>" +
+      "<rect x='795' y='476' width='10' height='4' style='fill:var(--fj-ember-warm)'/>";
+
     s += "<svg viewBox='0 0 1600 520' preserveAspectRatio='xMidYMax slice'>";
     s += "<rect x='0' y='" + (base - 10) + "' width='1600' height='10' style='fill:var(--fj-street)'/>";
+    s += path + pave;
     s += bamboo + cherry + maple;
     s += "<g style='fill:var(--fj-roof)'>" + bodies + pagoda + "</g>";
     s += "<g style='fill:var(--fj-house)'>" + roofs + "</g>";
-    s += bridge + fence;
+    s += bridge + fence + samurai;
     s += "<g class='fj-wins'>" + wins + "</g>";
     s += '</svg>';
     return s;
