@@ -6,7 +6,7 @@ tags: [SSRF,XSS,File Upload]
 image:
     path: images/hackthebox.png
 ---
-# HackTheBox — Blackout Ops [Easy]
+# HackTheBox: Blackout Ops [Easy]
 
 In this write-up, we will solve the **Blackout Ops** challenge from HackTheBox. The goal is to analyze the web application, identify its weaknesses, and use them to gain command execution in order to retrieve the flag. Along the way, we will break down each step of the exploitation process to clearly demonstrate how the vulnerability can be discovered and leveraged.
 

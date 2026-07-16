@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Remo, 参道 · Offensive Security Writing</title>
+<meta name="description" content="SadlyRemo, penetration tester. Writeups on Active Directory, exploit development, and web security. Walk the approach.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/sando.css">
+</head>
+<body>
+<div class="sky"></div><div class="fog"></div><div class="grain"></div>
+
+<div style="position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:.4rem;background:rgba(10,14,23,.92);padding:.4rem;border-radius:99px;font-family:var(--mono);font-size:.72rem;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);border:1px solid rgba(236,230,216,.1)">
+  <a href="index.html" style="padding:.4rem .9rem;border-radius:99px;background:linear-gradient(135deg,#6fe6cf,#2c8676);color:#fff">① 参道 SANDŌ</a>
+  <a href="explore/sumi.html" style="padding:.4rem .9rem;border-radius:99px;color:#c9c2b2">② 墨 SUMI</a>
+  <a href="explore/yugure.html" style="padding:.4rem .9rem;border-radius:99px;color:#c9c2b2">③ 夕暮れ YŪGURE</a>
+</div>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="index.html" aria-label="Remo, home">
+      <span class="brand__seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--ember)" stroke-width="1.6" stroke-linecap="round">
+          <path d="M3 8h18M5 8v11M19 8v11M2 8l10-5 10 5M8 8v11M16 8v11"/>
+        </svg>
+      </span>
+      <span class="brand__name">Remo<small>参道 · SANDŌ</small></span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#writeups" aria-current="page">Writeups</a>
+      <a href="#districts">Categories</a>
+      <a href="#series">Exploit&nbsp;Dev</a>
+      <a href="#" >Archive</a>
+      <a href="#about">About</a>
+    </nav>
+    <div class="nav__tools">
+      <button class="icon-btn search-btn" data-cmdk-open aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Search</span><kbd>⌘K</kbd>
+      </button>
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle daylight">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v2M12 19v2M5 12H3M21 12h-2M6 6 4.5 4.5M19.5 19.5 18 18M18 6l1.5-1.5M4.5 19.5 6 18"/><circle cx="12" cy="12" r="4"/></svg>
+      </button>
+      <button class="icon-btn nav__burger" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero__scene" aria-hidden="true">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0d1526"/><stop offset=".45" stop-color="#101a2e"/>
+          <stop offset="1" stop-color="#0a0e17"/>
+        </linearGradient>
+        <radialGradient id="glow" cx="76%" cy="14%" r="40%">
+          <stop offset="0" stop-color="#43bfa8" stop-opacity=".38"/>
+          <stop offset=".5" stop-color="#24796b" stop-opacity=".12"/>
+          <stop offset="1" stop-color="#0a0e17" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="mtn" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#26314a"/><stop offset="1" stop-color="#141c2c"/>
+        </linearGradient>
+        <linearGradient id="hill1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a2338"/><stop offset="1" stop-color="#111826"/>
+        </linearGradient>
+        <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0a0e17" stop-opacity="0"/><stop offset="1" stop-color="#0a0e17"/>
+        </linearGradient>
+      </defs>
+      <rect width="1440" height="900" fill="url(#sky)"/>
+      <rect width="1440" height="900" fill="url(#glow)"/>
+      <!-- stars -->
+      <g fill="#dfe7ff" opacity=".5">
+        <circle cx="180" cy="120" r="1"/><circle cx="320" cy="80" r="1.3"/><circle cx="540" cy="150" r="1"/>
+        <circle cx="900" cy="90" r="1"/><circle cx="1120" cy="170" r="1.2"/><circle cx="1320" cy="110" r="1"/>
+        <circle cx="700" cy="60" r="1"/><circle cx="1000" cy="220" r="1"/>
+      </g>
+      <!-- Fuji -->
+      <path d="M120 470 L360 210 Q380 195 400 210 L640 470 Z" fill="url(#mtn)"/>
+      <path d="M330 250 L360 210 Q380 195 400 210 L432 252 Q400 268 380 250 Q360 235 348 258 Z" fill="#cdd6ea" opacity=".9"/>
+      <!-- distant hills -->
+      <path d="M0 520 Q300 430 620 500 T1440 470 V900 H0 Z" fill="url(#hill1)" opacity=".85"/>
+      <path d="M0 600 Q380 520 760 585 T1440 560 V900 H0 Z" fill="#0f1626"/>
+      <!-- pagoda silhouette on right hill -->
+      <g fill="#0c1220" transform="translate(1015 300)">
+        <rect x="34" y="0" width="6" height="46"/>
+        <path d="M6 60 H68 L58 44 H16 Z"/><rect x="20" y="60" width="34" height="26"/>
+        <path d="M2 100 H72 L60 84 H14 Z"/><rect x="18" y="100" width="38" height="30"/>
+        <path d="M-4 146 H78 L64 128 H10 Z"/><rect x="14" y="146" width="46" height="34"/>
+        <path d="M-8 196 H82 L68 176 H6 Z"/>
+      </g>
+      <!-- foreground ground -->
+      <path d="M0 640 Q400 600 720 640 T1440 620 V900 H0 Z" fill="#0a0e17"/>
+      <!-- sandō path (perspective) -->
+      <path d="M700 900 L620 660 L820 660 L740 900 Z" fill="#141d30" opacity=".8"/>
+      <g stroke="#243247" stroke-width="1.4" opacity=".5">
+        <line x1="662" y1="740" x2="778" y2="740"/><line x1="640" y1="800" x2="800" y2="800"/>
+        <line x1="626" y1="850" x2="814" y2="850"/>
+      </g>
+      <!-- big torii, foreground left -->
+      <g fill="#0a0e17" stroke="#43bfa8" stroke-width="0" transform="translate(120 430)">
+        <path d="M-30 40 H360 L340 6 H-10 Z" fill="#181114"/>
+        <rect x="-10" y="40" width="330" height="16" fill="#1b1315"/>
+        <rect x="30" y="52" width="26" height="330" fill="#1b1315"/>
+        <rect x="256" y="52" width="26" height="330" fill="#1b1315"/>
+        <rect x="10" y="110" width="292" height="14" fill="#1b1315"/>
+        <path d="M-30 40 H360 L340 6 H-10 Z" fill="none" stroke="#43bfa8" stroke-opacity=".18" stroke-width="2"/>
+      </g>
+      <rect width="1440" height="900" fill="url(#fade)" opacity=".55"/>
+    </svg>
+    <!-- animated lantern glows -->
+    <div class="lantern" style="left:20%;top:52%"></div>
+    <div class="lantern" style="left:26%;top:60%;animation-delay:.8s"></div>
+    <div class="lantern" style="left:72%;top:44%;animation-delay:1.4s"></div>
+    <div class="lantern" style="left:78%;top:50%;animation-delay:.4s"></div>
+    <div class="particles" style="position:absolute;inset:0;pointer-events:none"></div>
+  </div>
+
+  <div class="wrap-wide hero__grid">
+    <div class="hero__content">
+      <span class="eyebrow hero__tag" data-reveal>Reverse Engineering · Exploit Development</span>
+      <h1 data-reveal data-reveal-delay="1">Walk the<br><span class="em">approach.</span></h1>
+      <p class="hero__sub" data-reveal data-reveal-delay="2">
+        Field notes from the offensive edge, Active Directory, Windows internals,
+        and exploit development, written the way a path leads to a gate: one deliberate step at a time.
+      </p>
+      <div class="hero__cta" data-reveal data-reveal-delay="3">
+        <a class="btn btn--primary" href="#writeups">Read the writeups
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--ghost" href="#about">Who is Remo</a>
+      </div>
+      <div class="hero__meta" data-reveal data-reveal-delay="4">
+        <div class="stat"><b>29</b><span>Writeups</span></div>
+        <div class="stat"><b>05</b><span>Disciplines</span></div>
+        <div class="stat"><b>06</b><span>Certifications</span></div>
+      </div>
+    </div>
+    <div class="hero__vk" aria-hidden="true">
+      <div class="vkanji">攻撃者の道</div>
+    </div>
+  </div>
+
+  <div class="scroll-cue" aria-hidden="true"><span></span>scroll</div>
+</section>
+
+<!-- ============ IDENTITY STRIP ============ -->
+<section class="section" id="about" style="padding-block:clamp(2.5rem,6vw,4.5rem)">
+  <div class="wrap" data-reveal style="display:grid;grid-template-columns:auto 1fr;gap:1.8rem;align-items:center">
+    <img src="../naruto.jpg" alt="Remo" width="88" height="88"
+      style="width:88px;height:88px;border-radius:20px;border:1px solid var(--line);object-fit:cover">
+    <div>
+      <p style="margin:0;font-family:var(--serif);font-size:clamp(1.15rem,1rem+1vw,1.6rem);line-height:1.5;color:var(--fg)">
+        I'm <strong style="color:var(--accent)">SadlyRemo</strong>, a penetration tester working
+        Active Directory, web, code review, and mobile. This is where I document the breaks.
+      </p>
+      <p style="margin:.6rem 0 0;font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;color:var(--fg-dim);text-transform:uppercase">
+        CRTE · CRTP · CRTO · eWPTX · eCPPT · eMAPT · ex-HTB Top&nbsp;5 Egypt
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WRITEUPS ============ -->
+<section class="section" id="writeups">
+  <div class="wrap-wide">
+    <div class="section-head" data-reveal>
+      <div>
+        <span class="eyebrow">最新 · Latest</span>
+        <h2>Recent writeups</h2>
+      </div>
+      <p>Machines, chains, and challenges, from initial foothold to the flag.</p>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="article.html" data-reveal>
+        <div class="card__glow"></div>
+        <div class="card__media"><img src="../images/seh-banner.png" alt="" loading="lazy">
+          <span class="card__cat"><span class="tag tag--ember">Exploit Dev</span></span></div>
+        <div class="card__body">
+          <h3 class="card__title">SEH Exploit Development, From Crash to Shell</h3>
+          <p class="card__excerpt">Structured Exception Handler overwrites in Sync Breeze, walked from the first crash through to a stable shell in WinDbg.</p>
+          <div class="card__foot"><span>Jun 04 2026</span><span class="dot"></span><span>seh · windbg</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="article.html" data-reveal data-reveal-delay="1">
+        <div class="card__glow"></div>
+        <div class="card__media"><img src="../images/egghunter-banner.png" alt="" loading="lazy">
+          <span class="card__cat"><span class="tag tag--ember">Exploit Dev</span></span></div>
+        <div class="card__body">
+          <h3 class="card__title">Overcoming Space Restrictions with Egghunters</h3>
+          <p class="card__excerpt">When your buffer is too small, hunt the egg. Building a Windows egghunter and staging a second-stage payload.</p>
+          <div class="card__foot"><span>Jun 10 2026</span><span class="dot"></span><span>egghunter</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="article.html" data-reveal data-reveal-delay="2">
+        <div class="card__glow"></div>
+        <div class="card__media"><img src="../images/dep-cover.png" alt="" loading="lazy">
+          <span class="card__cat"><span class="tag tag--ember">Exploit Dev</span></span></div>
+        <div class="card__body">
+          <h3 class="card__title">Bypassing DEP with ROP</h3>
+          <p class="card__excerpt">Data Execution Prevention meets return-oriented programming, chaining gadgets to flip memory executable.</p>
+          <div class="card__foot"><span>Jul 05 2026</span><span class="dot"></span><span>dep · rop</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="article.html" data-reveal>
+        <div class="card__glow"></div>
+        <div class="card__media"><img src="../images/breach-banner.png" alt="" loading="lazy">
+          <span class="card__cat"><span class="tag">Windows</span></span></div>
+        <div class="card__body">
+          <h3 class="card__title">VulnLab, Breach</h3>
+          <p class="card__excerpt">Silver tickets, MSSQL abuse, and NTLM relaying across a hardened Active Directory estate.</p>
+          <div class="card__foot"><span>Mar 30 2025</span><span class="dot"></span><span>active directory</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="article.html" data-reveal data-reveal-delay="1">
+        <div class="card__glow"></div>
+        <div class="card__media"><img src="../images/bamboo-banner.png" alt="" loading="lazy">
+          <span class="card__cat"><span class="tag">Linux</span></span></div>
+        <div class="card__body">
+          <h3 class="card__title">VulnLab, Bamboo</h3>
+          <p class="card__excerpt">A Squid proxy pinhole into the internal network, a PaperCut CVE, and a SUID bash to root.</p>
+          <div class="card__foot"><span>Mar 30 2025</span><span class="dot"></span><span>squid · cve</span></div>
+        </div>
+      </a>
+
+      <a class="card" href="article.html" data-reveal data-reveal-delay="2">
+        <div class="card__glow"></div>
+        <div class="card__media"><img src="../images/sendai-banner.png" alt="" loading="lazy">
+          <span class="card__cat"><span class="tag">Windows</span></span></div>
+        <div class="card__body">
+          <h3 class="card__title">VulnLab, Sendai</h3>
+          <p class="card__excerpt">ADCS ESC4, gMSA extraction, and password spraying woven into one clean domain compromise.</p>
+          <div class="card__foot"><span>Apr 03 2025</span><span class="dot"></span><span>adcs · gmsa</span></div>
+        </div>
+      </a>
+
+    </div>
+    <div style="text-align:center;margin-top:2.6rem" data-reveal>
+      <a class="btn btn--ghost" href="#">View all 29 writeups
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DISTRICTS (categories) ============ -->
+<section class="section" id="districts" style="padding-top:0">
+  <div class="wrap-wide">
+    <div class="section-head" data-reveal>
+      <div><span class="eyebrow">区 · Districts</span><h2>Choose a gate</h2></div>
+      <p>Every category is a district of the village, enter through its torii.</p>
+    </div>
+    <div class="gates">
+      <a class="gate" href="#" data-reveal>
+        <svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg>
+        <span class="gate__count">12</span><span class="gate__name">Windows Machines</span>
+        <span class="gate__sub">Active Directory · privesc</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="1">
+        <svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg>
+        <span class="gate__count">07</span><span class="gate__name">Linux Machines</span>
+        <span class="gate__sub">web · enumeration · CVEs</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="2">
+        <svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg>
+        <span class="gate__count">05</span><span class="gate__name">Web Challenges</span>
+        <span class="gate__sub">SSRF · SSTI · IDOR</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="3">
+        <svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg>
+        <span class="gate__count">03</span><span class="gate__name">Exploit Development</span>
+        <span class="gate__sub">SEH · egghunter · DEP</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="4">
+        <svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg>
+        <span class="gate__count">02</span><span class="gate__name">AD Chains</span>
+        <span class="gate__sub">trust abuse · full estate</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERIES ============ -->
+<section class="section" id="series" style="padding-top:0">
+  <div class="wrap-wide">
+    <div class="series" data-reveal>
+      <div class="series__inner">
+        <div class="series__text">
+          <span class="eyebrow">連載 · Series</span>
+          <h2 style="font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,1.2rem+1.6vw,2.4rem);margin:.4rem 0 .6rem;line-height:1.15">
+            The Windows Exploit Development trilogy</h2>
+          <p style="color:var(--fg-dim);max-width:40ch">A ground-up path through modern stack exploitation on Windows, read in order, or drop into any step.</p>
+          <div class="series__list">
+            <a class="series__item" href="article.html"><span class="series__num">01</span><b>SEH, From Crash to Shell</b>
+              <svg class="arrow" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="series__item" href="article.html"><span class="series__num">02</span><b>Egghunters &amp; Space Restrictions</b>
+              <svg class="arrow" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="series__item" href="article.html"><span class="series__num">03</span><b>Bypassing DEP with ROP</b>
+              <svg class="arrow" viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </div>
+        <div class="series__media"><img src="../images/seh-banner.png" alt="Exploit development series"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="foot">
+  <div class="vkanji foot__vk">また会おう</div>
+  <div class="wrap-wide">
+    <div class="foot__inner">
+      <div class="foot__brand">
+        <a class="brand" href="index.html">
+          <span class="brand__seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ember)" stroke-width="1.6" stroke-linecap="round"><path d="M3 8h18M5 8v11M19 8v11M2 8l10-5 10 5M8 8v11M16 8v11"/></svg></span>
+          <span class="brand__name">Remo<small>参道 · SANDŌ</small></span>
+        </a>
+        <p>Offensive-security field notes. Always hacking, always learning. 火を絶やすな, keep the lantern lit.</p>
+      </div>
+      <div class="foot__col">
+        <h4>Explore</h4>
+        <a href="#writeups">Writeups</a><a href="#districts">Categories</a>
+        <a href="#series">Exploit Dev</a><a href="#">Archive</a><a href="#about">About</a>
+      </div>
+      <div class="foot__col">
+        <h4>Elsewhere</h4>
+        <a href="https://github.com/Remo1x">GitHub</a>
+        <a href="https://x.com/Rem01x">Twitter / X</a>
+        <a href="https://www.linkedin.com/in/rem01x/">LinkedIn</a>
+        <a href="https://app.hackthebox.com/profile/1080501">HackTheBox</a>
+      </div>
+    </div>
+    <div class="foot__bottom">
+      <span>© <span data-year>2026</span> SadlyRemo · Built on the approach.</span>
+      <span>参道 · designed &amp; handcrafted</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ DRAWER (mobile) ============ -->
+<div class="drawer"><div class="drawer__inner">
+  <a href="#writeups">Writeups<small>最新</small></a>
+  <a href="#districts">Categories<small>区</small></a>
+  <a href="#series">Exploit Dev<small>連載</small></a>
+  <a href="#">Archive<small>記録</small></a>
+  <a href="#about">About<small>私</small></a>
+</div></div>
+
+<!-- ============ COMMAND PALETTE ============ -->
+<div class="cmdk" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="cmdk__panel">
+    <div class="cmdk__input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search writeups, tags, techniques…" aria-label="Search">
+    </div>
+    <div class="cmdk__results"></div>
+  </div>
+</div>
+
+<script>
+window.SANDO_INDEX = [
+  {title:"SEH Exploit Development, From Crash to Shell",cat:"ExpDev",tags:"seh windbg buffer overflow",url:"article.html"},
+  {title:"Overcoming Space Restrictions with Egghunters",cat:"ExpDev",tags:"egghunter windows",url:"article.html"},
+  {title:"Bypassing DEP with ROP",cat:"ExpDev",tags:"dep rop",url:"article.html"},
+  {title:"VulnLab, Bamboo",cat:"Linux",tags:"squid proxy cve papercut",url:"article.html"},
+  {title:"VulnLab, Breach",cat:"Windows",tags:"active directory silver ticket mssql ntlm relay",url:"article.html"},
+  {title:"VulnLab, Sendai",cat:"Windows",tags:"adcs esc4 gmsa spray",url:"article.html"},
+  {title:"VulnLab, Baby2",cat:"Windows",tags:"active directory acls gpo abuse",url:"article.html"},
+  {title:"HackTheBox, Neonify",cat:"Web",tags:"ruby ssti",url:"article.html"},
+  {title:"HackTheBox, ProxyAsAService",cat:"Web",tags:"ssrf filter bypass",url:"article.html"}
+];
+</script>
+<script src="assets/js/sando.js"></script>
+</body>
+</html>

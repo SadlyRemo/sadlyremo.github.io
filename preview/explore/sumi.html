@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Remo · 墨 SUMI, variant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sumi.css">
+</head>
+<body>
+<div class="paper-tex"></div>
+
+<!-- variant switcher -->
+<div style="position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:.4rem;background:rgba(28,25,19,.9);padding:.4rem;border-radius:99px;font-family:var(--mono);font-size:.72rem;box-shadow:0 10px 30px -10px rgba(0,0,0,.5)">
+  <a href="../index.html" style="padding:.4rem .9rem;border-radius:99px;color:#c9c2b2">① 参道 SANDŌ</a>
+  <a href="sumi.html" style="padding:.4rem .9rem;border-radius:99px;background:#b53a2b;color:#fff">② 墨 SUMI</a>
+  <a href="yugure.html" style="padding:.4rem .9rem;border-radius:99px;color:#c9c2b2">③ 夕暮れ YŪGURE</a>
+</div>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="#"><span class="brand__seal">れ</span><span class="brand__name">Remo<small>墨 · SUMI</small></span></a>
+    <nav class="nav__links"><a href="#work">Writeups</a><a href="#cats">Categories</a><a href="#">Exploit Dev</a><a href="#">Archive</a><a href="#">About</a></nav>
+    <div class="nav__tools">
+      <button class="icon-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- sumi-e ink-wash mountain -->
+  <svg class="hero__ink" viewBox="0 0 800 600" aria-hidden="true">
+    <defs>
+      <filter id="brush"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="3" seed="7" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="26"/></filter>
+      <linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1c1913" stop-opacity=".9"/><stop offset="1" stop-color="#3d382e" stop-opacity=".5"/></linearGradient>
+      <linearGradient id="ink2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3d382e" stop-opacity=".5"/><stop offset="1" stop-color="#6b6456" stop-opacity=".2"/></linearGradient>
+    </defs>
+    <g filter="url(#brush)">
+      <path d="M40 520 Q260 200 380 300 Q460 200 560 340 Q640 240 760 520 Z" fill="url(#ink2)"/>
+      <path d="M120 520 Q320 260 430 360 Q520 250 600 420 Q660 340 720 520 Z" fill="url(#ink)"/>
+      <ellipse cx="600" cy="150" rx="70" ry="70" fill="#b53a2b" opacity=".85"/>
+    </g>
+    <!-- brush horizon strokes -->
+    <g filter="url(#brush)" stroke="#1c1913" stroke-linecap="round" opacity=".25">
+      <line x1="60" y1="470" x2="360" y2="468" stroke-width="6"/>
+      <line x1="420" y1="490" x2="700" y2="486" stroke-width="4"/>
+    </g>
+  </svg>
+  <div class="hero__vk" aria-hidden="true"><div class="vkanji">静かに攻める</div></div>
+
+  <div class="wrap hero__inner">
+    <span class="eyebrow" data-reveal>Reverse Engineering · Exploit Development</span>
+    <h1 data-reveal data-reveal-delay="1">The quiet<br>art of the <em>break.</em></h1>
+    <p class="hero__sub" data-reveal data-reveal-delay="2">Offensive-security field notes, set on paper. Active Directory, Windows internals, and exploit development, documented with the patience of ink.</p>
+    <div class="hero__cta" data-reveal data-reveal-delay="3">
+      <a class="btn btn--seal" href="#work">Read the writeups <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a class="btn btn--line" href="#">Who is Remo</a>
+    </div>
+  </div>
+  <div class="seal-stamp" aria-hidden="true">れ<br>も</div>
+</section>
+
+<!-- WRITEUPS as editorial index -->
+<section class="section" id="work">
+  <div class="wrap">
+    <div class="section-label" data-reveal><span class="idx">最新 · Index</span><h2>Recent writeups</h2></div>
+
+    <a class="entry" href="#" data-reveal><span class="entry__no">01</span>
+      <div class="entry__main"><div class="entry__cat">Exploit Development</div>
+        <div class="entry__title">SEH Exploit Development, From Crash to Shell</div></div>
+      <span class="entry__meta">Jun 2026<br>windbg · seh</span>
+      <svg class="entry__arrow" viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+    <a class="entry" href="#" data-reveal><span class="entry__no">02</span>
+      <div class="entry__main"><div class="entry__cat">Exploit Development</div>
+        <div class="entry__title">Overcoming Space Restrictions with Egghunters</div></div>
+      <span class="entry__meta">Jun 2026<br>egghunter</span>
+      <svg class="entry__arrow" viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+    <a class="entry" href="#" data-reveal><span class="entry__no">03</span>
+      <div class="entry__main"><div class="entry__cat">Windows Machine</div>
+        <div class="entry__title">VulnLab, Breach</div></div>
+      <span class="entry__meta">Mar 2025<br>silver ticket · mssql</span>
+      <svg class="entry__arrow" viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+    <a class="entry" href="#" data-reveal><span class="entry__no">04</span>
+      <div class="entry__main"><div class="entry__cat">Linux Machine</div>
+        <div class="entry__title">VulnLab, Bamboo</div></div>
+      <span class="entry__meta">Mar 2025<br>squid · cve</span>
+      <svg class="entry__arrow" viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+    <a class="entry" href="#" data-reveal><span class="entry__no">05</span>
+      <div class="entry__main"><div class="entry__cat">Web Challenge</div>
+        <div class="entry__title">HackTheBox, ProxyAsAService</div></div>
+      <span class="entry__meta">Aug 2025<br>ssrf · bypass</span>
+      <svg class="entry__arrow" viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</section>
+
+<!-- CATEGORIES as chips -->
+<section class="section" id="cats" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-label" data-reveal><span class="idx">区 · Categories</span><h2>By discipline</h2></div>
+    <div class="chips" data-reveal>
+      <a class="chip" href="#"><b>Windows Machines</b><span>12</span></a>
+      <a class="chip" href="#"><b>Linux Machines</b><span>07</span></a>
+      <a class="chip" href="#"><b>Web Challenges</b><span>05</span></a>
+      <a class="chip" href="#"><b>Exploit Development</b><span>03</span></a>
+      <a class="chip" href="#"><b>AD Chains</b><span>02</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ENSO band -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="enso-band" data-reveal>
+      <svg class="enso" viewBox="0 0 200 200" aria-hidden="true">
+        <defs><filter id="brush2"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10"/></filter></defs>
+        <path filter="url(#brush2)" d="M100 20 a80 80 0 1 1 -30 6" fill="none" stroke="#b53a2b" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h3>One continuous line, the exploit-dev trilogy</h3>
+        <p>SEH overwrites, egghunters, and DEP bypass on Windows. Read in a single sweep, the way an ensō is drawn, from the first crash to the last shell.</p>
+        <a class="btn btn--seal" href="#">Enter the series <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap-wide">
+    <div class="foot__inner">
+      <div><a class="brand" href="#" style="margin-bottom:1rem"><span class="brand__seal">れ</span><span class="brand__name">Remo<small>墨 · SUMI</small></span></a>
+        <p>Offensive-security field notes on paper. Always hacking, always learning.</p></div>
+      <div><h4>Explore</h4><a href="#work">Writeups</a><a href="#cats">Categories</a><a href="#">Exploit Dev</a><a href="#">Archive</a></div>
+      <div><h4>Elsewhere</h4><a href="https://github.com/Remo1x">GitHub</a><a href="https://x.com/Rem01x">Twitter / X</a><a href="https://www.linkedin.com/in/rem01x/">LinkedIn</a><a href="https://app.hackthebox.com/profile/1080501">HackTheBox</a></div>
+    </div>
+    <div class="foot__bottom"><span>© 2026 SadlyRemo</span><span>墨 · ink on paper</span></div>
+  </div>
+</footer>
+
+<script src="../assets/js/sando.js"></script>
+</body>
+</html>

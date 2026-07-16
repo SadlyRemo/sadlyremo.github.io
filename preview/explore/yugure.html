@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Remo · 夕暮れ YŪGURE, variant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="yugure.css">
+</head>
+<body>
+
+<div style="position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:.4rem;background:rgba(21,15,42,.9);padding:.4rem;border-radius:99px;font-family:var(--mono);font-size:.72rem;box-shadow:0 10px 30px -10px rgba(0,0,0,.5)">
+  <a href="../index.html" style="padding:.4rem .9rem;border-radius:99px;color:#c3aec4">① 参道 SANDŌ</a>
+  <a href="sumi.html" style="padding:.4rem .9rem;border-radius:99px;color:#c3aec4">② 墨 SUMI</a>
+  <a href="yugure.html" style="padding:.4rem .9rem;border-radius:99px;background:linear-gradient(135deg,#f4a8c0,#e0563b);color:#2a1226">③ 夕暮れ YŪGURE</a>
+</div>
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="#"><span class="brand__seal">夕</span><span class="brand__name">Remo<small>夕暮れ · YŪGURE</small></span></a>
+    <nav class="nav__links"><a href="#work">Writeups</a><a href="#cats">Categories</a><a href="#">Exploit Dev</a><a href="#">Archive</a><a href="#">About</a></nav>
+    <button class="icon-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__scene" aria-hidden="true">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1b1338"/><stop offset=".4" stop-color="#3a2450"/>
+          <stop offset=".7" stop-color="#7d3350"/><stop offset=".9" stop-color="#c76b47"/><stop offset="1" stop-color="#e08a4e"/>
+        </linearGradient>
+        <radialGradient id="sun" cx="72%" cy="26%" r="30%">
+          <stop offset="0" stop-color="#ffd9a0" stop-opacity=".9"/><stop offset=".5" stop-color="#e88a52" stop-opacity=".4"/><stop offset="1" stop-color="#e08a4e" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="fuji2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3a63"/><stop offset="1" stop-color="#5b3a54"/></linearGradient>
+      </defs>
+      <rect width="1440" height="900" fill="url(#dusk)"/>
+      <circle cx="1037" cy="234" r="90" fill="#ffe1b0" opacity=".55"/>
+      <rect width="1440" height="900" fill="url(#sun)"/>
+      <!-- Fuji -->
+      <path d="M120 520 L370 250 Q390 234 410 250 L660 520 Z" fill="url(#fuji2)" opacity=".85"/>
+      <path d="M340 288 L370 250 Q390 234 410 250 L442 290 Q408 306 388 288 Q368 274 356 296 Z" fill="#f0e6f2" opacity=".8"/>
+      <!-- mist town -->
+      <path d="M0 560 Q360 500 720 555 T1440 540 V900 H0 Z" fill="#3a2450" opacity=".6"/>
+      <path d="M0 640 Q400 590 800 635 T1440 615 V900 H0 Z" fill="#2a1a44" opacity=".7"/>
+      <!-- Chureito 5-tier pagoda, right -->
+      <g fill="#7a2f26" transform="translate(1090 300)">
+        <rect x="46" y="-30" width="8" height="40"/>
+        <path d="M18 30 H82 L70 10 H30 Z" fill="#8f3a2c"/><rect x="30" y="30" width="40" height="26" fill="#6d2a22"/>
+        <path d="M10 78 H90 L76 56 H24 Z" fill="#8f3a2c"/><rect x="26" y="78" width="48" height="28" fill="#6d2a22"/>
+        <path d="M2 130 H98 L82 106 H18 Z" fill="#8f3a2c"/><rect x="22" y="130" width="56" height="30" fill="#6d2a22"/>
+        <path d="M-6 186 H106 L88 160 H12 Z" fill="#8f3a2c"/><rect x="18" y="186" width="64" height="34" fill="#6d2a22"/>
+        <path d="M-14 250 H114 L94 220 H6 Z" fill="#8f3a2c"/>
+      </g>
+      <!-- sakura branch overhang, top-left -->
+      <g stroke="#3a2038" stroke-width="5" fill="none" stroke-linecap="round" opacity=".9">
+        <path d="M-20 40 Q120 60 220 130 M120 55 Q160 40 200 20 M180 110 Q220 90 250 100"/>
+      </g>
+      <g fill="#f4a8c0" opacity=".92">
+        <circle cx="205" cy="18" r="9"/><circle cx="228" cy="30" r="7"/><circle cx="250" cy="98" r="8"/>
+        <circle cx="120" cy="52" r="8"/><circle cx="160" cy="38" r="7"/><circle cx="235" cy="125" r="9"/>
+        <circle cx="90" cy="44" r="6"/><circle cx="270" cy="108" r="6"/>
+      </g>
+      <path d="M0 700 Q400 660 900 700 T1440 690 V900 H0 Z" fill="#1b1030" opacity=".85"/>
+    </svg>
+  </div>
+
+  <div class="wrap-wide hero__grid">
+    <div class="hero__content">
+      <span class="eyebrow" data-reveal>Reverse Engineering · Exploit Development</span>
+      <h1 data-reveal data-reveal-delay="1">Notes from<br>the <span class="em">golden hour.</span></h1>
+      <p class="hero__sub" data-reveal data-reveal-delay="2">Offensive security, written where the light turns. Active Directory, Windows internals, and exploit development, one writeup at a time, as the day burns down.</p>
+      <div class="hero__cta" data-reveal data-reveal-delay="3">
+        <a class="btn btn--saku" href="#work">Read the writeups <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--ghost" href="#">Who is Remo</a>
+      </div>
+      <div class="hero__meta" data-reveal data-reveal-delay="4">
+        <div class="stat"><b>29</b><span>Writeups</span></div>
+        <div class="stat"><b>05</b><span>Disciplines</span></div>
+        <div class="stat"><b>06</b><span>Certifications</span></div>
+      </div>
+    </div>
+    <div class="hero__vk" aria-hidden="true"><div class="vkanji">黄昏の攻撃</div></div>
+  </div>
+</section>
+
+<!-- WRITEUPS -->
+<section class="section" id="work">
+  <div class="wrap-wide">
+    <div class="section-head" data-reveal><div><span class="eyebrow">最新 · Latest</span><h2>Recent writeups</h2></div>
+      <p>Machines, chains, and challenges, from foothold to flag.</p></div>
+    <div class="grid">
+      <a class="card" href="#" data-reveal><div class="card__media"><img src="../../images/seh-banner.png" alt="" loading="lazy"><span class="card__cat"><span class="tag tag--saku">Exploit Dev</span></span></div>
+        <div class="card__body"><h3 class="card__title">SEH, From Crash to Shell</h3><p class="card__excerpt">Structured Exception Handler overwrites in Sync Breeze, walked to a stable shell in WinDbg.</p>
+        <div class="card__foot"><span>Jun 04 2026</span><span class="dot"></span><span>seh · windbg</span></div></div></a>
+      <a class="card" href="#" data-reveal data-reveal-delay="1"><div class="card__media"><img src="../../images/egghunter-banner.png" alt="" loading="lazy"><span class="card__cat"><span class="tag tag--saku">Exploit Dev</span></span></div>
+        <div class="card__body"><h3 class="card__title">Egghunters &amp; Space Restrictions</h3><p class="card__excerpt">When the buffer is too small, hunt the egg, staging a second payload on Windows.</p>
+        <div class="card__foot"><span>Jun 10 2026</span><span class="dot"></span><span>egghunter</span></div></div></a>
+      <a class="card" href="#" data-reveal data-reveal-delay="2"><div class="card__media"><img src="../../images/breach-banner.png" alt="" loading="lazy"><span class="card__cat"><span class="tag">Windows</span></span></div>
+        <div class="card__body"><h3 class="card__title">VulnLab, Breach</h3><p class="card__excerpt">Silver tickets, MSSQL abuse, and NTLM relaying across a hardened AD estate.</p>
+        <div class="card__foot"><span>Mar 30 2025</span><span class="dot"></span><span>active directory</span></div></div></a>
+      <a class="card" href="#" data-reveal><div class="card__media"><img src="../../images/bamboo-banner.png" alt="" loading="lazy"><span class="card__cat"><span class="tag">Linux</span></span></div>
+        <div class="card__body"><h3 class="card__title">VulnLab, Bamboo</h3><p class="card__excerpt">A Squid proxy pinhole, a PaperCut CVE, and a SUID bash to root.</p>
+        <div class="card__foot"><span>Mar 30 2025</span><span class="dot"></span><span>squid · cve</span></div></div></a>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section" id="cats" style="padding-top:0">
+  <div class="wrap-wide">
+    <div class="section-head" data-reveal><div><span class="eyebrow">区 · Districts</span><h2>Choose a gate</h2></div>
+      <p>Each category, a torii lit by the last of the light.</p></div>
+    <div class="gates">
+      <a class="gate" href="#" data-reveal><svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg><span class="gate__count">12</span><span class="gate__name">Windows Machines</span><span class="gate__sub">active directory · privesc</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="1"><svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg><span class="gate__count">07</span><span class="gate__name">Linux Machines</span><span class="gate__sub">web · enumeration</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="2"><svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg><span class="gate__count">05</span><span class="gate__name">Web Challenges</span><span class="gate__sub">ssrf · ssti · idor</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="3"><svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg><span class="gate__count">03</span><span class="gate__name">Exploit Development</span><span class="gate__sub">seh · egghunter · dep</span></a>
+      <a class="gate" href="#" data-reveal data-reveal-delay="4"><svg class="gate__torii" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M4 6 2 3M20 6l2-3M5 6v15M19 6v15M5 10h14"/></svg><span class="gate__count">02</span><span class="gate__name">AD Chains</span><span class="gate__sub">trust abuse · full estate</span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap-wide">
+    <div class="foot__inner">
+      <div><a class="brand" href="#" style="margin-bottom:1rem"><span class="brand__seal">夕</span><span class="brand__name">Remo<small>夕暮れ · YŪGURE</small></span></a>
+        <p>Offensive-security field notes, written at dusk. Always hacking, always learning.</p></div>
+      <div><h4>Explore</h4><a href="#work">Writeups</a><a href="#cats">Categories</a><a href="#">Exploit Dev</a><a href="#">Archive</a></div>
+      <div><h4>Elsewhere</h4><a href="https://github.com/Remo1x">GitHub</a><a href="https://x.com/Rem01x">Twitter / X</a><a href="https://www.linkedin.com/in/rem01x/">LinkedIn</a><a href="https://app.hackthebox.com/profile/1080501">HackTheBox</a></div>
+    </div>
+    <div class="foot__bottom"><span>© 2026 SadlyRemo</span><span>夕暮れ · golden hour</span></div>
+  </div>
+</footer>
+
+<script>
+// sakura petals
+(()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+const n=window.innerWidth<700?8:16;for(let i=0;i<n;i++){const p=document.createElement('span');p.className='petal';
+p.style.left=Math.random()*100+'%';p.style.animationDuration=(9+Math.random()*8)+'s';
+p.style.animationDelay=(-Math.random()*12)+'s';p.style.transform='scale('+(.6+Math.random()*.8)+')';
+document.body.appendChild(p);}})();
+</script>
+<script src="../assets/js/sando.js"></script>
+</body>
+</html>

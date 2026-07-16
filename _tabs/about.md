@@ -4,7 +4,7 @@ icon: fas fa-info-circle
 order: 4
 ---
 ## 👋 Who Am I?
-I'm **Ramez Saber** (Remo), a **Penetration Tester** specializing in **Active Directory, Web Application Security, Code Review, and Mobile Pentesting**. With nearly a year of real-world experience at **ZeroSploit MEA**, I’ve sharpened my skills in offensive security, focusing on **lateral movement, persistence, and advanced exploitation techniques**.
+I'm **SadlyRemo** (Remo), a **Penetration Tester** specializing in **Active Directory, Web Application Security, Code Review, and Mobile Pentesting**. With nearly a year of real-world experience at **ZeroSploit MEA**, I’ve sharpened my skills in offensive security, focusing on **lateral movement, persistence, and advanced exploitation techniques**.
 
 ## 📜 Certifications
 - **CRTE** (Certified Red Team Expert)
