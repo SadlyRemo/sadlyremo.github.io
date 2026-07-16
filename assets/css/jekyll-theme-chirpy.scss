@@ -717,7 +717,7 @@ figure.highlight:hover {
     background: var(--highlight-bg-color);
     color: var(--code-color);
 
-    .c, .ch, .cm, .cp, .cpf, .c1, .cs { color: #7b6ea3; font-style: italic; } /* comments */
+    .c, .ch, .cm, .cp, .cpf, .c1, .cs { color: #847aad; font-style: italic; } /* comments */
     .err { color: #e06c78; }
     .k, .kc, .kd, .kn, .kp, .kr { color: #b79cff; }                            /* keywords */
     .kt, .nc, .nn, .no, .ne, .nb, .bp { color: #c4b5fd; }                       /* types/classes */
@@ -734,7 +734,7 @@ figure.highlight:hover {
     .gi { color: #9ecf9a; }                                                     /* diff + */
     .gd { color: #e06c78; }                                                     /* diff - */
     .gh, .gu { color: #b79cff; font-weight: 700; }
-    .gp { color: #7b6ea3; }
+    .gp { color: #847aad; }
     .ge { font-style: italic; }
     .gs { font-weight: 700; }
     .gl, .go { color: var(--code-color); }
