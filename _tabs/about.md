@@ -5,11 +5,17 @@ order: 4
 ---
 ## Who Am I?
 
-I’m **Ramez Saber** (SadlyRemo), a **Mid-Senior Penetration Tester** at **ZeroSploit MEA** with over two years of hands-on experience in offensive security. I specialize in comprehensive security assessments across web, mobile, API, source code, network infrastructure, Active Directory, and Microsoft Exchange environments.
+I’m **Ramez Saber**, but most people know me as **SadlyRemo**. I break things for a living and I wouldn’t have it any other way.
 
-Ranked among the **top offensive security professionals in Egypt** on Hack The Box. Passionate about exploit development and malware, with a foundation in binary exploitation and reverse engineering.
+I’m a **Mid-Senior Penetration Tester** at **ZeroSploit MEA** in Cairo, where I spend my days tearing apart web apps, internal networks, Active Directory environments, and anything else clients put in front of me. I do manual testing, source code review, and I hunt for the kind of bugs that scanners miss: logic flaws, auth bypasses, subtle misconfigurations that chain into something devastating.
 
-**B.Sc. in Information Technology**, Sinai University (2021-2025). Final project: **RAAD Framework**, a custom Red Team framework for AV bypass and advanced malware techniques (A+ grade).
+But pentesting is just what pays the bills. What really drives me is **exploit development**. I live in debuggers, I think in assembly, and I’m working toward becoming a recognized exploit developer. Right now I’m chasing the **OSED**, and every free hour goes into binary exploitation, reverse engineering, and building offensive tools.
+
+I compete with **0xL4ugh**, and I’ve made finals at **Black Hat MEA**, **Arab WarGames**, **ICMTC**, and more. On Hack The Box I hit **Top 5 in Egypt**, cleared 180+ machines, and finished ProLabs like Rastalabs, Zephyr, Offshore, and Dante. I’m not just solving boxes, I’m studying how things break at a fundamental level.
+
+I also teach. I’ve trained people in application security, AD exploitation, and intro to binary exploitation at **We Innovate**, because the best way to understand something deeply is to explain it to someone else.
+
+At the core, I’m someone who is never satisfied with surface-level understanding. I want to know *why* things break, not just *that* they break. If there’s a lower level to dig into, I’m going there.
 
 ---
 
@@ -69,19 +75,13 @@ Ranked among the **top offensive security professionals in Egypt** on Hack The B
 
 ---
 
-## Teaching & Mentorship
-
-- **Instructor at We Innovate:** Application Security (Web, Mobile, Secure Code Review), Infrastructure Security (Network, AD), Exploit Development (Intro to Binary Exploitation)
-- **Mentor:** Supporting cybersecurity students in skill development
-
 ## Projects & Research
 
-- **RAAD Framework:** Custom Red Team framework for AV bypass and advanced malware techniques
+- **RAAD Framework:** Custom Red Team framework for AV bypass and advanced malware techniques (A+ graded final project)
 - **Karma:** Shellcode obfuscator for red team engagements
 - **CTF Platform Development:** Built custom challenges (Web, API, Reversing, Binary Exploitation)
 - **MITRE ATT&CK Mapping:** Gap assessments for enterprise environments
 - **Security Code Reviews:** SAST reviews in Python, .NET, and PHP applications
-- **AI Agent Design:** Specialized AI agents for AD pentesting, web application security, and CTF workflows
 
 ---
 
@@ -92,4 +92,4 @@ Ranked among the **top offensive security professionals in Egypt** on Hack The B
 - **Twitter/X:** [Rem01x](https://x.com/Rem01x)
 - **HackTheBox:** [Profile](https://app.hackthebox.com/profile/1080501)
 
-Passionate about breaking security, understanding the internals, and pushing the limits of offensive security. **Always hacking, always learning.**
+**Always hacking, always learning.**
