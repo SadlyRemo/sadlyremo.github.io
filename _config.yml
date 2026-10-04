@@ -16,7 +16,7 @@ timezone:
 
 title: SadlyRemo # the main title
 
-tagline: Penetration Tester | Exploit Development Enthusiast | Cybersecurity Instructor # it will display as the subtitle
+tagline: Exploit Development Enthusiast # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   Offensive security blog by SadlyRemo, covering penetration testing, exploit development, reverse engineering, and red team operations.
