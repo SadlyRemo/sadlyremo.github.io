@@ -1,64 +1,95 @@
 ---
-# the default layout is 'page'
+# the default layout is ‘page’
 icon: fas fa-info-circle
 order: 4
 ---
-## 👋 Who Am I?
-I'm **Ramez Saber** (Remo), a **Penetration Tester** specializing in **Active Directory, Web Application Security, Code Review, and Mobile Pentesting**. With nearly a year of real-world experience at **ZeroSploit MEA**, I’ve sharpened my skills in offensive security, focusing on **lateral movement, persistence, and advanced exploitation techniques**.
+## Who Am I?
 
-## 📜 Certifications
-- **CRTE** (Certified Red Team Expert)
-- **CRTP** (Certified Red Team Professional)
-- **eWPTX** (eLearnSecurity Web Penetration Tester eXtreme)
-- **CRTO** (Certified Red Team Operator)
-- **eCPPT** (Certified Professional Penetration Tester)
-- **eMAPT** (Certified Mobile Penetration Tester)
+I’m **Ramez Saber** (SadlyRemo), a **Mid-Senior Penetration Tester** at **ZeroSploit MEA** with over two years of hands-on experience in offensive security. I specialize in comprehensive security assessments across web, mobile, API, source code, network infrastructure, Active Directory, and Microsoft Exchange environments.
 
-## 🏆 Achievements
-- **Was HackTheBox Top 5 in Egypt** 🏅
-- **HackTheBox ProLabs:** Rastalabs, Zephyr, Offshore, Dante
-- **Black Hat CTF Finals Qualifier**
-- **Active Directory, Web App, & Mobile Security**
+Ranked among the **top offensive security professionals in Egypt** on Hack The Box. Passionate about exploit development and malware, with a foundation in binary exploitation and reverse engineering.
+
+**B.Sc. in Information Technology**, Sinai University (2021-2025). Final project: **RAAD Framework**, a custom Red Team framework for AV bypass and advanced malware techniques (A+ grade).
+
+---
+
+## Certifications
+
+- **OSED** - OffSec Exploit Developer (In Progress)
+- **CWEE** - Certified Web Exploitation Expert
+- **CWES** - Certified Web Exploitation Specialist
+- **CPTS** - Certified Penetration Testing Specialist
+- **CRTM** - Certified Red Team Master
+- **CRTE** - Certified Red Team Expert
+- **CRTP** - Certified Red Team Professional
+- **CRTO** - Certified Red Team Operator
+- **eWPTX** - Web Application Penetration Tester eXtreme
+- **eMAPT** - Mobile Application Penetration Tester
+- **eCPPT** - Certified Penetration Testing Professional
+- **CJCA** - Certified Junior Cybersecurity Associate
 
 ## Training
 
-### 📌 **Offensive Security Courses**
-- **OSEP Training**  
-  - Advanced penetration testing techniques with a focus on bypassing modern security controls.  
+- **Offensive Security:** OSCP, OSWA, OSWP, OSEP (Completed), OSED (In Progress)
+- **CAPE** - Certified Active Directory Pentesting Expert (In Progress)
+- **CWPE** - Certified Wi-Fi Pentesting Expert (In Progress)
+- **INE Certified Exploit Developer** (In Progress)
+- **Malware Development:** Sektor7 Essentials, MalDev Academy
+- **Mobile Security:** Blackbelt Mobile Pentesting
+- **Debugging:** OpenSecurity Training (WinDbg, GDB)
 
-- **OSCP Training**  
-  - Foundational penetration testing skills, including exploitation, post-exploitation, and privilege escalation.  
+---
 
-### 📌 **Malware Development Courses**
-- **Sektor 7 - Malware Development Beginner Edition**  
-  - Focus on Windows malware development fundamentals.  
-  - Covers shellcoding, process injection, and evasion techniques.  
+## Areas of Expertise
 
-- **Maldev Academy (Progress: 1/3 Completed)**  
-  - Comprehensive training in malware development.  
-  - Emphasizes advanced evasion techniques, persistence, and payload development.  
-  - Hands-on labs for real-world scenarios.  
+- **Application Security:** Web, Mobile, API, and Source Code Review
+- **Infrastructure Security:** Network, Active Directory, Exchange, and Internal Assessments
+- **Wi-Fi Pentesting:** Personal and Enterprise Networks
+- **Exploit Development:** Shellcoding, Reverse Engineering
+- **Red Team Operations:** C2 Frameworks, Malware Development, AV Evasion
+- **CTF & Challenge Development:** Web, Reversing, Binary, Network
 
+---
 
-## 🔥 Areas of Expertise
-- **Active Directory Exploitation** 🏴‍☠️
-- **Red Team C2 Frameworks & Malware Development** 🐍
-- **Web & Source Code Review** 🕵️‍♂️
-- **Mobile Pentesting** 📱
+## Practical Experience
 
-## 🎓 Teaching & Mentorship
-- **Instructor:** Active Directory Exploitation Course (Lateral Movement, Persistence, Hands-on Labs)
+- **HackTheBox:** Top 5 in Egypt, Pro Hacker, Ruby Rank (S3 & S4), Holo Rank (S7)
+- **HackTheBox:** 180 Machines, 111 Challenges, ProLabs: Dante, Rastalabs, Offshore, Zephyr
+- **TryHackMe:** 150+ Rooms Solved
+- **VulnLab:** 20 Machines Completed
+- **RootMe:** Over 50% Server-Side Web Challenges Solved
+
+## CTF Competitions
+
+- **CTF Team:** 0xL4ugh
+- Top 3 Finalist, Aswan CTF
+- Top 7 Finalist, FDC CTF
+- Top 8 Finalist, Arab WarGames CTF
+- Finalist: ICMTC, Black Hat MEA 2024, CyCTF 2024
+
+---
+
+## Teaching & Mentorship
+
+- **Instructor at We Innovate:** Application Security (Web, Mobile, Secure Code Review), Infrastructure Security (Network, AD), Exploit Development (Intro to Binary Exploitation)
 - **Mentor:** Supporting cybersecurity students in skill development
 
-## ⚙️ Tech & Tools
-- ### Remo Tools  
-    - **Karma Shellcode Obfuscator**
-- **Researching:** Mobile Exploit Development
+## Projects & Research
 
-## 🚀 Let’s Connect
-- **GitHub:** [Follow me on Github](https://github.com/Remo1x)
-- **LinkedIn:** [Follow me on LinkedIn](https://www.linkedin.com/in/rem01x/)
-- **Twitter/X:** [Follow me on Twitter/X](https://x.com/Rem01x)
-- **HackTheBox** [Follow me on HackTheBox](https://app.hackthebox.com/profile/1080501)
+- **RAAD Framework:** Custom Red Team framework for AV bypass and advanced malware techniques
+- **Karma:** Shellcode obfuscator for red team engagements
+- **CTF Platform Development:** Built custom challenges (Web, API, Reversing, Binary Exploitation)
+- **MITRE ATT&CK Mapping:** Gap assessments for enterprise environments
+- **Security Code Reviews:** SAST reviews in Python, .NET, and PHP applications
+- **AI Agent Design:** Specialized AI agents for AD pentesting, web application security, and CTF workflows
 
-Passionate about breaking security, understanding the internals, and pushing the limits of offensive security. **Always hacking, always learning.** 🔥
+---
+
+## Let’s Connect
+
+- **GitHub:** [sadlyremo](https://github.com/sadlyremo)
+- **LinkedIn:** [rem01x](https://www.linkedin.com/in/rem01x/)
+- **Twitter/X:** [Rem01x](https://x.com/Rem01x)
+- **HackTheBox:** [Profile](https://app.hackthebox.com/profile/1080501)
+
+Passionate about breaking security, understanding the internals, and pushing the limits of offensive security. **Always hacking, always learning.**
