@@ -4,6 +4,8 @@ date: 2026-11-09 00:00:00 +0300
 categories: [Exploit Development, Shellcoding]
 tags: [x86, shellcoding, windows, assembly, exploit-development]
 description: "A comprehensive guide to writing custom x86 Windows shellcode — from PEB walking and API resolution to reverse shells, process injection, and beyond."
+image:
+  path: /assets/img/shellcoding/banner.svg
 ---
 
 In this series, we will build a fully custom Windows reverse shell in x86 assembly -- from zero to a working payload. No frameworks, no Metasploit, just raw assembly and a deep understanding of how Windows works under the hood.
@@ -1286,5 +1288,59 @@ Go experiment. Modify the examples. The patterns you have learned are composable
 The CPU is waiting. Go write something.
 
 ---
+
+---
+
+## About the Author
+
+<div align="center"><svg viewBox="0 0 750 320" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="320" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="35" text-anchor="middle" fill="#cdd6f4" font-size="16" font-weight="bold">Certifications</text>
+  <rect x="100" y="48" width="550" height="1" rx="1" fill="#313244"/>
+
+  <!-- Row 1 -->
+  <rect x="55" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="100" y="93" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">CWEE</text>
+
+  <rect x="165" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="210" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">CPTS</text>
+
+  <rect x="275" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="320" y="93" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">CWES</text>
+
+  <rect x="385" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="430" y="93" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">CJCA</text>
+
+  <rect x="495" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="540" y="93" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">CRTM</text>
+
+  <rect x="605" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="650" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">CRTE</text>
+
+  <!-- Row 2 -->
+  <rect x="110" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="155" y="148" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">CRTP</text>
+
+  <rect x="220" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="265" y="148" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">CRTO</text>
+
+  <rect x="330" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="375" y="148" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">eWPTX</text>
+
+  <rect x="440" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="485" y="148" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">eCPPT</text>
+
+  <rect x="550" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="595" y="148" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">eMAPT</text>
+
+  <!-- Divider -->
+  <rect x="200" y="185" width="350" height="1" rx="1" fill="#313244"/>
+
+  <!-- Message -->
+  <text x="375" y="215" text-anchor="middle" fill="#cdd6f4" font-size="13">Thank you for reading this far. If you made it here, you now have</text>
+  <text x="375" y="238" text-anchor="middle" fill="#cdd6f4" font-size="13">the tools to write any Windows shellcode from scratch.</text>
+  <text x="375" y="268" text-anchor="middle" fill="#a6e3a1" font-size="14" font-weight="bold">Keep learning. Keep building. Stay curious.</text>
+  <text x="375" y="300" text-anchor="middle" fill="#6c7086" font-size="12">-- @Rem01x</text>
+</svg></div>
 
 *Written by @Rem01x -- for educational purposes only.*
