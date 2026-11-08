@@ -20,7 +20,7 @@ Let's get started.
 1. [What Is Shellcode?](#1-what-is-shellcode)
 2. [The Shellcode Skeleton](#2-the-shellcode-skeleton)
 3. [Walking the PEB: Finding kernel32.dll](#3-walking-the-peb-finding-kernel32dll)
-4. [The find_function Engine: Resolving API Addresses](#4-the-findfunction-engine-resolving-api-addresses)
+4. [The find_function Engine: Resolving API Addresses](#4-the-find_function-engine-resolving-api-addresses)
 
 **Part II: Building Blocks**
 5. [Null-Free Encoding Patterns](#5-null-free-encoding-patterns)
