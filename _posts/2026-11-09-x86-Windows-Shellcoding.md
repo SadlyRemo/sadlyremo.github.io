@@ -16,34 +16,34 @@ Let's get started.
 
 ## Table of Contents
 
-**Part I -- Foundations**
+**Part I: Foundations**
 1. [What Is Shellcode?](#1-what-is-shellcode)
 2. [The Shellcode Skeleton](#2-the-shellcode-skeleton)
-3. [Walking the PEB -- Finding kernel32.dll](#3-walking-the-peb-finding-kernel32dll)
-4. [The find_function Engine -- Resolving API Addresses](#4-the-findfunction-engine-resolving-api-addresses)
+3. [Walking the PEB: Finding kernel32.dll](#3-walking-the-peb-finding-kernel32dll)
+4. [The find_function Engine: Resolving API Addresses](#4-the-findfunction-engine-resolving-api-addresses)
 
-**Part II -- Building Blocks**
+**Part II: Building Blocks**
 5. [Null-Free Encoding Patterns](#5-null-free-encoding-patterns)
 6. [Building Strings on the Stack](#6-building-strings-on-the-stack)
 7. [The ROR-13 Hash Generator](#7-the-ror-13-hash-generator)
-8. [Testing Shellcode -- Keystone and ctypes](#8-testing-shellcode-keystone-and-ctypes)
+8. [Testing Shellcode: Keystone and ctypes](#8-testing-shellcode-keystone-and-ctypes)
 
-**Part III -- Payloads**
-9. [Your First Shellcode -- WinExec](#9-your-first-shellcode-winexec)
-10. [Reverse Shell -- Calling Home](#10-reverse-shell-calling-home)
-11. [Bind Shell -- Waiting for Connections](#11-bind-shell-waiting-for-connections)
-12. [Working Under Restrictions -- A Case Study](#12-working-under-restrictions-a-case-study)
+**Part III: Payloads**
+9. [Your First Shellcode: WinExec](#9-your-first-shellcode-winexec)
+10. [Reverse Shell: Calling Home](#10-reverse-shell-calling-home)
+11. [Bind Shell: Waiting for Connections](#11-bind-shell-waiting-for-connections)
+12. [Working Under Restrictions: A Case Study](#12-working-under-restrictions-a-case-study)
 
-**Part IV -- Advanced Techniques**
-13. [Socket Reuse -- Hijacking Existing Connections](#13-socket-reuse-hijacking-existing-connections)
-14. [XOR Encoding -- Runtime Decoding](#14-xor-encoding-runtime-decoding)
-15. [Process Injection -- Running In Another Process](#15-process-injection-running-in-another-process)
-16. [HTTP Stager -- Downloading Second Stage](#16-http-stager-downloading-second-stage)
-17. [Registry Persistence -- Surviving Reboots](#17-registry-persistence-surviving-reboots)
+**Part IV: Advanced Techniques**
+13. [Socket Reuse: Hijacking Existing Connections](#13-socket-reuse-hijacking-existing-connections)
+14. [XOR Encoding: Runtime Decoding](#14-xor-encoding-runtime-decoding)
+15. [Process Injection: Running In Another Process](#15-process-injection-running-in-another-process)
+16. [HTTP Stager: Downloading Second Stage](#16-http-stager-downloading-second-stage)
+17. [Registry Persistence: Surviving Reboots](#17-registry-persistence-surviving-reboots)
 
-**Part V -- File Operations and Workflow**
-18. [SMB File Operations -- Network File Access](#18-smb-file-operations-network-file-access)
-19. [File I/O -- Writing to Disk](#19-file-io-writing-to-disk)
+**Part V: File Operations and Workflow**
+18. [SMB File Operations: Network File Access](#18-smb-file-operations-network-file-access)
+19. [File I/O: Writing to Disk](#19-file-io-writing-to-disk)
 20. [The Complete Development Workflow](#20-the-complete-development-workflow)
 21. [Mitigations, Ethics, and Closing Thoughts](#21-mitigations-ethics-and-closing-thoughts)
 
@@ -192,7 +192,7 @@ This two-instruction skeleton is the foundation we will never change. Everything
 
 ---
 
-## 3. Walking the PEB -- Finding kernel32.dll
+## 3. Walking the PEB: Finding kernel32.dll
 
 Our shellcode needs to call Windows API functions like `LoadLibraryA`, `CreateProcessA`, and `WSAStartup`. But where are they? They live in DLLs, and DLLs load at unpredictable addresses. So the first thing we must do is find the base address of **kernel32.dll** -- the DLL that exports the most essential Windows APIs.
 
@@ -314,7 +314,7 @@ When the loop exits, **EBX holds the base address of kernel32.dll**. This is the
 
 ---
 
-## 4. The find_function Engine -- Resolving API Addresses
+## 4. The find_function Engine: Resolving API Addresses
 
 We now have kernel32.dll's base address in EBX. But a base address alone does not let us call functions. We need the exact virtual address of functions like `LoadLibraryA` and `CreateProcessA`. To get those, we must parse the **PE Export Table** -- the part of a DLL that says "here are the functions I export, and here is where each one lives in memory."
 
@@ -686,7 +686,7 @@ These are the exact values we embed as immediates in our shellcode.
 
 ---
 
-## 8. Testing Shellcode -- Keystone and ctypes
+## 8. Testing Shellcode: Keystone and ctypes
 
 ### Assembling with Keystone
 
@@ -750,7 +750,7 @@ With our toolkit complete, we are ready to write real payloads.
 
 ---
 
-## 9. Your First Shellcode -- WinExec
+## 9. Your First Shellcode: WinExec
 
 Everything we have built so far -- the PEB walk, the export table parser, the ROR-13 hash resolver -- has been infrastructure. Now we put it all to work and write shellcode that actually *does* something: pop a command shell with `WinExec`.
 
@@ -794,7 +794,7 @@ That is it. When this shellcode runs, a `cmd.exe` window appears. Roughly 120 by
 
 ---
 
-## 10. Reverse Shell -- Calling Home
+## 10. Reverse Shell: Calling Home
 
 A **reverse shell** is the workhorse of remote exploitation. The target reaches out to a listener the attacker already has running, punching through firewalls that block inbound connections.
 
@@ -898,7 +898,7 @@ The critical fields: `dwFlags = 0x100` (STARTF_USESTDHANDLES), and `hStdInput/hS
 
 ---
 
-## 11. Bind Shell -- Waiting for Connections
+## 11. Bind Shell: Waiting for Connections
 
 A **bind shell** is the mirror image of a reverse shell. Instead of connecting out, the shellcode opens a port on the target and waits for the attacker to connect in.
 
@@ -970,7 +970,7 @@ zero_structs:
 
 ---
 
-## 12. Working Under Restrictions -- A Case Study
+## 12. Working Under Restrictions: A Case Study
 
 What if the vulnerability filters out far more than just `0x00`? Real-world exploits often have extensive bad character lists. When half the byte range is off limits, every constant must be constructed indirectly.
 
@@ -994,7 +994,7 @@ With the networking payloads and encoding techniques covered, we now move into m
 
 ---
 
-## 13. Socket Reuse -- Hijacking Existing Connections
+## 13. Socket Reuse: Hijacking Existing Connections
 
 Every shellcode technique so far creates a *new* network connection. **Socket reuse** sidesteps that by hijacking the very TCP socket the exploit already opened. No new connections, no new firewall rules to bypass.
 
@@ -1031,7 +1031,7 @@ call_getpeername:
 
 ---
 
-## 14. XOR Encoding -- Runtime Decoding
+## 14. XOR Encoding: Runtime Decoding
 
 Manually avoiding bad characters one instruction at a time works for small payloads. For larger ones, **XOR encoding** transforms the entire payload so no bad characters remain, then decodes it at runtime.
 
@@ -1063,7 +1063,7 @@ for key in range(1, 256):
 
 ---
 
-## 15. Process Injection -- Running In Another Process
+## 15. Process Injection: Running In Another Process
 
 **Process injection** transplants our code into a different, stable process. The seven-step chain: Snapshot, Enumerate, Find, Open, Allocate, Write, Execute.
 
@@ -1093,7 +1093,7 @@ find_process:
 
 ---
 
-## 16. HTTP Stager -- Downloading Second Stage
+## 16. HTTP Stager: Downloading Second Stage
 
 A stager writes a small first stage that downloads and executes a larger second stage from an HTTP server.
 
@@ -1125,7 +1125,7 @@ Then `CreateThread` executes the downloaded code and `WaitForSingleObject` keeps
 
 ---
 
-## 17. Registry Persistence -- Surviving Reboots
+## 17. Registry Persistence: Surviving Reboots
 
 **Registry persistence** ensures our payload runs again after every reboot by writing to `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
 
@@ -1159,7 +1159,7 @@ With persistence and advanced injection behind us, the final sections cover file
 
 ---
 
-## 18. SMB File Operations -- Network File Access
+## 18. SMB File Operations: Network File Access
 
 Our goal is to authenticate to a remote SMB share and copy a file -- all from position-independent assembly. We need **WNetAddConnection2A** from **mpr.dll** and **CopyFileA** from kernel32.
 
@@ -1190,7 +1190,7 @@ Build the 32-byte struct with `dwType = 1` (RESOURCETYPE_DISK) and `lpRemoteName
 
 ---
 
-## 19. File I/O -- Writing to Disk
+## 19. File I/O: Writing to Disk
 
 Three kernel32 APIs: **CreateFileA**, **WriteFile**, **CloseHandle**.
 
