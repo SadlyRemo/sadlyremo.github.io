@@ -4,8 +4,6 @@ date: 2026-11-09 00:00:00 +0300
 categories: [Exploit Development, Shellcoding]
 tags: [x86, shellcoding, windows, assembly, exploit-development]
 description: "A comprehensive guide to writing custom x86 Windows shellcode — from PEB walking and API resolution to reverse shells, process injection, and beyond."
-image:
-  path: /assets/img/shellcoding/banner.png
 ---
 
 In this series, we will build a fully custom Windows reverse shell in x86 assembly -- from zero to a working payload. No frameworks, no Metasploit, just raw assembly and a deep understanding of how Windows works under the hood.
@@ -19,31 +17,31 @@ Let's get started.
 **Part I -- Foundations**
 1. [What Is Shellcode?](#1-what-is-shellcode)
 2. [The Shellcode Skeleton](#2-the-shellcode-skeleton)
-3. [Walking the PEB -- Finding kernel32.dll](#3-walking-the-peb----finding-kernel32dll)
-4. [The find_function Engine -- Resolving API Addresses](#4-the-find_function-engine----resolving-api-addresses)
+3. [Walking the PEB -- Finding kernel32.dll](#3-walking-the-peb-finding-kernel32dll)
+4. [The find_function Engine -- Resolving API Addresses](#4-the-findfunction-engine-resolving-api-addresses)
 
 **Part II -- Building Blocks**
 5. [Null-Free Encoding Patterns](#5-null-free-encoding-patterns)
 6. [Building Strings on the Stack](#6-building-strings-on-the-stack)
 7. [The ROR-13 Hash Generator](#7-the-ror-13-hash-generator)
-8. [Testing Shellcode -- Keystone and ctypes](#8-testing-shellcode----keystone-and-ctypes)
+8. [Testing Shellcode -- Keystone and ctypes](#8-testing-shellcode-keystone-and-ctypes)
 
 **Part III -- Payloads**
-9. [Your First Shellcode -- WinExec](#9-your-first-shellcode----winexec)
-10. [Reverse Shell -- Calling Home](#10-reverse-shell----calling-home)
-11. [Bind Shell -- Waiting for Connections](#11-bind-shell----waiting-for-connections)
-12. [Working Under Restrictions -- A Case Study](#12-working-under-restrictions----a-case-study)
+9. [Your First Shellcode -- WinExec](#9-your-first-shellcode-winexec)
+10. [Reverse Shell -- Calling Home](#10-reverse-shell-calling-home)
+11. [Bind Shell -- Waiting for Connections](#11-bind-shell-waiting-for-connections)
+12. [Working Under Restrictions -- A Case Study](#12-working-under-restrictions-a-case-study)
 
 **Part IV -- Advanced Techniques**
-13. [Socket Reuse -- Hijacking Existing Connections](#13-socket-reuse----hijacking-existing-connections)
-14. [XOR Encoding -- Runtime Decoding](#14-xor-encoding----runtime-decoding)
-15. [Process Injection -- Running In Another Process](#15-process-injection----running-in-another-process)
-16. [HTTP Stager -- Downloading Second Stage](#16-http-stager----downloading-second-stage)
-17. [Registry Persistence -- Surviving Reboots](#17-registry-persistence----surviving-reboots)
+13. [Socket Reuse -- Hijacking Existing Connections](#13-socket-reuse-hijacking-existing-connections)
+14. [XOR Encoding -- Runtime Decoding](#14-xor-encoding-runtime-decoding)
+15. [Process Injection -- Running In Another Process](#15-process-injection-running-in-another-process)
+16. [HTTP Stager -- Downloading Second Stage](#16-http-stager-downloading-second-stage)
+17. [Registry Persistence -- Surviving Reboots](#17-registry-persistence-surviving-reboots)
 
 **Part V -- File Operations and Workflow**
-18. [SMB File Operations -- Network File Access](#18-smb-file-operations----network-file-access)
-19. [File I/O -- Writing to Disk](#19-file-io----writing-to-disk)
+18. [SMB File Operations -- Network File Access](#18-smb-file-operations-network-file-access)
+19. [File I/O -- Writing to Disk](#19-file-io-writing-to-disk)
 20. [The Complete Development Workflow](#20-the-complete-development-workflow)
 21. [Mitigations, Ethics, and Closing Thoughts](#21-mitigations-ethics-and-closing-thoughts)
 
