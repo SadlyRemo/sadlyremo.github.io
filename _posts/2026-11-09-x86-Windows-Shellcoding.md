@@ -811,6 +811,37 @@ add   esp, 0xfffff9f0       ; Same result: ESP - 0x610
 
 The formula: `two's_complement(X) = NOT(X) + 1`.
 
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Two's Complement: 0x610 to 0xFFFFF9F0</text>
+  <rect x="40" y="55" width="150" height="50" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="115" y="76" text-anchor="middle" fill="#f38ba8" font-size="13" font-weight="bold">0x00000610</text>
+  <text x="115" y="96" text-anchor="middle" fill="#6c7086" font-size="10">Original (has nulls!)</text>
+  <line x1="195" y1="80" x2="238" y2="80" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="235,74 245,80 235,86" fill="#a6e3a1"/>
+  <text x="220" y="70" text-anchor="middle" fill="#a6e3a1" font-size="10" font-weight="bold">NOT</text>
+  <rect x="250" y="55" width="170" height="50" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="335" y="76" text-anchor="middle" fill="#fab387" font-size="13" font-weight="bold">0xFFFFF9EF</text>
+  <text x="335" y="96" text-anchor="middle" fill="#6c7086" font-size="10">All bits flipped</text>
+  <line x1="425" y1="80" x2="468" y2="80" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="465,74 475,80 465,86" fill="#a6e3a1"/>
+  <text x="450" y="70" text-anchor="middle" fill="#a6e3a1" font-size="10" font-weight="bold">+ 1</text>
+  <rect x="480" y="55" width="230" height="50" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="595" y="76" text-anchor="middle" fill="#a6e3a1" font-size="13" font-weight="bold">0xFFFFF9F0</text>
+  <text x="595" y="96" text-anchor="middle" fill="#cdd6f4" font-size="10">No null bytes!</text>
+  <text x="375" y="135" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">Bit-Level View (all 32 bits)</text>
+  <text x="50" y="160" fill="#f38ba8" font-size="11" font-weight="bold">0x0610:</text>
+  <rect x="140" y="147" width="560" height="22" rx="3" fill="#313244" stroke="#f38ba8" stroke-width="1"/>
+  <text x="420" y="163" text-anchor="middle" fill="#cdd6f4" font-size="10">0000 0000 0000 0000 0000 0110 0001 0000</text>
+  <text x="50" y="195" fill="#fab387" font-size="11" font-weight="bold">NOT:</text>
+  <rect x="140" y="182" width="560" height="22" rx="3" fill="#313244" stroke="#fab387" stroke-width="1"/>
+  <text x="420" y="198" text-anchor="middle" fill="#fab387" font-size="10">1111 1111 1111 1111 1111 1001 1110 1111</text>
+  <text x="50" y="230" fill="#a6e3a1" font-size="11" font-weight="bold">+1:</text>
+  <rect x="140" y="217" width="560" height="22" rx="3" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="420" y="233" text-anchor="middle" fill="#a6e3a1" font-size="10">1111 1111 1111 1111 1111 1001 1111 0000</text>
+  <text x="375" y="265" text-anchor="middle" fill="#cdd6f4" font-size="11">add esp, 0xFFFFF9F0 produces the same effect as sub esp, 0x610</text>
+</svg></div>
+
 ### Pattern 3: NOT Encoding
 
 ```nasm
@@ -844,6 +875,62 @@ mov   al, 0xBB              ; EAX = 0x000000BB
 shl   eax, 0x08             ; EAX = 0x0000BB00
 inc   eax                   ; EAX = 0x0000BB01 (port 443 in NBO)
 ```
+
+<div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="310" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">SHL Chain: Building Port 443 (0xBB01) Byte-by-Byte</text>
+  <!-- Step 1 -->
+  <text x="40" y="62" fill="#a6e3a1" font-size="12" font-weight="bold">Step 1: xor eax, eax</text>
+  <rect x="280" y="48" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="310" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="345" y="48" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="375" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="410" y="48" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="440" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="475" y="48" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="505" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <text x="580" y="67" fill="#6c7086" font-size="10">= 0x00000000</text>
+  <!-- Step 2 -->
+  <text x="40" y="112" fill="#a6e3a1" font-size="12" font-weight="bold">Step 2: mov al, 0xBB</text>
+  <rect x="280" y="98" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="310" y="117" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="345" y="98" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="375" y="117" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="410" y="98" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="440" y="117" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="475" y="98" width="60" height="28" rx="4" fill="#fab387" stroke-width="2"/>
+  <text x="505" y="117" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">BB</text>
+  <text x="580" y="117" fill="#fab387" font-size="10">AL = 0xBB</text>
+  <!-- Shift arrow -->
+  <text x="160" y="160" fill="#89b4fa" font-size="11" font-weight="bold">SHL 8: byte slides left one position</text>
+  <line x1="505" y1="130" x2="440" y2="148" stroke="#89b4fa" stroke-width="2" stroke-dasharray="4,3"/>
+  <polygon points="443,144 437,152 447,150" fill="#89b4fa"/>
+  <!-- Step 3 -->
+  <text x="40" y="192" fill="#a6e3a1" font-size="12" font-weight="bold">Step 3: shl eax, 0x08</text>
+  <rect x="280" y="178" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="310" y="197" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="345" y="178" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="375" y="197" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="410" y="178" width="60" height="28" rx="4" fill="#fab387" stroke-width="2"/>
+  <text x="440" y="197" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">BB</text>
+  <rect x="475" y="178" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="505" y="197" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <text x="580" y="197" fill="#fab387" font-size="10">= 0x0000BB00</text>
+  <!-- Step 4 -->
+  <text x="40" y="242" fill="#a6e3a1" font-size="12" font-weight="bold">Step 4: inc eax</text>
+  <rect x="280" y="228" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="310" y="247" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="345" y="228" width="60" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="375" y="247" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="410" y="228" width="60" height="28" rx="4" fill="#fab387" stroke-width="2"/>
+  <text x="440" y="247" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">BB</text>
+  <rect x="475" y="228" width="60" height="28" rx="4" fill="#a6e3a1" stroke-width="2"/>
+  <text x="505" y="247" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">01</text>
+  <text x="580" y="247" fill="#a6e3a1" font-size="10" font-weight="bold">= 0x0000BB01</text>
+  <!-- Result -->
+  <rect x="180" y="270" width="390" height="28" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="375" y="289" text-anchor="middle" fill="#a6e3a1" font-size="12">Port 443 in network byte order -- zero null bytes in opcodes</text>
+</svg></div>
 
 ### Pattern 7: XOR with a Key
 
@@ -999,6 +1086,68 @@ push  eax
 
 This builds `"dll\0"` byte by byte. We will see this pattern repeatedly when building DLL name strings.
 
+<div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="340" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">SHL/MOV AL Trick: Building "dll\0" in EAX</text>
+  <!-- Step 1 -->
+  <text x="40" y="62" fill="#a6e3a1" font-size="12" font-weight="bold">Step 1: xor eax, eax</text>
+  <rect x="300" y="48" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="324" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="353" y="48" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="377" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="406" y="48" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="430" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="459" y="48" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="483" y="67" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <text x="540" y="67" fill="#6c7086" font-size="10">EAX = 0</text>
+  <!-- Step 2 -->
+  <text x="40" y="112" fill="#a6e3a1" font-size="12" font-weight="bold">Step 2: mov ax, 0x6c6c</text>
+  <rect x="300" y="98" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="324" y="117" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="353" y="98" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="377" y="117" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="406" y="98" width="48" height="28" rx="4" fill="#89b4fa" stroke-width="2"/>
+  <text x="430" y="117" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">6c</text>
+  <rect x="459" y="98" width="48" height="28" rx="4" fill="#89b4fa" stroke-width="2"/>
+  <text x="483" y="117" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">6c</text>
+  <text x="540" y="112" fill="#89b4fa" font-size="10">AX = "ll"</text>
+  <!-- Shift arrow -->
+  <text x="180" y="160" fill="#fab387" font-size="11" font-weight="bold">SHL 8: all bytes slide left, low byte zeroed</text>
+  <line x1="430" y1="130" x2="377" y2="148" stroke="#fab387" stroke-width="2" stroke-dasharray="4,3"/>
+  <polygon points="380,144 374,152 384,150" fill="#fab387"/>
+  <!-- Step 3 -->
+  <text x="40" y="192" fill="#a6e3a1" font-size="12" font-weight="bold">Step 3: shl eax, 0x08</text>
+  <rect x="300" y="178" width="48" height="28" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1.5"/>
+  <text x="324" y="197" text-anchor="middle" fill="#6c7086" font-size="12">00</text>
+  <rect x="353" y="178" width="48" height="28" rx="4" fill="#89b4fa" stroke-width="2"/>
+  <text x="377" y="197" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">6c</text>
+  <rect x="406" y="178" width="48" height="28" rx="4" fill="#89b4fa" stroke-width="2"/>
+  <text x="430" y="197" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">6c</text>
+  <rect x="459" y="178" width="48" height="28" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="483" y="197" text-anchor="middle" fill="#f38ba8" font-size="12">00</text>
+  <text x="540" y="192" fill="#fab387" font-size="10">= "ll\0" gap</text>
+  <!-- Step 4 -->
+  <text x="40" y="242" fill="#a6e3a1" font-size="12" font-weight="bold">Step 4: mov al, 0x64</text>
+  <rect x="300" y="228" width="48" height="28" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="324" y="247" text-anchor="middle" fill="#a6e3a1" font-size="11">\0</text>
+  <rect x="353" y="228" width="48" height="28" rx="4" fill="#89b4fa" stroke-width="2"/>
+  <text x="377" y="247" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">6c</text>
+  <rect x="406" y="228" width="48" height="28" rx="4" fill="#89b4fa" stroke-width="2"/>
+  <text x="430" y="247" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">6c</text>
+  <rect x="459" y="228" width="48" height="28" rx="4" fill="#a6e3a1" stroke-width="2"/>
+  <text x="483" y="247" text-anchor="middle" fill="#1e1e2e" font-size="12" font-weight="bold">64</text>
+  <text x="540" y="237" fill="#a6e3a1" font-size="10" font-weight="bold">= "dll\0"</text>
+  <text x="540" y="252" fill="#6c7086" font-size="9">0x006c6c64</text>
+  <!-- Character labels underneath -->
+  <text x="324" y="275" text-anchor="middle" fill="#6c7086" font-size="10">'\0'</text>
+  <text x="377" y="275" text-anchor="middle" fill="#cdd6f4" font-size="10">'l'</text>
+  <text x="430" y="275" text-anchor="middle" fill="#cdd6f4" font-size="10">'l'</text>
+  <text x="483" y="275" text-anchor="middle" fill="#cdd6f4" font-size="10">'d'</text>
+  <!-- Result box -->
+  <rect x="140" y="295" width="470" height="30" rx="5" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="375" y="315" text-anchor="middle" fill="#a6e3a1" font-size="12">push eax puts "dll\0" on the stack in little-endian order: 64 6c 6c 00</text>
+</svg></div>
+
 ---
 
 ## 7. The ROR-13 Hash Generator
@@ -1069,6 +1218,42 @@ These are the exact values we embed as immediates in our shellcode.
 </svg></div>
 
 > **Important:** The hash algorithm in your shellcode and in your Python script must be identical. If you split the rotation for bad character avoidance (e.g., `ror edx, 7` + `ror edx, 6` instead of `ror edx, 13`), the total rotation is still 13, so the hashes remain the same.
+
+<div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="280" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">ROR-13 Hash Pipeline: From API Name to Shellcode</text>
+  <!-- Step 1: Function name -->
+  <rect x="30" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="120" y="76" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">API Function Name</text>
+  <text x="120" y="96" text-anchor="middle" fill="#cdd6f4" font-size="11">"LoadLibraryA"</text>
+  <!-- Arrow 1 -->
+  <line x1="215" y1="82" x2="253" y2="82" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="250,76 260,82 250,88" fill="#a6e3a1"/>
+  <!-- Step 2: Hash script -->
+  <rect x="265" y="55" width="180" height="55" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="355" y="76" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">Python hash.py</text>
+  <text x="355" y="96" text-anchor="middle" fill="#cdd6f4" font-size="11">ROR-13 each char</text>
+  <!-- Arrow 2 -->
+  <line x1="450" y1="82" x2="488" y2="82" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="485,76 495,82 485,88" fill="#a6e3a1"/>
+  <!-- Step 3: Hash value -->
+  <rect x="500" y="55" width="220" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="610" y="76" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">32-bit Hash</text>
+  <text x="610" y="96" text-anchor="middle" fill="#a6e3a1" font-size="13">0xec0e4e8e</text>
+  <!-- Arrow down -->
+  <line x1="610" y1="115" x2="610" y2="145" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="604,142 610,152 616,142" fill="#a6e3a1"/>
+  <!-- Step 4: Embedded in ASM -->
+  <rect x="120" y="155" width="510" height="60" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="375" y="178" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">Embedded in Shellcode Assembly</text>
+  <text x="375" y="200" text-anchor="middle" fill="#cdd6f4" font-size="12">push 0xec0e4e8e    ; LoadLibraryA hash</text>
+  <!-- Arrow down -->
+  <line x1="375" y1="220" x2="375" y2="240" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="369,237 375,247 381,237" fill="#a6e3a1"/>
+  <!-- Step 5: Resolution at runtime -->
+  <rect x="200" y="248" width="350" height="25" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="266" text-anchor="middle" fill="#89b4fa" font-size="11">call find_function --> EAX = address of LoadLibraryA</text>
+</svg></div>
 
 ---
 
@@ -1341,6 +1526,19 @@ call_winexec:
 
 That is it. When this shellcode runs, a `cmd.exe` window appears. Roughly 120 bytes of machine code.
 
+### PoC Video
+
+The following video demonstrates the WinExec shellcode launching calc.exe in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/winexec-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: WinExec shellcode popping calc.exe*
+
 ---
 
 ## 10. Reverse Shell: Calling Home
@@ -1527,6 +1725,19 @@ The critical fields: `dwFlags = 0x100` (STARTF_USESTDHANDLES), and `hStdInput/hS
 
 *Figure 10.2 - Reverse shell data flow: the target connects out to the attacker, and STARTUPINFOA redirects all stdio through the socket.*
 
+### PoC Video
+
+The following video demonstrates the reverse shell shellcode connecting back to our listener and providing an interactive command prompt in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/reverse-shell-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Reverse shell connecting back to attacker*
+
 ---
 
 ## 11. Bind Shell: Waiting for Connections
@@ -1641,6 +1852,19 @@ zero_structs:
 
 *Figure 11.1 - Bind shell sequence: bind to a port, listen, block on accept, then spawn a shell using the accepted client socket.*
 
+### PoC Video
+
+The following video demonstrates the bind shell shellcode listening on a port and accepting an incoming connection in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/bind-shell-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Bind shell accepting incoming connection*
+
 ---
 
 ## 12. Working Under Restrictions: A Case Study
@@ -1722,9 +1946,117 @@ The core encoding patterns for a restricted-charset reverse shell:
 
 **Field-by-field struct construction:** Allocate space, then fill each field individually with `mov word/dword ptr`.
 
+<div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="340" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Restricted Charset Encoding Pipeline</text>
+  <rect x="30" y="50" width="185" height="180" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="122" y="72" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">Original Bytes</text>
+  <text x="45" y="96" fill="#a6e3a1" font-size="10">31 C9</text><text x="105" y="96" fill="#f38ba8" font-size="10" font-weight="bold">00 0D</text><text x="155" y="96" fill="#a6e3a1" font-size="10">8B 71</text>
+  <text x="45" y="116" fill="#a6e3a1" font-size="10">89 E5</text><text x="105" y="116" fill="#f38ba8" font-size="10" font-weight="bold">0A 00</text><text x="155" y="116" fill="#a6e3a1" font-size="10">FC AC</text>
+  <text x="45" y="136" fill="#a6e3a1" font-size="10">C1 CA</text><text x="105" y="136" fill="#f38ba8" font-size="10" font-weight="bold">00 20</text><text x="155" y="136" fill="#a6e3a1" font-size="10">EB F4</text>
+  <text x="45" y="156" fill="#a6e3a1" font-size="10">3B 54</text><text x="105" y="156" fill="#f38ba8" font-size="10" font-weight="bold">00 00</text><text x="155" y="156" fill="#a6e3a1" font-size="10">8B 57</text>
+  <rect x="50" y="170" width="145" height="22" rx="4" fill="#1e1e2e" stroke="#f38ba8" stroke-width="1"/>
+  <text x="122" y="186" text-anchor="middle" fill="#f38ba8" font-size="10">8 bad bytes found</text>
+  <text x="122" y="218" text-anchor="middle" fill="#6c7086" font-size="9">Size: 142 bytes</text>
+  <line x1="215" y1="140" x2="255" y2="140" stroke="#fab387" stroke-width="2"/><polygon points="252,135 262,140 252,145" fill="#fab387"/>
+  <rect x="265" y="55" width="220" height="170" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="375" y="78" text-anchor="middle" fill="#fab387" font-size="12" font-weight="bold">Encoding Engine</text>
+  <line x1="285" y1="88" x2="465" y2="88" stroke="#6c7086" stroke-width="0.5"/>
+  <text x="285" y="110" fill="#89b4fa" font-size="10">XOR Zeroing</text><text x="410" y="110" fill="#cdd6f4" font-size="9">0x00 -> xor r,r</text>
+  <text x="285" y="130" fill="#89b4fa" font-size="10">NOT Encode</text><text x="410" y="130" fill="#cdd6f4" font-size="9">push ~val; not</text>
+  <text x="285" y="150" fill="#89b4fa" font-size="10">NEG Byte</text><text x="410" y="150" fill="#cdd6f4" font-size="9">0x06 -> neg 0xFA</text>
+  <text x="285" y="170" fill="#89b4fa" font-size="10">SHL Build</text><text x="410" y="170" fill="#cdd6f4" font-size="9">byte-by-byte</text>
+  <text x="285" y="190" fill="#89b4fa" font-size="10">XOR Key</text><text x="410" y="190" fill="#cdd6f4" font-size="9">val ^ 0x50505050</text>
+  <text x="285" y="210" fill="#89b4fa" font-size="10">INC/DEC</text><text x="410" y="210" fill="#cdd6f4" font-size="9">small values</text>
+  <line x1="485" y1="140" x2="525" y2="140" stroke="#a6e3a1" stroke-width="2"/><polygon points="522,135 532,140 522,145" fill="#a6e3a1"/>
+  <rect x="535" y="50" width="185" height="180" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="627" y="72" text-anchor="middle" fill="#a6e3a1" font-size="12" font-weight="bold">Clean Shellcode</text>
+  <text x="550" y="96" fill="#a6e3a1" font-size="10">31 C9</text><text x="610" y="96" fill="#a6e3a1" font-size="10">33 C9</text><text x="660" y="96" fill="#a6e3a1" font-size="10">8B 71</text>
+  <text x="550" y="116" fill="#a6e3a1" font-size="10">89 E5</text><text x="610" y="116" fill="#a6e3a1" font-size="10">81 C4</text><text x="660" y="116" fill="#a6e3a1" font-size="10">FC AC</text>
+  <text x="550" y="136" fill="#a6e3a1" font-size="10">C1 CA</text><text x="610" y="136" fill="#a6e3a1" font-size="10">F9 F0</text><text x="660" y="136" fill="#a6e3a1" font-size="10">EB F4</text>
+  <text x="550" y="156" fill="#a6e3a1" font-size="10">3B 54</text><text x="610" y="156" fill="#a6e3a1" font-size="10">FF FF</text><text x="660" y="156" fill="#a6e3a1" font-size="10">8B 57</text>
+  <rect x="555" y="170" width="145" height="22" rx="4" fill="#1e1e2e" stroke="#a6e3a1" stroke-width="1"/>
+  <text x="627" y="186" text-anchor="middle" fill="#a6e3a1" font-size="10">0 bad bytes!</text>
+  <text x="627" y="218" text-anchor="middle" fill="#6c7086" font-size="9">Size: 186 bytes (+31%)</text>
+  <rect x="100" y="260" width="550" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="282" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">Size vs. Safety Trade-off</text>
+  <rect x="130" y="292" width="210" height="12" rx="3" fill="#a6e3a1" opacity="0.7"/><text x="237" y="302" text-anchor="middle" fill="#1e1e2e" font-size="9" font-weight="bold">142 bytes (original)</text>
+  <rect x="130" y="292" width="275" height="12" rx="3" fill="#fab387" opacity="0.4"/><text x="420" y="302" fill="#fab387" font-size="9">+44 encoding overhead</text>
+  <text x="560" y="302" fill="#6c7086" font-size="9">= 186 bytes total</text>
+</svg></div>
+
+*Figure 12.2 - The encoding pipeline: bad bytes (red) pass through composable transforms to produce clean shellcode (green), at the cost of increased size.*
+
+<div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="300" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Bad Character Byte Map (Typical Restricted Set)</text>
+  <rect x="200" y="42" width="12" height="12" rx="2" fill="#f38ba8" opacity="0.8"/><text x="218" y="53" fill="#f38ba8" font-size="10">Bad (blocked)</text>
+  <rect x="330" y="42" width="12" height="12" rx="2" fill="#a6e3a1" opacity="0.3"/><text x="348" y="53" fill="#a6e3a1" font-size="10">Safe (usable)</text>
+  <rect x="460" y="42" width="12" height="12" rx="2" fill="#fab387" opacity="0.5"/><text x="478" y="53" fill="#fab387" font-size="10">Caution</text>
+  <!-- Headers -->
+  <text x="130" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x0</text><text x="165" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x1</text><text x="200" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x2</text><text x="235" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x3</text>
+  <text x="270" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x4</text><text x="305" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x5</text><text x="340" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x6</text><text x="375" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x7</text>
+  <text x="410" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x8</text><text x="445" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">x9</text><text x="480" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">xA</text><text x="515" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">xB</text>
+  <text x="550" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">xC</text><text x="585" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">xD</text><text x="620" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">xE</text><text x="655" y="73" fill="#89b4fa" font-size="9" text-anchor="middle">xF</text>
+  <!-- Row 0x0_ -->
+  <text x="105" y="93" fill="#89b4fa" font-size="9" text-anchor="end">0x0_</text>
+  <rect x="116" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.9"/><text x="130" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8" font-weight="bold">00</text>
+  <rect x="151" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="165" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">01</text>
+  <rect x="186" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="200" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">02</text>
+  <rect x="221" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="235" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">03</text>
+  <rect x="256" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="270" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">04</text>
+  <rect x="291" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="305" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">05</text>
+  <rect x="326" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="340" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">06</text>
+  <rect x="361" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="375" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">07</text>
+  <rect x="396" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="410" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">08</text>
+  <rect x="431" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="445" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">09</text>
+  <rect x="466" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.9"/><text x="480" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8" font-weight="bold">0A</text>
+  <rect x="501" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="515" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">0B</text>
+  <rect x="536" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="550" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">0C</text>
+  <rect x="571" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.9"/><text x="585" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8" font-weight="bold">0D</text>
+  <rect x="606" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="620" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">0E</text>
+  <rect x="641" y="80" width="28" height="18" rx="2" fill="#f38ba8" opacity="0.5"/><text x="655" y="93" text-anchor="middle" fill="#1e1e2e" font-size="8">0F</text>
+  <!-- Row 0x1_ -->
+  <text x="105" y="113" fill="#89b4fa" font-size="9" text-anchor="end">0x1_</text>
+  <rect x="116" y="100" width="548" height="18" rx="2" fill="#f38ba8" opacity="0.35"/><text x="390" y="113" text-anchor="middle" fill="#cdd6f4" font-size="8">10..1F  (all control chars -- blocked)</text>
+  <!-- Row 0x2_ -->
+  <text x="105" y="133" fill="#89b4fa" font-size="9" text-anchor="end">0x2_</text>
+  <rect x="116" y="120" width="28" height="18" rx="2" fill="#fab387" opacity="0.5"/><text x="130" y="133" text-anchor="middle" fill="#cdd6f4" font-size="8">20</text>
+  <rect x="151" y="120" width="513" height="18" rx="2" fill="#a6e3a1" opacity="0.2"/><text x="407" y="133" text-anchor="middle" fill="#cdd6f4" font-size="8">21..2F  (mostly safe -- symbols and punctuation)</text>
+  <!-- Rows 0x3_-7_ -->
+  <text x="105" y="153" fill="#89b4fa" font-size="9" text-anchor="end">0x3_-7_</text>
+  <rect x="116" y="140" width="548" height="18" rx="2" fill="#a6e3a1" opacity="0.2"/><text x="390" y="153" text-anchor="middle" fill="#a6e3a1" font-size="8">Printable ASCII: digits, uppercase, lowercase, symbols -- all safe</text>
+  <!-- Rows 0x8_-F_ -->
+  <text x="105" y="173" fill="#89b4fa" font-size="9" text-anchor="end">0x8_-F_</text>
+  <rect x="116" y="160" width="548" height="18" rx="2" fill="#a6e3a1" opacity="0.2"/><text x="390" y="173" text-anchor="middle" fill="#a6e3a1" font-size="8">Extended bytes (0x80-0xFF): rarely restricted in binary exploit protocols</text>
+  <!-- Worst offenders -->
+  <rect x="80" y="195" width="590" height="45" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="1.5"/>
+  <text x="375" y="214" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">Most Common Bad Characters</text>
+  <text x="140" y="232" fill="#f38ba8" font-size="11">0x00 null</text><text x="255" y="232" fill="#f38ba8" font-size="11">0x0A LF</text><text x="355" y="232" fill="#f38ba8" font-size="11">0x0D CR</text>
+  <text x="455" y="232" fill="#fab387" font-size="11">0x20 space</text><text x="575" y="232" fill="#fab387" font-size="11">0x25 %</text>
+  <!-- Summary -->
+  <rect x="100" y="254" width="550" height="30" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="274" text-anchor="middle" fill="#89b4fa" font-size="10" font-weight="bold">~33 blocked + ~223 usable of 256 | Always run a full 0x00-0xFF bad char test first!</text>
+</svg></div>
+
+*Figure 12.3 - Bad character byte map. Null (0x00), LF (0x0A), and CR (0x0D) are almost always blocked. Extended bytes (0x80-0xFF) are rarely restricted.*
+
 > The restricted-charset shellcode is not a separate technique -- it is the same shellcode with an encoding adapter wrapped around every constant.
 
 With the networking payloads and encoding techniques covered, we now move into more advanced territory.
+
+### PoC Video
+
+The following video demonstrates the restricted-charset reverse shell executing successfully despite heavy bad character filtering in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/restricted-charset-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Restricted-charset shellcode executing cleanly*
 
 ---
 
@@ -1806,6 +2138,19 @@ call_getpeername:
 
 *Figure 13.1 - Socket reuse: scan handles, test with getpeername, match port, redirect stdio.*
 
+### PoC Video
+
+The following video demonstrates the socket reuse shellcode hijacking an existing connection to establish a shell in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/socket-reuse-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Socket reuse shell over existing connection*
+
 ---
 
 ## 14. XOR Encoding: Runtime Decoding
@@ -1886,6 +2231,19 @@ for key in range(1, 256):
 <div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#1e1e2e;border-radius:8px"><text x="375" y="30" fill="#cdd6f4" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">XOR Decode Loop (key = 0xAA)</text><text x="60" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Iter</text><text x="180" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Before</text><text x="340" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Operation</text><text x="510" y="70" fill="#fab387" font-family="Consolas,monospace" font-size="11" text-anchor="middle">After</text><rect x="20" y="85" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="109" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">1</text><text x="180" y="109" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8</text><text x="340" y="109" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8 XOR 0xAA</text><text x="510" y="109" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x72 = 'r'</text><rect x="20" y="128" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="152" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">2</text><text x="180" y="152" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF</text><text x="340" y="152" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF XOR 0xAA</text><text x="510" y="152" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x65 = 'e'</text><rect x="20" y="171" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="195" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">3</text><text x="180" y="195" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7</text><text x="340" y="195" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7 XOR 0xAA</text><text x="510" y="195" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6D = 'm'</text><rect x="20" y="214" width="710" height="38" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1"/><text x="60" y="238" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">4</text><text x="180" y="238" fill="#f38ba8" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5</text><text x="340" y="238" fill="#cdd6f4" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5 XOR 0xAA</text><text x="510" y="238" fill="#a6e3a1" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6F = 'o'</text></svg></div>
 
 *Figure 14.1 - Each iteration XORs one encoded byte back to its original value.*
+
+### PoC Video
+
+The following video demonstrates the XOR-encoded shellcode decoding itself at runtime before executing the payload in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/xor-encoding-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: XOR decoder stub running at runtime*
 
 ---
 
@@ -1992,6 +2350,19 @@ Once we locate the target PID, the injection writes our shellcode into the remot
 
 *Figure 15.2 - The shellcode is copied across process boundaries and executed as a new thread inside the target*
 
+### PoC Video
+
+The following video demonstrates the process injection shellcode injecting and executing code inside a remote process in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/process-injection-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Shellcode injected into remote process*
+
 ---
 
 ## 16. HTTP Stager: Downloading Second Stage
@@ -2089,6 +2460,19 @@ Each iteration reads up to 4096 bytes. The buffer pointer advances by the number
 </svg></div>
 
 *Figure 16.2 - Each loop iteration fills the next chunk of the buffer. When InternetReadFile returns 0 bytes, the payload is complete and ready for execution.*
+
+### PoC Video
+
+The following video demonstrates the HTTP stager downloading and executing a second-stage payload from a web server in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/http-stager-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: HTTP stager fetching second-stage payload*
 
 ---
 
@@ -2193,6 +2577,19 @@ The registry path string is 52 characters long. We push it as DWORDs in reverse 
 
 With persistence and advanced injection behind us, the final sections cover file operations followed by a complete development workflow and closing thoughts.
 
+### PoC Video
+
+The following video demonstrates the registry persistence shellcode creating a Run key entry that survives system reboots in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/registry-persistence-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Registry Run key persistence surviving reboot*
+
 ---
 
 ## 18. SMB File Operations: Network File Access
@@ -2280,6 +2677,19 @@ Then authenticate with `WNetAddConnection2A` and copy with `CopyFileA`.
 
 *Figure 18.1 - SMB file copy sequence: load DLL, authenticate, copy, exit*
 
+### PoC Video
+
+The following video demonstrates the SMB file operations shellcode reading and writing files over the network in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/smb-file-ops-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: SMB file read/write over network share*
+
 ---
 
 ## 19. File I/O: Writing to Disk
@@ -2358,6 +2768,19 @@ call_closehandle:
 </svg></div>
 
 *Figure 19.1 - File I/O: create, write, close, terminate*
+
+### PoC Video
+
+The following video demonstrates the file I/O shellcode creating and writing data to a file on disk in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/file-io-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: File creation and write to disk*
 
 ---
 
@@ -2445,6 +2868,61 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 
 *Figure 20.1 - The 10-step shellcode development pipeline. Steps 7-10 form an inner loop that repeats until all bad characters are eliminated and the payload works correctly.*
 
+<div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <defs>
+    <marker id="ta20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#a6e3a1"/></marker>
+    <marker id="tb20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#89b4fa"/></marker>
+    <marker id="tc20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#fab387"/></marker>
+  </defs>
+  <rect width="750" height="310" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Shellcode Development Tooling Ecosystem</text>
+  <!-- Center: shellcode.asm -->
+  <rect x="280" y="100" width="190" height="75" rx="8" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="375" y="125" text-anchor="middle" fill="#f38ba8" font-size="13" font-weight="bold">shellcode.asm</text>
+  <text x="375" y="145" text-anchor="middle" fill="#cdd6f4" font-size="10">Your x86 assembly payload</text>
+  <text x="375" y="162" text-anchor="middle" fill="#6c7086" font-size="9">The single source of truth</text>
+  <!-- Left: Python tools -->
+  <rect x="20" y="45" width="210" height="185" rx="8" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="125" y="70" text-anchor="middle" fill="#89b4fa" font-size="13" font-weight="bold">Python Toolchain</text>
+  <line x1="40" y1="80" x2="210" y2="80" stroke="#6c7086" stroke-width="0.5"/>
+  <text x="40" y="100" fill="#a6e3a1" font-size="10">Keystone</text><text x="130" y="100" fill="#6c7086" font-size="9">assembler</text>
+  <text x="40" y="120" fill="#a6e3a1" font-size="10">hash.py</text><text x="130" y="120" fill="#6c7086" font-size="9">ROR-13 hashes</text>
+  <text x="40" y="140" fill="#a6e3a1" font-size="10">ctypes</text><text x="130" y="140" fill="#6c7086" font-size="9">test harness</text>
+  <text x="40" y="160" fill="#a6e3a1" font-size="10">badchar.py</text><text x="130" y="160" fill="#6c7086" font-size="9">byte scanner</text>
+  <text x="40" y="180" fill="#a6e3a1" font-size="10">struct</text><text x="130" y="180" fill="#6c7086" font-size="9">pack helpers</text>
+  <rect x="40" y="195" width="170" height="22" rx="4" fill="#1e1e2e" stroke="#89b4fa" stroke-width="1"/>
+  <text x="125" y="211" text-anchor="middle" fill="#89b4fa" font-size="9">Assemble -> Scan -> Inject</text>
+  <!-- Right: WinDbg -->
+  <rect x="520" y="55" width="210" height="160" rx="8" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="625" y="80" text-anchor="middle" fill="#fab387" font-size="13" font-weight="bold">WinDbg</text>
+  <line x1="540" y1="90" x2="710" y2="90" stroke="#6c7086" stroke-width="0.5"/>
+  <text x="540" y="110" fill="#cdd6f4" font-size="10">int3 breakpoints</text>
+  <text x="540" y="130" fill="#cdd6f4" font-size="10">Register inspection</text>
+  <text x="540" y="150" fill="#cdd6f4" font-size="10">Stack layout view</text>
+  <text x="540" y="170" fill="#cdd6f4" font-size="10">Memory dumps</text>
+  <text x="540" y="190" fill="#cdd6f4" font-size="10">Single-step execution</text>
+  <!-- Arrows: ASM -> Python (assemble) -->
+  <line x1="280" y1="125" x2="235" y2="100" stroke="#89b4fa" stroke-width="1.5" marker-end="url(#tb20)"/>
+  <text x="245" y="98" fill="#89b4fa" font-size="8">assemble</text>
+  <!-- Arrow: Python -> center (bytes) -->
+  <line x1="230" y1="145" x2="278" y2="140" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ta20)"/>
+  <text x="245" y="155" fill="#a6e3a1" font-size="8">bytes</text>
+  <!-- Arrow: center -> WinDbg (inject + debug) -->
+  <line x1="470" y1="125" x2="518" y2="105" stroke="#fab387" stroke-width="1.5" marker-end="url(#tc20)"/>
+  <text x="498" y="100" fill="#fab387" font-size="8">inject</text>
+  <!-- Arrow: WinDbg -> center (fix) -->
+  <line x1="520" y1="155" x2="472" y2="150" stroke="#f38ba8" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="498" y="165" fill="#f38ba8" font-size="8">fix bugs</text>
+  <!-- Bottom: output -->
+  <rect x="200" y="250" width="350" height="40" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="1.5"/>
+  <text x="375" y="268" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">Final: shellcode.bin (clean, tested, null-free)</text>
+  <text x="375" y="283" text-anchor="middle" fill="#6c7086" font-size="9">Ready for exploit payload delivery</text>
+  <!-- Arrow down -->
+  <line x1="375" y1="175" x2="375" y2="248" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ta20)"/>
+</svg></div>
+
+*Figure 20.2 - The tooling ecosystem: Python scripts handle assembly and byte scanning, WinDbg handles runtime debugging, and the cycle repeats until the payload is clean.*
+
 > **Pro tip:** Keep a personal library of tested building blocks: `find_kernel32`, `find_function`, string-push sequences for common DLL names, and the ctypes test harness. New payloads become an assembly job rather than a greenfield project.
 
 ---
@@ -2495,6 +2973,57 @@ Each layer adds a barrier that shellcode must defeat. Understanding these helps 
 When you see a suspicious memory region in a forensic dump, you can recognize the PEB walk pattern. When an EDR flags `VirtualAlloc` with RWX permissions, you understand why that is suspicious. When you write detection signatures, you can target structural patterns -- `fs:[0x30]`, the `ror edx, 0x0d` loop, `rep stosb` zero-fill -- rather than relying on fragile byte signatures.
 
 Understanding the attacker's craft makes you a better defender. Full stop.
+
+<div align="center"><svg viewBox="0 0 750 330" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="330" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Structural Patterns for Detection</text>
+  <text x="375" y="48" text-anchor="middle" fill="#6c7086" font-size="10">Shellcode fingerprints that defenders can target in signatures and memory scans</text>
+  <!-- Pattern 1: PEB access -->
+  <rect x="30" y="65" width="215" height="70" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="137" y="85" text-anchor="middle" fill="#f38ba8" font-size="11" font-weight="bold">PEB Access</text>
+  <text x="137" y="103" text-anchor="middle" fill="#cdd6f4" font-size="10">mov eax, fs:[0x30]</text>
+  <text x="137" y="123" text-anchor="middle" fill="#6c7086" font-size="9">TEB -> PEB traversal</text>
+  <!-- Pattern 2: ROR hash loop -->
+  <rect x="268" y="65" width="215" height="70" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="375" y="85" text-anchor="middle" fill="#fab387" font-size="11" font-weight="bold">Hash Loop</text>
+  <text x="375" y="103" text-anchor="middle" fill="#cdd6f4" font-size="10">ror edx, 0x0d; add edx, eax</text>
+  <text x="375" y="123" text-anchor="middle" fill="#6c7086" font-size="9">ROR-13 function name hashing</text>
+  <!-- Pattern 3: VirtualAlloc RWX -->
+  <rect x="506" y="65" width="215" height="70" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="613" y="85" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">RWX Allocation</text>
+  <text x="613" y="103" text-anchor="middle" fill="#cdd6f4" font-size="10">VirtualAlloc(0x40)</text>
+  <text x="613" y="123" text-anchor="middle" fill="#6c7086" font-size="9">PAGE_EXECUTE_READWRITE</text>
+  <!-- Arrow connectors (detection chain) -->
+  <line x1="137" y1="135" x2="137" y2="155" stroke="#f38ba8" stroke-width="1.5"/>
+  <line x1="375" y1="135" x2="375" y2="155" stroke="#fab387" stroke-width="1.5"/>
+  <line x1="613" y1="135" x2="613" y2="155" stroke="#89b4fa" stroke-width="1.5"/>
+  <!-- Timeline bar -->
+  <rect x="30" y="155" width="690" height="4" rx="2" fill="#6c7086" opacity="0.5"/>
+  <circle cx="137" cy="157" r="5" fill="#f38ba8"/><circle cx="375" cy="157" r="5" fill="#fab387"/><circle cx="613" cy="157" r="5" fill="#89b4fa"/>
+  <text x="137" y="178" text-anchor="middle" fill="#f38ba8" font-size="9">Stage 1: Locate</text>
+  <text x="375" y="178" text-anchor="middle" fill="#fab387" font-size="9">Stage 2: Resolve</text>
+  <text x="613" y="178" text-anchor="middle" fill="#89b4fa" font-size="9">Stage 3: Execute</text>
+  <!-- Pattern 4: API resolution -->
+  <rect x="30" y="195" width="215" height="70" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="137" y="215" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">API Resolution</text>
+  <text x="137" y="233" text-anchor="middle" fill="#cdd6f4" font-size="10">push hash; call find_func</text>
+  <text x="137" y="253" text-anchor="middle" fill="#6c7086" font-size="9">Hash-based export lookup</text>
+  <!-- Pattern 5: Zero-fill -->
+  <rect x="268" y="195" width="215" height="70" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="375" y="215" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">Zero-Fill</text>
+  <text x="375" y="233" text-anchor="middle" fill="#cdd6f4" font-size="10">xor eax,eax; rep stosb</text>
+  <text x="375" y="253" text-anchor="middle" fill="#6c7086" font-size="9">Struct initialization pattern</text>
+  <!-- Pattern 6: Stack strings -->
+  <rect x="506" y="195" width="215" height="70" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="613" y="215" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">Stack Strings</text>
+  <text x="613" y="233" text-anchor="middle" fill="#cdd6f4" font-size="10">push 0x2e646d63</text>
+  <text x="613" y="253" text-anchor="middle" fill="#6c7086" font-size="9">Runtime string construction</text>
+  <!-- Bottom summary -->
+  <rect x="80" y="282" width="590" height="32" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="303" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Target structural patterns, not fragile byte signatures -- shellcode mutates, structure persists</text>
+</svg></div>
+
+*Figure 21.2 - Structural detection patterns. These code patterns appear in virtually all PEB-walking shellcode and are far more reliable detection targets than specific byte sequences.*
 
 ### A Note on Ethics
 
