@@ -1,5 +1,5 @@
 ---
-title: "The Art of x86 Windows Shellcoding"
+title: "Ghost in the Stack: The Silent Language of Shellcode"
 date: 2026-11-09 00:00:00 +0300
 categories: [Exploit Development, Shellcoding]
 tags: [x86, shellcoding, windows, assembly, exploit-development]

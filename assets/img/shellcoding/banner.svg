@@ -168,11 +168,11 @@
   <rect x="425" y="75" width="350" height="32" rx="16" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
   <text x="600" y="96" text-anchor="middle" font-family="'Consolas', monospace" font-size="12" fill="#00d4ff" letter-spacing="4" opacity="0.7">x86  ·  WINDOWS  ·  ASSEMBLY</text>
 
-  <!-- Main title — "THE ART OF" -->
-  <text x="600" y="170" text-anchor="middle" font-family="'Segoe UI', 'Consolas', monospace" font-size="22" fill="#8b949e" letter-spacing="8" font-weight="300">THE ART OF</text>
+  <!-- Main title -->
+  <text x="600" y="175" text-anchor="middle" font-family="'Consolas', monospace" font-size="56" font-weight="bold" fill="#e0e7ff" filter="url(#bigGlow)">GHOST IN THE STACK</text>
 
-  <!-- Main title — big text -->
-  <text x="600" y="225" text-anchor="middle" font-family="'Consolas', monospace" font-size="62" font-weight="bold" fill="#e0e7ff" filter="url(#bigGlow)">SHELLCODING</text>
+  <!-- Subtitle -->
+  <text x="600" y="220" text-anchor="middle" font-family="'Segoe UI', 'Consolas', monospace" font-size="22" fill="#8b949e" letter-spacing="4" font-weight="300">THE SILENT LANGUAGE OF SHELLCODE</text>
 
   <!-- Subtitle glow line -->
   <rect x="250" y="240" width="700" height="1" fill="url(#greenGlow)" rx="1"/>
