@@ -1,22 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0e1a"/>
-      <stop offset="50%" stop-color="#111827"/>
-      <stop offset="100%" stop-color="#0a0e1a"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#0a0e17"/>
+      <stop offset="40%" stop-color="#0d1520"/>
+      <stop offset="100%" stop-color="#060a12"/>
     </linearGradient>
-    <linearGradient id="accentLine" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#00e5a0" stop-opacity="0"/>
-      <stop offset="20%" stop-color="#00e5a0" stop-opacity="1"/>
-      <stop offset="80%" stop-color="#5b8def" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#5b8def" stop-opacity="0"/>
+    <linearGradient id="cyanGlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
     </linearGradient>
+    <linearGradient id="greenGlow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00ff88" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00ff88" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00ff88" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="pinkGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff3366" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ff3366" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="orbCyan" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbPink" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#ff3366" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#ff3366" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orbGreen" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#00ff88" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#00ff88" stop-opacity="0"/>
+    </radialGradient>
     <filter id="glow">
       <feGaussianBlur stdDeviation="3" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    <filter id="bigGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
     <filter id="softGlow">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feGaussianBlur stdDeviation="12" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
@@ -24,144 +48,204 @@
   <!-- Background -->
   <rect width="1200" height="630" fill="url(#bgGrad)"/>
 
-  <!-- Grid pattern -->
-  <g opacity="0.04" stroke="#5b8def" stroke-width="0.5">
-    <line x1="0" y1="0" x2="0" y2="630"/><line x1="60" y1="0" x2="60" y2="630"/>
-    <line x1="120" y1="0" x2="120" y2="630"/><line x1="180" y1="0" x2="180" y2="630"/>
-    <line x1="240" y1="0" x2="240" y2="630"/><line x1="300" y1="0" x2="300" y2="630"/>
-    <line x1="360" y1="0" x2="360" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/>
-    <line x1="480" y1="0" x2="480" y2="630"/><line x1="540" y1="0" x2="540" y2="630"/>
-    <line x1="600" y1="0" x2="600" y2="630"/><line x1="660" y1="0" x2="660" y2="630"/>
-    <line x1="720" y1="0" x2="720" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/>
-    <line x1="840" y1="0" x2="840" y2="630"/><line x1="900" y1="0" x2="900" y2="630"/>
-    <line x1="960" y1="0" x2="960" y2="630"/><line x1="1020" y1="0" x2="1020" y2="630"/>
-    <line x1="1080" y1="0" x2="1080" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/>
-    <line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/>
-    <line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/>
-    <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/>
-    <line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/>
-    <line x1="0" y1="540" x2="1200" y2="540"/>
+  <!-- Ambient orbs -->
+  <circle cx="200" cy="150" r="200" fill="url(#orbCyan)"/>
+  <circle cx="950" cy="480" r="250" fill="url(#orbPink)"/>
+  <circle cx="600" cy="350" r="300" fill="url(#orbGreen)"/>
+
+  <!-- Subtle circuit board pattern -->
+  <g stroke="#00d4ff" stroke-width="0.5" opacity="0.04" fill="none">
+    <path d="M 0,120 H 200 L 220,140 H 400"/>
+    <path d="M 0,240 H 150 L 170,220 H 350 L 370,240 H 500"/>
+    <path d="M 0,360 H 100 L 130,390 H 300"/>
+    <path d="M 800,100 H 1000 L 1020,120 H 1200"/>
+    <path d="M 700,200 H 900 L 920,180 H 1100 L 1120,200 H 1200"/>
+    <path d="M 850,350 H 1050 L 1070,370 H 1200"/>
+    <path d="M 900,500 H 1100 L 1120,480 H 1200"/>
+    <circle cx="200" cy="120" r="3"/><circle cx="400" cy="140" r="3"/>
+    <circle cx="150" cy="240" r="3"/><circle cx="500" cy="240" r="3"/>
+    <circle cx="300" cy="390" r="3"/>
+    <circle cx="1000" cy="100" r="3"/><circle cx="1100" cy="200" r="3"/>
+    <circle cx="1050" cy="350" r="3"/><circle cx="1100" cy="500" r="3"/>
   </g>
 
-  <!-- Hex rain columns (left side) -->
-  <g font-family="Consolas, 'Courier New', monospace" font-size="11" fill="#00e5a0" opacity="0.08">
-    <text x="30" y="40">89 E5 81 C4</text>
-    <text x="30" y="60">F0 F9 FF FF</text>
-    <text x="30" y="80">31 C9 64 8B</text>
-    <text x="30" y="100">71 30 8B 76</text>
-    <text x="30" y="120">0C 8B 76 1C</text>
-    <text x="30" y="140">8B 5E 08 8B</text>
-    <text x="30" y="160">7E 20 8B 36</text>
-    <text x="30" y="180">66 39 4F 18</text>
-    <text x="30" y="200">75 F2 EB 06</text>
-    <text x="30" y="220">5E 89 75 04</text>
-    <text x="30" y="240">EB 54 E8 F5</text>
-    <text x="30" y="260">FF FF FF 60</text>
-    <text x="30" y="280">8B 43 3C 8B</text>
-    <text x="30" y="300">7C 18 78 01</text>
-    <text x="30" y="320">DF 8B 4F 18</text>
-    <text x="30" y="340">8B 47 20 01</text>
+  <!-- Falling hex bytes — left -->
+  <g font-family="'Consolas', 'Courier New', monospace" font-size="11" opacity="0.06">
+    <text x="40" y="50" fill="#00d4ff">89 E5 81 C4 F0 F9</text>
+    <text x="40" y="72" fill="#00d4ff">31 C9 64 8B 71 30</text>
+    <text x="40" y="94" fill="#00d4ff">8B 76 0C 8B 76 1C</text>
+    <text x="40" y="116" fill="#00ff88">8B 5E 08 8B 7E 20</text>
+    <text x="40" y="138" fill="#00ff88">66 39 4F 18 75 F2</text>
+    <text x="40" y="160" fill="#00d4ff">60 8B 43 3C 8B 7C</text>
+    <text x="40" y="182" fill="#00d4ff">18 78 01 DF 8B 4F</text>
+    <text x="40" y="480" fill="#ff3366">C1 CA 0D 01 C2 EB</text>
+    <text x="40" y="502" fill="#ff3366">F4 3B 54 24 24 75</text>
+    <text x="40" y="524" fill="#00d4ff">E1 8B 57 24 01 DA</text>
+    <text x="40" y="546" fill="#00d4ff">66 8B 0C 4A 8B 57</text>
+    <text x="40" y="568" fill="#00ff88">1C 01 DA 8B 04 8A</text>
+    <text x="40" y="590" fill="#00ff88">01 D8 89 44 24 1C</text>
   </g>
 
-  <!-- Hex rain columns (right side) -->
-  <g font-family="Consolas, 'Courier New', monospace" font-size="11" fill="#5b8def" opacity="0.08">
-    <text x="1070" y="290">D8 89 45 FC</text>
-    <text x="1070" y="310">E3 34 49 8B</text>
-    <text x="1070" y="330">45 FC 8B 34</text>
-    <text x="1070" y="350">88 01 DE 31</text>
-    <text x="1070" y="370">C0 99 FC AC</text>
-    <text x="1070" y="390">84 C0 74 07</text>
-    <text x="1070" y="410">C1 CA 0D 01</text>
-    <text x="1070" y="430">C2 EB F4 3B</text>
-    <text x="1070" y="450">54 24 24 75</text>
-    <text x="1070" y="470">E1 8B 57 24</text>
-    <text x="1070" y="490">01 DA 66 8B</text>
-    <text x="1070" y="510">0C 4A 8B 57</text>
-    <text x="1070" y="530">1C 01 DA 8B</text>
-    <text x="1070" y="550">04 8A 01 D8</text>
-    <text x="1070" y="570">89 44 24 1C</text>
-    <text x="1070" y="590">61 C3 00 00</text>
+  <!-- Falling hex bytes — right -->
+  <g font-family="'Consolas', 'Courier New', monospace" font-size="11" opacity="0.06">
+    <text x="1040" y="50" fill="#ff3366">68 83 B9 B5 78 FF</text>
+    <text x="1040" y="72" fill="#ff3366">15 04 00 00 00 89</text>
+    <text x="1040" y="94" fill="#00d4ff">45 10 68 8E 4E 0E</text>
+    <text x="1040" y="116" fill="#00d4ff">EC FF 15 04 00 00</text>
+    <text x="1040" y="138" fill="#00ff88">00 89 45 14 68 7E</text>
+    <text x="1040" y="480" fill="#00d4ff">D8 87 E2 73 FF 15</text>
+    <text x="1040" y="502" fill="#00d4ff">04 00 00 00 89 45</text>
+    <text x="1040" y="524" fill="#ff3366">18 31 C0 50 68 72</text>
+    <text x="1040" y="546" fill="#ff3366">65 6D 6F 89 E6 50</text>
+    <text x="1040" y="568" fill="#00ff88">56 56 50 FF 55 18</text>
+    <text x="1040" y="590" fill="#00ff88">31 C0 50 FF 55 14</text>
   </g>
 
-  <!-- Accent line top -->
-  <rect x="100" y="160" width="1000" height="2" fill="url(#accentLine)" rx="1"/>
+  <!-- Central CPU/chip visual -->
+  <g transform="translate(600, 315)">
+    <!-- Outer ring -->
+    <rect x="-120" y="-120" width="240" height="240" rx="12" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.15"/>
+    <rect x="-105" y="-105" width="210" height="210" rx="8" fill="#0a0e17" stroke="#00d4ff" stroke-width="0.5" opacity="0.25"/>
+
+    <!-- Chip pins -->
+    <g stroke="#00d4ff" stroke-width="1.5" opacity="0.12">
+      <!-- Top pins -->
+      <line x1="-60" y1="-120" x2="-60" y2="-145"/>
+      <line x1="-20" y1="-120" x2="-20" y2="-155"/>
+      <line x1="20" y1="-120" x2="20" y2="-155"/>
+      <line x1="60" y1="-120" x2="60" y2="-145"/>
+      <!-- Bottom pins -->
+      <line x1="-60" y1="120" x2="-60" y2="145"/>
+      <line x1="-20" y1="120" x2="-20" y2="155"/>
+      <line x1="20" y1="120" x2="20" y2="155"/>
+      <line x1="60" y1="120" x2="60" y2="145"/>
+      <!-- Left pins -->
+      <line x1="-120" y1="-60" x2="-145" y2="-60"/>
+      <line x1="-120" y1="-20" x2="-155" y2="-20"/>
+      <line x1="-120" y1="20" x2="-155" y2="20"/>
+      <line x1="-120" y1="60" x2="-145" y2="60"/>
+      <!-- Right pins -->
+      <line x1="120" y1="-60" x2="145" y2="-60"/>
+      <line x1="120" y1="-20" x2="155" y2="-20"/>
+      <line x1="120" y1="20" x2="155" y2="20"/>
+      <line x1="120" y1="60" x2="145" y2="60"/>
+    </g>
+
+    <!-- Inner die -->
+    <rect x="-75" y="-75" width="150" height="150" rx="4" fill="#0d1520" stroke="#00ff88" stroke-width="0.8" opacity="0.3"/>
+
+    <!-- Die pattern — registers -->
+    <g font-family="'Consolas', monospace" font-size="9" fill="#00ff88" opacity="0.25">
+      <text x="-60" y="-50">EAX</text><text x="-10" y="-50">EBX</text><text x="30" y="-50">ECX</text>
+      <text x="-60" y="-30">EDX</text><text x="-10" y="-30">ESI</text><text x="30" y="-30">EDI</text>
+      <text x="-60" y="-10">EBP</text><text x="-10" y="-10">ESP</text><text x="30" y="-10">EIP</text>
+    </g>
+
+    <!-- Die center glow -->
+    <circle cx="0" cy="25" r="30" fill="none" stroke="#ff3366" stroke-width="0.5" opacity="0.2"/>
+    <text x="0" y="22" text-anchor="middle" font-family="'Consolas', monospace" font-size="8" fill="#ff3366" opacity="0.4">ROR 0x0D</text>
+    <text x="0" y="34" text-anchor="middle" font-family="'Consolas', monospace" font-size="7" fill="#8b949e" opacity="0.3">hash loop</text>
+
+    <!-- Corner dots -->
+    <circle cx="-95" cy="-95" r="2" fill="#00d4ff" opacity="0.3"/>
+    <circle cx="95" cy="-95" r="2" fill="#00d4ff" opacity="0.3"/>
+    <circle cx="-95" cy="95" r="2" fill="#00d4ff" opacity="0.3"/>
+    <circle cx="95" cy="95" r="2" fill="#00d4ff" opacity="0.3"/>
+  </g>
+
+  <!-- Connecting traces from chip to edges -->
+  <g stroke-width="1" opacity="0.08" fill="none">
+    <path d="M 480,255 Q 350,200 200,120" stroke="#00d4ff"/>
+    <path d="M 480,375 Q 300,430 100,390" stroke="#00ff88"/>
+    <path d="M 720,255 Q 850,200 1000,100" stroke="#ff3366"/>
+    <path d="M 720,375 Q 900,450 1100,500" stroke="#00d4ff"/>
+  </g>
+
+  <!-- Top accent line -->
+  <rect x="150" y="105" width="900" height="1.5" fill="url(#cyanGlow)" rx="1"/>
 
   <!-- Badge -->
-  <rect x="460" y="130" width="280" height="30" rx="15" fill="none" stroke="#00e5a0" stroke-width="1" opacity="0.6"/>
-  <text x="600" y="150" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="11" fill="#00e5a0" letter-spacing="3" opacity="0.8">x86  ·  WINDOWS  ·  ASSEMBLY</text>
+  <rect x="425" y="75" width="350" height="32" rx="16" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+  <text x="600" y="96" text-anchor="middle" font-family="'Consolas', monospace" font-size="12" fill="#00d4ff" letter-spacing="4" opacity="0.7">x86  ·  WINDOWS  ·  ASSEMBLY</text>
 
-  <!-- Main title -->
-  <text x="600" y="240" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="52" font-weight="bold" fill="#e2e8f0" filter="url(#glow)">SHELLCODING</text>
-  <text x="600" y="290" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="20" fill="#8892a8" letter-spacing="6">FROM ZERO TO CUSTOM PAYLOADS</text>
+  <!-- Main title — "THE ART OF" -->
+  <text x="600" y="170" text-anchor="middle" font-family="'Segoe UI', 'Consolas', monospace" font-size="22" fill="#8b949e" letter-spacing="8" font-weight="300">THE ART OF</text>
 
-  <!-- Accent line bottom -->
-  <rect x="200" y="310" width="800" height="1.5" fill="url(#accentLine)" rx="1"/>
+  <!-- Main title — big text -->
+  <text x="600" y="225" text-anchor="middle" font-family="'Consolas', monospace" font-size="62" font-weight="bold" fill="#e0e7ff" filter="url(#bigGlow)">SHELLCODING</text>
 
-  <!-- Register strip -->
-  <g font-family="Consolas, 'Courier New', monospace" font-size="13" opacity="0.7">
-    <text x="195" y="355"><tspan fill="#5b8def" font-weight="bold">EBP</tspan><tspan fill="#6e7a8a"> var_table</tspan></text>
-    <text x="345" y="355"><tspan fill="#5b8def" font-weight="bold">EBX</tspan><tspan fill="#6e7a8a"> dll_base</tspan></text>
-    <text x="490" y="355"><tspan fill="#5b8def" font-weight="bold">ESI</tspan><tspan fill="#6e7a8a"> peb_walk</tspan></text>
-    <text x="635" y="355"><tspan fill="#5b8def" font-weight="bold">EDI</tspan><tspan fill="#6e7a8a"> export_tbl</tspan></text>
-    <text x="790" y="355"><tspan fill="#5b8def" font-weight="bold">EDX</tspan><tspan fill="#6e7a8a"> ror13_hash</tspan></text>
+  <!-- Subtitle glow line -->
+  <rect x="250" y="240" width="700" height="1" fill="url(#greenGlow)" rx="1"/>
+
+  <!-- PEB chain — visual centerpiece below chip -->
+  <g transform="translate(225, 490)" font-family="'Consolas', monospace">
+    <!-- TEB -->
+    <rect x="0" y="0" width="100" height="44" rx="6" fill="#0d1520" stroke="#00d4ff" stroke-width="1.2" opacity="0.5"/>
+    <text x="50" y="18" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold" opacity="0.8">TEB</text>
+    <text x="50" y="34" text-anchor="middle" fill="#8b949e" font-size="9" opacity="0.5">fs:[0x30]</text>
+
+    <line x1="100" y1="22" x2="135" y2="22" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+    <polygon points="130,18 138,22 130,26" fill="#00ff88" opacity="0.5"/>
+
+    <!-- PEB -->
+    <rect x="140" y="0" width="100" height="44" rx="6" fill="#0d1520" stroke="#00d4ff" stroke-width="1.2" opacity="0.5"/>
+    <text x="190" y="18" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold" opacity="0.8">PEB</text>
+    <text x="190" y="34" text-anchor="middle" fill="#8b949e" font-size="9" opacity="0.5">+0x0C</text>
+
+    <line x1="240" y1="22" x2="275" y2="22" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+    <polygon points="270,18 278,22 270,26" fill="#00ff88" opacity="0.5"/>
+
+    <!-- PEB_LDR -->
+    <rect x="280" y="0" width="120" height="44" rx="6" fill="#0d1520" stroke="#ff6b35" stroke-width="1.2" opacity="0.5"/>
+    <text x="340" y="18" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold" opacity="0.8">PEB_LDR</text>
+    <text x="340" y="34" text-anchor="middle" fill="#8b949e" font-size="9" opacity="0.5">InInitOrder</text>
+
+    <line x1="400" y1="22" x2="435" y2="22" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+    <polygon points="430,18 438,22 430,26" fill="#00ff88" opacity="0.5"/>
+
+    <!-- kernel32.dll -->
+    <rect x="440" y="0" width="140" height="44" rx="6" fill="#0d1520" stroke="#00ff88" stroke-width="2" opacity="0.7"/>
+    <text x="510" y="18" text-anchor="middle" fill="#00ff88" font-size="11" font-weight="bold" filter="url(#glow)">kernel32.dll</text>
+    <text x="510" y="34" text-anchor="middle" fill="#00ff88" font-size="9" opacity="0.6">EBX = base</text>
+
+    <line x1="580" y1="22" x2="615" y2="22" stroke="#ff3366" stroke-width="1.5" opacity="0.4"/>
+    <polygon points="610,18 618,22 610,26" fill="#ff3366" opacity="0.5"/>
+
+    <!-- Export Table -->
+    <rect x="620" y="0" width="130" height="44" rx="6" fill="#0d1520" stroke="#ff3366" stroke-width="1.5" opacity="0.5"/>
+    <text x="685" y="18" text-anchor="middle" fill="#ff3366" font-size="10" font-weight="bold" opacity="0.8">Export Table</text>
+    <text x="685" y="34" text-anchor="middle" fill="#8b949e" font-size="9" opacity="0.5">PE +0x78</text>
   </g>
 
-  <!-- Mini PEB chain diagram -->
-  <g transform="translate(160, 400)" font-family="Consolas, 'Courier New', monospace">
-    <rect x="0" y="0" width="90" height="40" rx="5" fill="none" stroke="#5b8def" stroke-width="1.2" opacity="0.5"/>
-    <text x="45" y="17" text-anchor="middle" fill="#5b8def" font-size="10" font-weight="bold" opacity="0.7">TEB</text>
-    <text x="45" y="32" text-anchor="middle" fill="#6e7a8a" font-size="9" opacity="0.5">fs:[0x30]</text>
-
-    <line x1="90" y1="20" x2="120" y2="20" stroke="#00e5a0" stroke-width="1.2" opacity="0.4"/>
-    <polygon points="117,16 124,20 117,24" fill="#00e5a0" opacity="0.4"/>
-
-    <rect x="125" y="0" width="90" height="40" rx="5" fill="none" stroke="#5b8def" stroke-width="1.2" opacity="0.5"/>
-    <text x="170" y="17" text-anchor="middle" fill="#5b8def" font-size="10" font-weight="bold" opacity="0.7">PEB</text>
-    <text x="170" y="32" text-anchor="middle" fill="#6e7a8a" font-size="9" opacity="0.5">+0x0C</text>
-
-    <line x1="215" y1="20" x2="245" y2="20" stroke="#00e5a0" stroke-width="1.2" opacity="0.4"/>
-    <polygon points="242,16 249,20 242,24" fill="#00e5a0" opacity="0.4"/>
-
-    <rect x="250" y="0" width="110" height="40" rx="5" fill="none" stroke="#5b8def" stroke-width="1.2" opacity="0.5"/>
-    <text x="305" y="17" text-anchor="middle" fill="#5b8def" font-size="10" font-weight="bold" opacity="0.7">PEB_LDR</text>
-    <text x="305" y="32" text-anchor="middle" fill="#6e7a8a" font-size="9" opacity="0.5">+0x1C</text>
-
-    <line x1="360" y1="20" x2="390" y2="20" stroke="#00e5a0" stroke-width="1.2" opacity="0.4"/>
-    <polygon points="387,16 394,20 387,24" fill="#00e5a0" opacity="0.4"/>
-
-    <rect x="395" y="0" width="120" height="40" rx="5" fill="none" stroke="#00e5a0" stroke-width="1.5" opacity="0.6"/>
-    <text x="455" y="17" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="bold" opacity="0.8">kernel32.dll</text>
-    <text x="455" y="32" text-anchor="middle" fill="#00e5a0" font-size="9" opacity="0.5">EBX = base</text>
-  </g>
-
-  <!-- Mini code snippet -->
-  <g transform="translate(160, 475)" font-family="Consolas, 'Courier New', monospace" font-size="11" opacity="0.35">
-    <text x="0" y="0" fill="#5b8def">find_function:</text>
-    <text x="20" y="18" fill="#e2e8f0">mov   eax, [ebx+0x3c]</text>
-    <text x="20" y="36" fill="#e2e8f0">mov   edi, [ebx+eax+0x78]</text>
-    <text x="20" y="54" fill="#e2e8f0">add   edi, ebx</text>
-    <text x="350" y="0" fill="#5b8def">compute_hash:</text>
-    <text x="370" y="18" fill="#e2e8f0">lodsb</text>
-    <text x="370" y="36" fill="#00e5a0">ror   edx, 0x0d</text>
-    <text x="370" y="54" fill="#e2e8f0">add   edx, eax</text>
-    <text x="600" y="0" fill="#6e7a8a">; ROR-13 hash loop</text>
-    <text x="600" y="18" fill="#6e7a8a">; rotate right 13</text>
-    <text x="600" y="36" fill="#6e7a8a">; accumulate char</text>
-    <text x="600" y="54" fill="#6e7a8a">; position-independent</text>
+  <!-- Floating hash values -->
+  <g font-family="'Consolas', monospace" font-size="10" opacity="0.12">
+    <text x="170" y="300" fill="#ff3366">0x78b5b983</text>
+    <text x="900" y="280" fill="#00ff88">0xec0e4e8e</text>
+    <text x="180" y="430" fill="#00d4ff">0x73e2d87e</text>
+    <text x="920" y="420" fill="#ff6b35">0x6e1a959c</text>
+    <text x="160" y="560" fill="#00ff88">0xefe297c0</text>
+    <text x="940" y="560" fill="#ff3366">0x72bd9cdd</text>
   </g>
 
   <!-- Bottom accent -->
-  <rect x="100" y="560" width="1000" height="1" fill="url(#accentLine)" rx="1" opacity="0.5"/>
+  <rect x="150" y="555" width="900" height="1" fill="url(#cyanGlow)" rx="1" opacity="0.4"/>
 
-  <!-- Author -->
-  <text x="600" y="590" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="14" fill="#6e7a8a">
-    <tspan fill="#00e5a0" font-weight="bold">SadlyRemo</tspan>
-    <tspan>  ·  Exploit Development  ·  Educational</tspan>
+  <!-- Author line -->
+  <text x="600" y="585" text-anchor="middle" font-family="'Consolas', monospace" font-size="14" fill="#8b949e" opacity="0.6">
+    <tspan fill="#00ff88" font-weight="bold" opacity="0.8">SadlyRemo</tspan>
+    <tspan fill="#8b949e">  ·  Exploit Development  ·  From Zero to Custom Payloads</tspan>
   </text>
 
-  <!-- Corner decorations -->
-  <path d="M 0,0 L 60,0 L 60,3 L 3,3 L 3,60 L 0,60 Z" fill="#00e5a0" opacity="0.15"/>
-  <path d="M 1200,0 L 1140,0 L 1140,3 L 1197,3 L 1197,60 L 1200,60 Z" fill="#00e5a0" opacity="0.15"/>
-  <path d="M 0,630 L 60,630 L 60,627 L 3,627 L 3,570 L 0,570 Z" fill="#5b8def" opacity="0.15"/>
-  <path d="M 1200,630 L 1140,630 L 1140,627 L 1197,627 L 1197,570 L 1200,570 Z" fill="#5b8def" opacity="0.15"/>
+  <!-- Corner brackets -->
+  <g stroke-width="2" opacity="0.12" fill="none">
+    <path d="M 20,50 L 20,20 L 50,20" stroke="#00d4ff"/>
+    <path d="M 1180,50 L 1180,20 L 1150,20" stroke="#00d4ff"/>
+    <path d="M 20,580 L 20,610 L 50,610" stroke="#ff3366"/>
+    <path d="M 1180,580 L 1180,610 L 1150,610" stroke="#ff3366"/>
+  </g>
+
+  <!-- Scan line effect -->
+  <rect x="0" y="0" width="1200" height="630" fill="none" opacity="0.02">
+    <animate attributeName="y" from="0" to="630" dur="8s" repeatCount="indefinite"/>
+  </rect>
 </svg>
