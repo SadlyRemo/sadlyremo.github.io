@@ -4732,18 +4732,6 @@ print(f"[+] Generated Shellcode: {shellcode_str}")
 print(f"[+] Shellcode length: {len(shellcode)} bytes")
 ```
 
-### PoC Video
-
-The following video demonstrates the socket reuse shellcode hijacking an existing connection and providing an interactive shell without creating any new network connections:
-
-<div align="center">
-  <video width="720" controls>
-    <source src="/assets/video/shellcoding/socket-reuse-poc.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</div>
-
-*Video: Socket reuse hijacking an existing TCP connection*
 
 ---
 
@@ -8026,7 +8014,7 @@ The following video demonstrates the SMB file copy shellcode authenticating to t
 
 <div align="center">
   <video width="720" controls>
-    <source src="/assets/video/shellcoding/smb-copy-poc.mp4" type="video/mp4">
+    <source src="/assets/video/shellcoding/smb-file-ops-poc.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 </div>
@@ -8502,7 +8490,7 @@ The following video demonstrates the file write shellcode creating `secretremo.t
 
 <div align="center">
   <video width="720" controls>
-    <source src="/assets/video/shellcoding/filewrite-poc.mp4" type="video/mp4">
+    <source src="/assets/video/shellcoding/file-io-poc.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 </div>
