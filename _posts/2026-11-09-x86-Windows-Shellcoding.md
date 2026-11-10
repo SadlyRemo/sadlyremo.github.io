@@ -3,14 +3,14 @@ title: "The Art of x86 Windows Shellcoding"
 date: 2026-11-09 00:00:00 +0300
 categories: [Exploit Development, Shellcoding]
 tags: [x86, shellcoding, windows, assembly, exploit-development]
-description: "A deep dive into crafting custom x86 Windows shellcode — every instruction explained, every API call visualized."
+description: "A deep dive into crafting custom x86 Windows shellcode -- every instruction explained, every API call visualized."
 image:
   path: /assets/img/shellcoding/banner.svg
 ---
 
-I always wondered what actually happens between the moment an exploit hijacks execution and the moment a shell pops on the attacker's screen. Not the Metasploit-generated blob — the actual instructions. The PEB walk, the hash loop, the struct built one DWORD at a time on the stack. So I sat down and wrote every payload from scratch, in raw x86 assembly, until the mystery was gone.
+I always wondered what actually happens between the moment an exploit hijacks execution and the moment a shell pops on the attacker's screen. Not the Metasploit-generated blob -- the actual instructions. The PEB walk, the hash loop, the struct built one DWORD at a time on the stack. So I sat down and wrote every payload from scratch, in raw x86 assembly, until the mystery was gone.
 
-This is everything I learned. Every instruction is here, every API call is explained, and every concept has a diagram. No frameworks, no shortcuts — just you, the CPU, and the Windows API.
+This is everything I learned. Every instruction is here, every API call is explained, and every concept has a diagram. No frameworks, no shortcuts -- just you, the CPU, and the Windows API.
 
 ---
 
@@ -1467,17 +1467,17 @@ With our toolkit complete, we are ready to write real payloads.
 
 ## 9. Your First Shellcode: WinExec
 
-Everything we have built so far — the PEB walk, the export table parser, the ROR-13 hash resolver — has been infrastructure. Now we put it all to work and write shellcode that actually *does* something: pop a command shell with `WinExec`.
+Everything we have built so far -- the PEB walk, the export table parser, the ROR-13 hash resolver -- has been infrastructure. Now we put it all to work and write shellcode that actually *does* something: pop a command shell with `WinExec`.
 
 ### Step 1: Resolving kernel32.dll Functions
 
 Our shellcode needs three functions from `kernel32.dll`. Each one is resolved by pushing its ROR-13 hash onto the stack, calling `find_function` (stored at `[ebp+0x04]`), and saving the returned address into our EBP variable table.
 
-**TerminateProcess** — `BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)` — Terminates a process and all of its threads. We resolve it so we can cleanly exit after our payload runs. The hash `0x78b5b983` corresponds to the string `"TerminateProcess"` run through our ROR-13 algorithm.
+**TerminateProcess** -- `BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)` -- Terminates a process and all of its threads. We resolve it so we can cleanly exit after our payload runs. The hash `0x78b5b983` corresponds to the string `"TerminateProcess"` run through our ROR-13 algorithm.
 
-**LoadLibraryA** — `HMODULE LoadLibraryA(LPCSTR lpLibFileName)` — Loads a DLL into the current process's address space and returns its base address. While we do not need it for this simple WinExec shellcode, we resolve it here because every future shellcode that uses networking (ws2_32.dll) will depend on it. Hash: `0xec0e4e8e`.
+**LoadLibraryA** -- `HMODULE LoadLibraryA(LPCSTR lpLibFileName)` -- Loads a DLL into the current process's address space and returns its base address. While we do not need it for this simple WinExec shellcode, we resolve it here because every future shellcode that uses networking (ws2_32.dll) will depend on it. Hash: `0xec0e4e8e`.
 
-**WinExec** — `UINT WinExec(LPCSTR lpCmdLine, UINT uCmdShow)` — The simplest Windows API to execute a program. Hand it a pointer to a command string and a display flag, and Windows runs it. Hash: `0x0e8afe98`.
+**WinExec** -- `UINT WinExec(LPCSTR lpCmdLine, UINT uCmdShow)` -- The simplest Windows API to execute a program. Hand it a pointer to a command string and a display flag, and Windows runs it. Hash: `0x0e8afe98`.
 
 ```nasm
 resolve_symbols_kernel32:
@@ -1899,17 +1899,17 @@ The following video demonstrates the WinExec shellcode launching cmd.exe in acti
 
 ## 10. Reverse Shell: Calling Home
 
-A **reverse shell** is the workhorse of remote exploitation. The target reaches out to a listener the attacker already has running, punching through firewalls that block inbound connections. This shellcode is significantly more complex than WinExec — it requires loading an additional DLL, initializing the Winsock library, creating a TCP socket, connecting to the attacker, and redirecting stdio through that socket before spawning a shell.
+A **reverse shell** is the workhorse of remote exploitation. The target reaches out to a listener the attacker already has running, punching through firewalls that block inbound connections. This shellcode is significantly more complex than WinExec -- it requires loading an additional DLL, initializing the Winsock library, creating a TCP socket, connecting to the attacker, and redirecting stdio through that socket before spawning a shell.
 
 ### Step 1: Resolving kernel32.dll Functions
 
 We need three functions from `kernel32.dll`:
 
-**TerminateProcess** — `BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)` — Terminates the current process. Hash: `0x78b5b983`.
+**TerminateProcess** -- `BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)` -- Terminates the current process. Hash: `0x78b5b983`.
 
-**LoadLibraryA** — `HMODULE LoadLibraryA(LPCSTR lpLibFileName)` — Loads a DLL into the process. We need this to bring in `ws2_32.dll` for networking. Hash: `0xec0e4e8e`.
+**LoadLibraryA** -- `HMODULE LoadLibraryA(LPCSTR lpLibFileName)` -- Loads a DLL into the process. We need this to bring in `ws2_32.dll` for networking. Hash: `0xec0e4e8e`.
 
-**CreateProcessA** — `BOOL CreateProcessA(...)` — Creates a new process (cmd.exe) with its stdio handles redirected to our socket. This is the function that actually spawns the interactive shell. Hash: `0x16b3fe72`.
+**CreateProcessA** -- `BOOL CreateProcessA(...)` -- Creates a new process (cmd.exe) with its stdio handles redirected to our socket. This is the function that actually spawns the interactive shell. Hash: `0x16b3fe72`.
 
 ```nasm
 resolve_symbols_kernel32:
@@ -2010,11 +2010,11 @@ load_ws2_32:
 
 With `ws2_32.dll` loaded and its base in EBX, we resolve three Winsock functions:
 
-**WSAStartup** — `int WSAStartup(WORD wVersionRequired, LPWSADATA lpWSAData)` — Initializes the Winsock library. Must be called before any other Winsock function. Hash: `0x3bfcedcb`.
+**WSAStartup** -- `int WSAStartup(WORD wVersionRequired, LPWSADATA lpWSAData)` -- Initializes the Winsock library. Must be called before any other Winsock function. Hash: `0x3bfcedcb`.
 
-**WSASocketA** — `SOCKET WSASocketA(int af, int type, int protocol, ...)` — Creates a TCP socket. We use this instead of `socket()` because it gives us more control over flags. Hash: `0xadf509d9`.
+**WSASocketA** -- `SOCKET WSASocketA(int af, int type, int protocol, ...)` -- Creates a TCP socket. We use this instead of `socket()` because it gives us more control over flags. Hash: `0xadf509d9`.
 
-**WSAConnect** — `int WSAConnect(SOCKET s, const struct sockaddr *name, int namelen, ...)` — Connects the socket to the attacker's listener. Hash: `0xb32dba0c`.
+**WSAConnect** -- `int WSAConnect(SOCKET s, const struct sockaddr *name, int namelen, ...)` -- Connects the socket to the attacker's listener. Hash: `0xb32dba0c`.
 
 ```nasm
 resolve_symbols_ws2_32:
@@ -2618,11 +2618,11 @@ The bind shell introduces three new Winsock functions (`bind`, `listen`, `accept
 
 We need three functions from `kernel32.dll`:
 
-**LoadLibraryA** — `HMODULE LoadLibraryA(LPCSTR lpLibFileName)` — Loads `ws2_32.dll` for networking. Hash: `0xec0e4e8e`.
+**LoadLibraryA** -- `HMODULE LoadLibraryA(LPCSTR lpLibFileName)` -- Loads `ws2_32.dll` for networking. Hash: `0xec0e4e8e`.
 
-**CreateProcessA** — `BOOL CreateProcessA(...)` — Spawns cmd.exe with stdio redirected to the client socket. Hash: `0x16b3fe72`.
+**CreateProcessA** -- `BOOL CreateProcessA(...)` -- Spawns cmd.exe with stdio redirected to the client socket. Hash: `0x16b3fe72`.
 
-**ExitProcess** — `void ExitProcess(UINT uExitCode)` — Cleanly exits the process when the shell session ends. Hash: `0x73e2d87e`. Unlike the reverse shell which used `TerminateProcess`, here we use `ExitProcess` for a cleaner shutdown.
+**ExitProcess** -- `void ExitProcess(UINT uExitCode)` -- Cleanly exits the process when the shell session ends. Hash: `0x73e2d87e`. Unlike the reverse shell which used `TerminateProcess`, here we use `ExitProcess` for a cleaner shutdown.
 
 ```nasm
 resolve_symbols_kernel32:
@@ -2693,15 +2693,15 @@ load_ws2_32_dll:
 
 The bind shell needs five functions from `ws2_32.dll` -- two more than the reverse shell:
 
-**WSAStartup** — Initializes Winsock. Hash: `0x3bfcedcb`.
+**WSAStartup** -- Initializes Winsock. Hash: `0x3bfcedcb`.
 
-**WSASocketA** — Creates the listening TCP socket. Hash: `0xadf509d9`.
+**WSASocketA** -- Creates the listening TCP socket. Hash: `0xadf509d9`.
 
-**bind** — `int bind(SOCKET s, const struct sockaddr *addr, int namelen)` — Assigns a local address and port to the socket. We bind to `0.0.0.0:4444` (all interfaces). Hash: `0xc7701aa4`.
+**bind** -- `int bind(SOCKET s, const struct sockaddr *addr, int namelen)` -- Assigns a local address and port to the socket. We bind to `0.0.0.0:4444` (all interfaces). Hash: `0xc7701aa4`.
 
-**listen** — `int listen(SOCKET s, int backlog)` — Puts the socket into listening mode. Hash: `0xe92eada4`.
+**listen** -- `int listen(SOCKET s, int backlog)` -- Puts the socket into listening mode. Hash: `0xe92eada4`.
 
-**accept** — `SOCKET accept(SOCKET s, struct sockaddr *addr, int *addrlen)` — Blocks until a client connects, then returns a **new socket handle** for the connection. Hash: `0x498649e5`.
+**accept** -- `SOCKET accept(SOCKET s, struct sockaddr *addr, int *addrlen)` -- Blocks until a client connects, then returns a **new socket handle** for the connection. Hash: `0x498649e5`.
 
 ```nasm
 resolve_symbols_ws2_32_dll:
@@ -3456,13 +3456,13 @@ This shellcode is a restricted-charset reverse shell. It uses `neg`, `xor`, and 
 
 We need four functions from `kernel32.dll` -- one more than the standard reverse shell:
 
-**LoadLibraryA** — Hash: `0xec0e4e8e`. Loads ws2_32.dll.
+**LoadLibraryA** -- Hash: `0xec0e4e8e`. Loads ws2_32.dll.
 
-**CreateProcessA** — Hash: `0x16b3fe72`. Spawns cmd.exe with stdio redirect.
+**CreateProcessA** -- Hash: `0x16b3fe72`. Spawns cmd.exe with stdio redirect.
 
-**WaitForSingleObject** — `DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)` — Waits for a process to terminate. We pass `-1` (INFINITE) so the shellcode does not exit while the shell session is active. Hash: `0xce05d9ad`.
+**WaitForSingleObject** -- `DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)` -- Waits for a process to terminate. We pass `-1` (INFINITE) so the shellcode does not exit while the shell session is active. Hash: `0xce05d9ad`.
 
-**ExitProcess** — Hash: `0x73e2d87e`. Clean process exit after the shell session ends.
+**ExitProcess** -- Hash: `0x73e2d87e`. Clean process exit after the shell session ends.
 
 ```nasm
 resolve_symbols_kernel32:
@@ -4155,11 +4155,11 @@ This technique is invaluable when firewalls block all new outbound AND inbound c
 
 Three standard functions from `kernel32.dll`:
 
-**LoadLibraryA** — Hash: `0xec0e4e8e`. Loads ws2_32.dll.
+**LoadLibraryA** -- Hash: `0xec0e4e8e`. Loads ws2_32.dll.
 
-**CreateProcessA** — Hash: `0x16b3fe72`. Spawns cmd.exe.
+**CreateProcessA** -- Hash: `0x16b3fe72`. Spawns cmd.exe.
 
-**ExitProcess** — Hash: `0x73e2d87e`. Clean exit.
+**ExitProcess** -- Hash: `0x73e2d87e`. Clean exit.
 
 ```nasm
 resolve_symbols_kernel32:
@@ -4199,11 +4199,11 @@ resolve_symbols_kernel32:
 
 The key function here is `getpeername` -- it retrieves the remote address of a connected socket. We use it to identify which handle belongs to the exploit's connection:
 
-**WSAStartup** — Hash: `0x3bfcedcb`. Init Winsock.
+**WSAStartup** -- Hash: `0x3bfcedcb`. Init Winsock.
 
-**WSASocketA** — Hash: `0xadf509d9`. Not used for creating a socket here, but resolved for completeness.
+**WSASocketA** -- Hash: `0xadf509d9`. Not used for creating a socket here, but resolved for completeness.
 
-**getpeername** — `int getpeername(SOCKET s, struct sockaddr *name, int *namelen)` — Returns the remote address of a connected socket. If the handle is not a socket, the call fails. Hash: `0x95066ef2`.
+**getpeername** -- `int getpeername(SOCKET s, struct sockaddr *name, int *namelen)` -- Returns the remote address of a connected socket. If the handle is not a socket, the call fails. Hash: `0x95066ef2`.
 
 ```nasm
 resolve_symbols_ws2_32_dll:
@@ -4401,7 +4401,7 @@ struct_STARTUPINFOA:
   </defs>
   <rect width="750" height="140" rx="10" fill="url(#bg_s1306)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1306)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1306)" font-weight="bold">STARTUPINFOA — Redirect stdio to Reused Socket</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1306)" font-weight="bold">STARTUPINFOA -- Redirect stdio to Reused Socket</text>
   <rect x="50" y="48" width="200" height="35" rx="5" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
   <text x="150" y="70" text-anchor="middle" fill="#00ff88" font-size="10">hStdInput = socket</text>
   <rect x="275" y="48" width="200" height="35" rx="5" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
@@ -4745,9 +4745,9 @@ This shellcode demonstrates the concept by XOR-encoding the string `"remo"` with
 
 Two functions from `kernel32.dll`:
 
-**TerminateProcess** — Hash: `0x78b5b983`. Clean process exit after the message box.
+**TerminateProcess** -- Hash: `0x78b5b983`. Clean process exit after the message box.
 
-**LoadLibraryA** — Hash: `0xec0e4e8e`. Loads user32.dll for the MessageBox API.
+**LoadLibraryA** -- Hash: `0xec0e4e8e`. Loads user32.dll for the MessageBox API.
 
 ```nasm
 resolve_symbols_kernel32:
@@ -4820,7 +4820,7 @@ load_user32:
 
 ### Step 3: Resolving MessageBoxA
 
-**MessageBoxA** — `int MessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)` — Displays a modal dialog box with text and buttons. Hash: `0xbc4da2a8`.
+**MessageBoxA** -- `int MessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)` -- Displays a modal dialog box with text and buttons. Hash: `0xbc4da2a8`.
 
 ```nasm
 resolve_symbols_User32:
@@ -4887,7 +4887,7 @@ decode_loop:
   </defs>
   <rect width="750" height="320" rx="10" fill="url(#bg_s1401)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1401)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1401)" font-weight="bold">XOR Decode Loop — Key 0xAA</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1401)" font-weight="bold">XOR Decode Loop -- Key 0xAA</text>
 
   <!-- Iteration 1 -->
   <text x="50" y="60" fill="#00d4ff" font-size="11" font-weight="bold">Iteration 1 (ECX=4):</text>
@@ -4975,7 +4975,7 @@ With the decoded string on the stack, we call `MessageBoxA` to display it:
   </defs>
   <rect width="750" height="110" rx="10" fill="url(#bg_s1406)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1406)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1406)" font-weight="bold">MessageBoxA — Display Decoded String</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1406)" font-weight="bold">MessageBoxA -- Display Decoded String</text>
   <rect x="50" y="48" width="130" height="30" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="115" y="68" text-anchor="middle" fill="#8b949e" font-size="10">hWnd = NULL</text>
   <rect x="195" y="48" width="150" height="30" rx="4" fill="#151b28" stroke="#00ff88" stroke-width="1.5"/>
@@ -4985,7 +4985,7 @@ With the decoded string on the stack, we call `MessageBoxA` to display it:
   <rect x="545" y="48" width="160" height="30" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="625" y="68" text-anchor="middle" fill="#8b949e" font-size="10">uType = MB_OK (0)</text>
   <rect x="50" y="85" width="655" height="18" rx="3" fill="#0d1117" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="377" y="99" text-anchor="middle" fill="#8b949e" font-size="9">ESI points to decoded "remo" — used for both title and body text</text>
+  <text x="377" y="99" text-anchor="middle" fill="#8b949e" font-size="9">ESI points to decoded "remo" -- used for both title and body text</text>
 </svg></div>
 
 *Figure 14.d -- MessageBoxA called with the XOR-decoded "remo" string as both caption and text.*
@@ -5013,9 +5013,9 @@ call_terminateprocess:
   </defs>
   <rect width="750" height="90" rx="10" fill="url(#bg_s1407)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1407)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1407)" font-weight="bold">TerminateProcess — Clean Exit</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1407)" font-weight="bold">TerminateProcess -- Clean Exit</text>
   <rect x="150" y="48" width="450" height="30" rx="5" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
-  <text x="375" y="68" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">TerminateProcess(-1, 0) — dec eax builds -1 from 0</text>
+  <text x="375" y="68" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">TerminateProcess(-1, 0) -- dec eax builds -1 from 0</text>
 </svg></div>
 
 *Figure 14.e -- TerminateProcess exits using -1 (pseudo-handle for current process).*
@@ -5383,7 +5383,7 @@ call_CreateToolhelp32Snapshot:
   </defs>
   <rect width="750" height="220" rx="10" fill="url(#bg_s1504)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1504)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1504)" font-weight="bold">CreateToolhelp32Snapshot — Snapshot All Processes</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1504)" font-weight="bold">CreateToolhelp32Snapshot -- Snapshot All Processes</text>
 
   <rect x="50" y="50" width="200" height="70" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="150" y="72" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Build Value 2</text>
@@ -5407,7 +5407,7 @@ call_CreateToolhelp32Snapshot:
 
   <rect x="50" y="145" width="660" height="55" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="375" y="168" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="bold">Why inc+inc instead of mov edx, 2?</text>
-  <text x="375" y="188" text-anchor="middle" fill="#8b949e" font-size="10">mov edx, 0x00000002 encodes as B8 02 00 00 00 — three null bytes. Two inc instructions avoid them entirely.</text>
+  <text x="375" y="188" text-anchor="middle" fill="#8b949e" font-size="10">mov edx, 0x00000002 encodes as B8 02 00 00 00 -- three null bytes. Two inc instructions avoid them entirely.</text>
 </svg></div>
 
 *CreateToolhelp32Snapshot with TH32CS_SNAPPROCESS (2) captures every running process. The return handle is used by Process32First/Next to iterate entries.*
@@ -5440,7 +5440,7 @@ call_Process32First:
   </defs>
   <rect width="750" height="280" rx="10" fill="url(#bg_s1505)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1505)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1505)" font-weight="bold">Process32First — PROCESSENTRY32 Setup</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1505)" font-weight="bold">Process32First -- PROCESSENTRY32 Setup</text>
 
   <rect x="50" y="50" width="300" height="100" rx="6" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="200" y="72" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Stack Allocation</text>
@@ -5505,7 +5505,7 @@ next_process:
   </defs>
   <rect width="750" height="260" rx="10" fill="url(#bg_s1501)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1501)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1501)" font-weight="bold">Process Name Matching — "notepad.exe"</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1501)" font-weight="bold">Process Name Matching -- "notepad.exe"</text>
 
   <text x="50" y="58" fill="#8b949e" font-size="11">PROCESSENTRY32.szExeFile at [edi+0x24]:</text>
 
@@ -5578,7 +5578,7 @@ call_OpenProcess:
   </defs>
   <rect width="750" height="240" rx="10" fill="url(#bg_s1506)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1506)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1506)" font-weight="bold">OpenProcess — Acquire Target Handle</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1506)" font-weight="bold">OpenProcess -- Acquire Target Handle</text>
 
   <rect x="50" y="50" width="280" height="80" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="190" y="72" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Building PROCESS_ALL_ACCESS</text>
@@ -5636,7 +5636,7 @@ call_VirtualAllocEx:
   </defs>
   <rect width="750" height="280" rx="10" fill="url(#bg_s1507)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1507)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1507)" font-weight="bold">VirtualAllocEx — Remote Memory Allocation</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1507)" font-weight="bold">VirtualAllocEx -- Remote Memory Allocation</text>
 
   <rect x="50" y="50" width="320" height="100" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="210" y="72" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Building Constants (Null-Free)</text>
@@ -5700,7 +5700,7 @@ do_write:
   </defs>
   <rect width="750" height="280" rx="10" fill="url(#bg_s1508)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1508)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1508)" font-weight="bold">WriteProcessMemory — The call/pop Payload Trick</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1508)" font-weight="bold">WriteProcessMemory -- The call/pop Payload Trick</text>
 
   <rect x="50" y="50" width="310" height="105" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1.5"/>
   <text x="205" y="72" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">Locating the Embedded Payload</text>
@@ -6204,7 +6204,7 @@ load_wininet:
   </defs>
   <rect width="750" height="220" rx="10" fill="url(#bg_s1605)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1605)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1605)" font-weight="bold">Loading wininet.dll — String Construction</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1605)" font-weight="bold">Loading wininet.dll -- String Construction</text>
 
   <rect x="50" y="48" width="320" height="100" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="210" y="70" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Building "wininet.dll" on Stack</text>
@@ -6233,11 +6233,11 @@ load_wininet:
 
 Three functions from `wininet.dll`:
 
-**InternetOpenA** — Hash: `0x57e84429`. Initializes WinINet.
+**InternetOpenA** -- Hash: `0x57e84429`. Initializes WinINet.
 
-**InternetOpenUrlA** — Hash: `0x7e0fed49`. Opens an HTTP URL and returns a handle.
+**InternetOpenUrlA** -- Hash: `0x7e0fed49`. Opens an HTTP URL and returns a handle.
 
-**InternetReadFile** — Hash: `0x5fe34b8b`. Reads data from the URL handle.
+**InternetReadFile** -- Hash: `0x5fe34b8b`. Reads data from the URL handle.
 
 ```nasm
 resolve_symbols_wininet:
@@ -6313,7 +6313,7 @@ call_InternetOpenA:
   </defs>
   <rect width="750" height="230" rx="10" fill="url(#bg_s1607)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1607)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1607)" font-weight="bold">InternetOpenA — Initialize WinINet Session</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1607)" font-weight="bold">InternetOpenA -- Initialize WinINet Session</text>
 
   <rect x="50" y="50" width="280" height="85" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="190" y="72" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Build User-Agent String</text>
@@ -6845,11 +6845,11 @@ This shellcode loads `advapi32.dll`, opens `HKCU\Software\Microsoft\Windows\Curr
 
 Three functions from `kernel32.dll`:
 
-**TerminateProcess** — Hash: `0x78b5b983` → `[ebp+0x10]`
+**TerminateProcess** -- Hash: `0x78b5b983` → `[ebp+0x10]`
 
-**LoadLibraryA** — Hash: `0xec0e4e8e` → `[ebp+0x14]`. Loads advapi32.dll.
+**LoadLibraryA** -- Hash: `0xec0e4e8e` → `[ebp+0x14]`. Loads advapi32.dll.
 
-**ExitProcess** — Hash: `0x73e2d87e` → `[ebp+0x24]`
+**ExitProcess** -- Hash: `0x73e2d87e` → `[ebp+0x24]`
 
 ```nasm
 resolve_symbols_kernel32:
@@ -6887,7 +6887,7 @@ resolve_symbols_kernel32:
   <text x="600" y="88" text-anchor="middle" fill="#e0e7ff" font-size="9">0x73e2d87e → [ebp+0x24]</text>
 
   <rect x="50" y="118" width="655" height="45" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="375" y="138" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="bold">Minimal kernel32 footprint — just 3 APIs</text>
+  <text x="375" y="138" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="bold">Minimal kernel32 footprint -- just 3 APIs</text>
   <text x="375" y="155" text-anchor="middle" fill="#8b949e" font-size="10">LoadLibraryA loads advapi32.dll for registry ops. TerminateProcess/ExitProcess for cleanup.</text>
 </svg></div>
 
@@ -6918,7 +6918,7 @@ load_advapi32:
   </defs>
   <rect width="750" height="200" rx="10" fill="url(#bg_s1704)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1704)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1704)" font-weight="bold">Loading advapi32.dll — String Construction</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1704)" font-weight="bold">Loading advapi32.dll -- String Construction</text>
 
   <rect x="50" y="50" width="310" height="80" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="205" y="72" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Building "advapi32.dll" on Stack</text>
@@ -6935,7 +6935,7 @@ load_advapi32:
   <text x="415" y="128" fill="#8b949e" font-size="9">EAX = advapi32.dll base address</text>
 
   <rect x="50" y="150" width="655" height="35" rx="6" fill="#151b28" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="375" y="172" text-anchor="middle" fill="#8b949e" font-size="10">advapi32.dll provides RegOpenKeyExA, RegSetValueExA, RegCloseKey — the registry manipulation APIs</text>
+  <text x="375" y="172" text-anchor="middle" fill="#8b949e" font-size="10">advapi32.dll provides RegOpenKeyExA, RegSetValueExA, RegCloseKey -- the registry manipulation APIs</text>
 </svg></div>
 
 *The "advapi32.dll" string is built from four DWORDs. LoadLibraryA maps it into the process so we can resolve registry functions from its export table.*
@@ -6944,11 +6944,11 @@ load_advapi32:
 
 Three registry functions:
 
-**RegOpenKeyExA** — `LSTATUS RegOpenKeyExA(HKEY hKey, LPCSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult)` — Opens a registry key. Hash: `0xa84aeb81`.
+**RegOpenKeyExA** -- `LSTATUS RegOpenKeyExA(HKEY hKey, LPCSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult)` -- Opens a registry key. Hash: `0xa84aeb81`.
 
-**RegSetValueExA** — `LSTATUS RegSetValueExA(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData)` — Sets a value under a key. Hash: `0x2d1c9add`.
+**RegSetValueExA** -- `LSTATUS RegSetValueExA(HKEY hKey, LPCSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData)` -- Sets a value under a key. Hash: `0x2d1c9add`.
 
-**RegCloseKey** — `LSTATUS RegCloseKey(HKEY hKey)` — Closes a registry handle. Hash: `0x35e273e6`.
+**RegCloseKey** -- `LSTATUS RegCloseKey(HKEY hKey)` -- Closes a registry handle. Hash: `0x35e273e6`.
 
 ```nasm
 resolve_symbols_advapi32:
@@ -7113,7 +7113,7 @@ call_RegSetValueExA:
   </defs>
   <rect width="750" height="300" rx="10" fill="url(#bg_s1706)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1706)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1706)" font-weight="bold">RegSetValueExA — Writing the Persistence Entry</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="15" filter="url(#glow_s1706)" font-weight="bold">RegSetValueExA -- Writing the Persistence Entry</text>
 
   <rect x="50" y="48" width="320" height="80" rx="6" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="210" y="68" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Building "C:\shell.exe" on Stack</text>
@@ -7193,7 +7193,7 @@ call_ExitProcess:
   <rect x="50" y="115" width="650" height="70" rx="6" fill="#151b28" stroke="#ff3366" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="375" y="138" text-anchor="middle" fill="#e0e7ff" font-size="12" font-weight="bold">Result: Auto-Start on Login</text>
   <text x="375" y="158" text-anchor="middle" fill="#e0e7ff" font-size="11">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</text>
-  <text x="375" y="178" text-anchor="middle" fill="#8b949e" font-size="10">"Updater" = "C:\shell.exe" — runs every time the user logs in</text>
+  <text x="375" y="178" text-anchor="middle" fill="#8b949e" font-size="10">"Updater" = "C:\shell.exe" -- runs every time the user logs in</text>
 </svg></div>
 
 *Figure 17.2 -- Registry persistence pipeline. The shellcode creates a Run key entry so `C:\shell.exe` launches automatically on every user login.*
@@ -7421,11 +7421,11 @@ This shellcode demonstrates exfiltrating a file over SMB. It loads `mpr.dll`, es
 
 Three functions from `kernel32.dll`:
 
-**LoadLibraryA** — Hash: `0xec0e4e8e` → `[ebp+0x10]`. Loads mpr.dll.
+**LoadLibraryA** -- Hash: `0xec0e4e8e` → `[ebp+0x10]`. Loads mpr.dll.
 
-**CopyFileA** — `BOOL CopyFileA(LPCSTR lpExistingFileName, LPCSTR lpNewFileName, BOOL bFailIfExists)` — Copies a file. Hash: `0x99ec895e` → `[ebp+0x14]`.
+**CopyFileA** -- `BOOL CopyFileA(LPCSTR lpExistingFileName, LPCSTR lpNewFileName, BOOL bFailIfExists)` -- Copies a file. Hash: `0x99ec895e` → `[ebp+0x14]`.
 
-**ExitProcess** — Hash: `0x73e2d87e` → `[ebp+0x18]`
+**ExitProcess** -- Hash: `0x73e2d87e` → `[ebp+0x18]`
 
 > This shellcode uses split ROR-13 (`ror edx, 0x07; ror edx, 0x06`) to avoid the `0x0D` byte in the hash computation.
 
@@ -7512,7 +7512,7 @@ load_mpr_dll:
 
 ### Step 3: Resolving WNetAddConnection2A
 
-**WNetAddConnection2A** — `DWORD WNetAddConnection2A(LPNETRESOURCE lpNetResource, LPCSTR lpPassword, LPCSTR lpUserName, DWORD dwFlags)` — Establishes an authenticated connection to a network resource. Hash: `0xd7d23576`.
+**WNetAddConnection2A** -- `DWORD WNetAddConnection2A(LPNETRESOURCE lpNetResource, LPCSTR lpPassword, LPCSTR lpUserName, DWORD dwFlags)` -- Establishes an authenticated connection to a network resource. Hash: `0xd7d23576`.
 
 ```nasm
 resolve_symbols_mpr_dll:
@@ -7653,7 +7653,7 @@ call_WNetAddConnection2A:
   </defs>
   <rect width="750" height="130" rx="10" fill="url(#bg_s1806)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1806)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1806)" font-weight="bold">WNetAddConnection2A — Authenticate to SMB Share</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1806)" font-weight="bold">WNetAddConnection2A -- Authenticate to SMB Share</text>
   <rect x="50" y="48" width="155" height="30" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="127" y="68" text-anchor="middle" fill="#8b949e" font-size="10">dwFlags = 0</text>
   <rect x="215" y="48" width="155" height="30" rx="4" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
@@ -7716,20 +7716,20 @@ call_ExitProcess:
   </defs>
   <rect width="750" height="180" rx="10" fill="url(#bg_s1807)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1807)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1807)" font-weight="bold">CopyFileA — File Exfiltration + ExitProcess</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1807)" font-weight="bold">CopyFileA -- File Exfiltration + ExitProcess</text>
   <rect x="50" y="48" width="300" height="45" rx="5" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="200" y="66" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">Source (local)</text>
-  <text x="200" y="84" text-anchor="middle" fill="#e0e7ff" font-size="10">"c:\proof.txt" — 3 DWORDs + null</text>
+  <text x="200" y="84" text-anchor="middle" fill="#e0e7ff" font-size="10">"c:\proof.txt" -- 3 DWORDs + null</text>
   <rect x="400" y="48" width="310" height="45" rx="5" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="555" y="66" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">Destination (remote)</text>
-  <text x="555" y="84" text-anchor="middle" fill="#e0e7ff" font-size="10">"\\192.168.1.7\share\proof.txt" — 8 DWORDs</text>
+  <text x="555" y="84" text-anchor="middle" fill="#e0e7ff" font-size="10">"\\192.168.1.7\share\proof.txt" -- 8 DWORDs</text>
   <line x1="350" y1="70" x2="395" y2="70" stroke="#00ff88" stroke-width="2" marker-end="url(#arr_s1807)"/>
   <rect x="50" y="108" width="420" height="30" rx="4" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="260" y="128" text-anchor="middle" fill="#ff3366" font-size="11" font-weight="bold">CopyFileA(src, dest, FALSE)</text>
   <rect x="490" y="108" width="220" height="30" rx="4" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="600" y="128" text-anchor="middle" fill="#8b949e" font-size="11">ExitProcess(0)</text>
   <rect x="50" y="148" width="660" height="22" rx="3" fill="#0d1117" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="380" y="164" text-anchor="middle" fill="#8b949e" font-size="9">bFailIfExists=FALSE — overwrites if file exists at destination</text>
+  <text x="380" y="164" text-anchor="middle" fill="#8b949e" font-size="9">bFailIfExists=FALSE -- overwrites if file exists at destination</text>
 </svg></div>
 
 *Figure 18.e -- CopyFileA copies the local file to the authenticated SMB share, then ExitProcess terminates cleanly.*
@@ -8032,17 +8032,17 @@ This shellcode creates a file on disk and writes a message to it. It resolves `C
 
 Six function addresses are resolved from `kernel32.dll`:
 
-**TerminateProcess** — Hash: `0x78b5b983` → `[ebp+0x10]`
+**TerminateProcess** -- Hash: `0x78b5b983` → `[ebp+0x10]`
 
-**LoadLibraryA** — Hash: `0xec0e4e8e` → `[ebp+0x14]`
+**LoadLibraryA** -- Hash: `0xec0e4e8e` → `[ebp+0x14]`
 
-**CreateFileA** — `HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)` — Creates or opens a file. Hash: `0x7c0017a5` → `[ebp+0x18]`
+**CreateFileA** -- `HANDLE CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)` -- Creates or opens a file. Hash: `0x7c0017a5` → `[ebp+0x18]`
 
-**WriteFile** — `BOOL WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)` — Writes data to a file. Hash: `0xe80a791f` → `[ebp+0x1C]`
+**WriteFile** -- `BOOL WriteFile(HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToWrite, LPDWORD lpNumberOfBytesWritten, LPOVERLAPPED lpOverlapped)` -- Writes data to a file. Hash: `0xe80a791f` → `[ebp+0x1C]`
 
-**CloseHandle** — `BOOL CloseHandle(HANDLE hObject)` — Closes an open handle. Hash: `0x0ffd97fb` → `[ebp+0x20]`
+**CloseHandle** -- `BOOL CloseHandle(HANDLE hObject)` -- Closes an open handle. Hash: `0x0ffd97fb` → `[ebp+0x20]`
 
-**TerminateProcess** — Resolved a second time. Hash: `0x78b5b983` → `[ebp+0x24]`
+**TerminateProcess** -- Resolved a second time. Hash: `0x78b5b983` → `[ebp+0x24]`
 
 ```nasm
 resolve_symbols_kernel32:
@@ -8074,7 +8074,7 @@ resolve_symbols_kernel32:
   </defs>
   <rect width="750" height="170" rx="10" fill="url(#bg_s1903)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1903)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1903)" font-weight="bold">kernel32.dll API Resolution — File I/O</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1903)" font-weight="bold">kernel32.dll API Resolution -- File I/O</text>
   <rect x="50" y="48" width="200" height="30" rx="5" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
   <text x="150" y="68" text-anchor="middle" fill="#8b949e" font-size="10">TerminateProcess → [ebp+0x10]</text>
   <rect x="275" y="48" width="200" height="30" rx="5" fill="#151b28" stroke="#8b949e" stroke-width="1"/>
@@ -8093,7 +8093,7 @@ resolve_symbols_kernel32:
 
 *Figure 19.a -- Six kernel32 APIs resolved for file creation, writing, cleanup, and termination.*
 
-### Step 2: CreateFileA — Creating the Output File
+### Step 2: CreateFileA -- Creating the Output File
 
 We create `secretremo.txt` with read/write access. The access mask `GENERIC_READ | GENERIC_WRITE` (`0xC0000000`) is built by loading `0x03` into EBX and shifting left by 30 bits:
 
@@ -8175,7 +8175,7 @@ The `shl ebx, 30` trick avoids pushing the large constant `0xC0000000` directly,
 
 *Figure 19.1 -- CreateFileA parameter setup. The access mask 0xC0000000 is built with `shl` to avoid null bytes, and the filename "secretremo.txt" is assembled from DWORD pushes.*
 
-### Step 3: WriteFile — Writing the Message
+### Step 3: WriteFile -- Writing the Message
 
 The returned file handle is saved in EBX. We build the message "Shellcoding With Secret Remo" (28 bytes = `0x1C`) on the stack and write it to the file:
 
@@ -8214,7 +8214,7 @@ call_writefile:
   </defs>
   <rect width="750" height="170" rx="10" fill="url(#bg_s1904)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1904)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1904)" font-weight="bold">WriteFile — Writing Message to Disk</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1904)" font-weight="bold">WriteFile -- Writing Message to Disk</text>
   <rect x="50" y="48" width="250" height="45" rx="5" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="175" y="66" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">File Handle (EBX)</text>
   <text x="175" y="82" text-anchor="middle" fill="#e0e7ff" font-size="10">from CreateFileA return</text>
@@ -8257,7 +8257,7 @@ call_terminateprocess:
   </defs>
   <rect width="750" height="110" rx="10" fill="url(#bg_s1905)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s1905)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1905)" font-weight="bold">Cleanup — CloseHandle + TerminateProcess</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s1905)" font-weight="bold">Cleanup -- CloseHandle + TerminateProcess</text>
   <rect x="100" y="50" width="250" height="40" rx="5" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
   <text x="225" y="66" text-anchor="middle" fill="#ff6b35" font-size="11" font-weight="bold">CloseHandle(hFile)</text>
   <text x="225" y="82" text-anchor="middle" fill="#e0e7ff" font-size="10">releases file handle from EBX</text>
@@ -8508,17 +8508,17 @@ This shellcode enumerates running processes using the Toolhelp32 API, finds `not
 
 Six functions from `kernel32.dll`:
 
-**TerminateProcess** — `BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)` — Terminates a process. Hash: `0x78b5b983` → `[ebp+0x10]`
+**TerminateProcess** -- `BOOL TerminateProcess(HANDLE hProcess, UINT uExitCode)` -- Terminates a process. Hash: `0x78b5b983` → `[ebp+0x10]`
 
-**CreateToolhelp32Snapshot** — `HANDLE CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID)` — Takes a snapshot of running processes. Hash: `0xe454dfed` → `[ebp+0x14]`
+**CreateToolhelp32Snapshot** -- `HANDLE CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID)` -- Takes a snapshot of running processes. Hash: `0xe454dfed` → `[ebp+0x14]`
 
-**Process32First** — `BOOL Process32First(HANDLE hSnapshot, LPPROCESSENTRY32 lppe)` — Retrieves the first process from the snapshot. Hash: `0x3249baa7` → `[ebp+0x18]`
+**Process32First** -- `BOOL Process32First(HANDLE hSnapshot, LPPROCESSENTRY32 lppe)` -- Retrieves the first process from the snapshot. Hash: `0x3249baa7` → `[ebp+0x18]`
 
-**Process32Next** — `BOOL Process32Next(HANDLE hSnapshot, LPPROCESSENTRY32 lppe)` — Retrieves the next process entry. Hash: `0x4776654a` → `[ebp+0x1C]`
+**Process32Next** -- `BOOL Process32Next(HANDLE hSnapshot, LPPROCESSENTRY32 lppe)` -- Retrieves the next process entry. Hash: `0x4776654a` → `[ebp+0x1C]`
 
-**OpenProcess** — `HANDLE OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId)` — Opens an existing process. Hash: `0xefe297c0` → `[ebp+0x20]`
+**OpenProcess** -- `HANDLE OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId)` -- Opens an existing process. Hash: `0xefe297c0` → `[ebp+0x20]`
 
-**CloseHandle** — Hash: `0x0ffd97fb` → `[ebp+0x24]`
+**CloseHandle** -- Hash: `0x0ffd97fb` → `[ebp+0x24]`
 
 ```nasm
 resolve_symbols_kernel32:
@@ -8550,7 +8550,7 @@ resolve_symbols_kernel32:
   </defs>
   <rect width="750" height="170" rx="10" fill="url(#bg_s2003)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s2003)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s2003)" font-weight="bold">kernel32.dll API Resolution — Process Termination</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s2003)" font-weight="bold">kernel32.dll API Resolution -- Process Termination</text>
   <rect x="50" y="48" width="210" height="30" rx="5" fill="#151b28" stroke="#ff3366" stroke-width="2"/>
   <text x="155" y="68" text-anchor="middle" fill="#ff3366" font-size="10">TerminateProcess → [ebp+0x10]</text>
   <rect x="270" y="48" width="230" height="30" rx="5" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
@@ -8641,12 +8641,12 @@ set_req_parameters:
   <text x="545" y="64" text-anchor="middle" fill="#00ff88" font-size="11" font-weight="bold">EDI → PROCESSENTRY32 base</text>
   <text x="545" y="80" text-anchor="middle" fill="#e0e7ff" font-size="10">[edi+0x00] = dwSize = 0x22C (required)</text>
   <rect x="50" y="102" width="660" height="28" rx="4" fill="#0d1117" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="380" y="121" text-anchor="middle" fill="#8b949e" font-size="10">Struct zeroed on stack, then dwSize set — required by Process32First before enumeration</text>
+  <text x="380" y="121" text-anchor="middle" fill="#8b949e" font-size="10">Struct zeroed on stack, then dwSize set -- required by Process32First before enumeration</text>
 </svg></div>
 
 *Figure 20.c -- PROCESSENTRY32 allocated on the stack. The 556-byte struct is zeroed by pushing DWORDs in a loop, then dwSize is set.*
 
-### Step 4: Process32First — Getting the First Entry
+### Step 4: Process32First -- Getting the First Entry
 
 ```nasm
 call_process32first:
@@ -8663,7 +8663,7 @@ call_process32first:
   </defs>
   <rect width="750" height="100" rx="10" fill="url(#bg_s2006)"/>
   <rect x="50" y="2" width="650" height="1" rx="1" fill="url(#line_s2006)"/>
-  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s2006)" font-weight="bold">Process32First — Begin Enumeration</text>
+  <text x="375" y="28" text-anchor="middle" fill="#e0e7ff" font-size="14" filter="url(#glow_s2006)" font-weight="bold">Process32First -- Begin Enumeration</text>
   <rect x="100" y="48" width="250" height="35" rx="5" fill="#151b28" stroke="#00d4ff" stroke-width="1.5"/>
   <text x="225" y="70" text-anchor="middle" fill="#00d4ff" font-size="11">hSnapshot from [ebp+0x2C]</text>
   <rect x="400" y="48" width="260" height="35" rx="5" fill="#151b28" stroke="#ff6b35" stroke-width="1.5"/>
@@ -8709,14 +8709,14 @@ create_notepad_string:
   <text x="556" y="64" text-anchor="middle" fill="#00d4ff" font-size="11" font-weight="bold">"exe\0" via shl trick</text>
   <text x="556" y="78" text-anchor="middle" fill="#8b949e" font-size="9">0x6578 << 8 | 0x65</text>
   <rect x="80" y="92" width="586" height="20" rx="3" fill="#0d1117" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="373" y="107" text-anchor="middle" fill="#8b949e" font-size="9">Pointer saved at [ebp+0x30] — used for DWORD comparison against szExeFile in the detection loop</text>
+  <text x="373" y="107" text-anchor="middle" fill="#8b949e" font-size="9">Pointer saved at [ebp+0x30] -- used for DWORD comparison against szExeFile in the detection loop</text>
 </svg></div>
 
 *Figure 20.e -- "notepad.exe" built on the stack from DWORDs. The shl trick constructs "exe\0" without null bytes.*
 
-### Step 6: Detection Loop — Finding notepad.exe
+### Step 6: Detection Loop -- Finding notepad.exe
 
-The detection loop iterates over process entries. At offset `0x24` in the `PROCESSENTRY32` struct lies `szExeFile` — the process name. We compare it DWORD by DWORD against our target:
+The detection loop iterates over process entries. At offset `0x24` in the `PROCESSENTRY32` struct lies `szExeFile` -- the process name. We compare it DWORD by DWORD against our target:
 
 ```nasm
 detection_loop:
@@ -8728,7 +8728,7 @@ detection_loop:
     mov   eax, [edi+0x28]
     cmp   eax, 0x2e646170        ; "pad."
     jne   next_process
-    ; Match found — get the PID
+    ; Match found -- get the PID
     mov   eax, [edi+0x08]        ; th32ProcessID
     jmp   kill_process
 
