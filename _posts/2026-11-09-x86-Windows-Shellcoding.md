@@ -2138,19 +2138,6 @@ call_getpeername:
 
 *Figure 13.1 - Socket reuse: scan handles, test with getpeername, match port, redirect stdio.*
 
-### PoC Video
-
-The following video demonstrates the socket reuse shellcode hijacking an existing connection to establish a shell in action:
-
-<div align="center">
-  <video width="720" controls>
-    <source src="/assets/video/shellcoding/socket-reuse-poc.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</div>
-
-*Video: Socket reuse shell over existing connection*
-
 ---
 
 ## 14. XOR Encoding: Runtime Decoding
