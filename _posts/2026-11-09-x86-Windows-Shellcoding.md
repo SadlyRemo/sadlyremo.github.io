@@ -1,52 +1,16 @@
 ---
-title: "x86 Windows Shellcoding: From Zero to Custom Payloads"
+title: "The Art of x86 Windows Shellcoding"
 date: 2026-11-09 00:00:00 +0300
 categories: [Exploit Development, Shellcoding]
 tags: [x86, shellcoding, windows, assembly, exploit-development]
-description: "A comprehensive guide to writing custom x86 Windows shellcode — from PEB walking and API resolution to reverse shells, process injection, and beyond."
+description: "A deep dive into crafting custom x86 Windows shellcode — every instruction explained, every API call visualized."
 image:
   path: /assets/img/shellcoding/banner.svg
 ---
 
-In this series, we will build a fully custom Windows reverse shell in x86 assembly -- from zero to a working payload. No frameworks, no Metasploit, just raw assembly and a deep understanding of how Windows works under the hood.
+I always wondered what actually happens between the moment an exploit hijacks execution and the moment a shell pops on the attacker's screen. Not the Metasploit-generated blob — the actual instructions. The PEB walk, the hash loop, the struct built one DWORD at a time on the stack. So I sat down and wrote every payload from scratch, in raw x86 assembly, until the mystery was gone.
 
-Why bother? Because pre-built shellcode is the first thing antivirus signatures target. When we write our own, we control every byte: the size, the encoding, the bad characters we avoid, and the tricks we use to stay invisible. That understanding is what separates someone who *uses* tools from someone who *builds* them.
-
-Let's get started.
-
-## Table of Contents
-
-**Part I: Foundations**
-1. [What Is Shellcode?](#1-what-is-shellcode)
-2. [The Shellcode Skeleton](#2-the-shellcode-skeleton)
-3. [Walking the PEB: Finding kernel32.dll](#3-walking-the-peb-finding-kernel32dll)
-4. [The find_function Engine: Resolving API Addresses](#4-the-find_function-engine-resolving-api-addresses)
-
-**Part II: Building Blocks**
-5. [Null-Free Encoding Patterns](#5-null-free-encoding-patterns)
-6. [Building Strings on the Stack](#6-building-strings-on-the-stack)
-7. [The ROR-13 Hash Generator](#7-the-ror-13-hash-generator)
-8. [Testing Shellcode: Keystone and ctypes](#8-testing-shellcode-keystone-and-ctypes)
-
-**Part III: Payloads**
-9. [Your First Shellcode: WinExec](#9-your-first-shellcode-winexec)
-10. [Reverse Shell: Calling Home](#10-reverse-shell-calling-home)
-11. [Bind Shell: Waiting for Connections](#11-bind-shell-waiting-for-connections)
-12. [Working Under Restrictions: A Case Study](#12-working-under-restrictions-a-case-study)
-
-**Part IV: Advanced Techniques**
-13. [Socket Reuse: Hijacking Existing Connections](#13-socket-reuse-hijacking-existing-connections)
-14. [XOR Encoding: Runtime Decoding](#14-xor-encoding-runtime-decoding)
-15. [Process Injection: Running In Another Process](#15-process-injection-running-in-another-process)
-16. [HTTP Stager: Downloading Second Stage](#16-http-stager-downloading-second-stage)
-17. [Registry Persistence: Surviving Reboots](#17-registry-persistence-surviving-reboots)
-
-**Part V: File Operations, Termination, and Workflow**
-18. [SMB File Operations: Network File Access](#18-smb-file-operations-network-file-access)
-19. [File I/O: Writing to Disk](#19-file-io-writing-to-disk)
-20. [Process Termination: Killing a Target Process](#20-process-termination-killing-a-target-process)
-21. [The Complete Development Workflow](#21-the-complete-development-workflow)
-22. [Mitigations, Ethics, and Closing Thoughts](#22-mitigations-ethics-and-closing-thoughts)
+This is everything I learned. Every instruction is here, every API call is explained, and every concept has a diagram. No frameworks, no shortcuts — just you, the CPU, and the Windows API.
 
 ---
 
@@ -3279,19 +3243,11 @@ Understanding the attacker's craft makes you a better defender. Full stop.
 
 *Figure 22.2 - Structural detection patterns. These code patterns appear in virtually all PEB-walking shellcode and are far more reliable detection targets than specific byte sequences.*
 
-### A Note on Ethics
-
-Every technique in this series is published for **authorized security testing and education only**. Always operate within the scope of a written authorization. Test only on systems you own or have explicit permission to test.
-
 ### Final Reflection
 
-We started with a question: *what actually happens between the exploit and the payload?* Now you know. Shellcode is not magic. It is careful, patient engineering: finding a DLL by walking linked lists, matching function names by computing hashes, building data structures one DWORD at a time, and calling the same Windows APIs that every normal program uses -- just without the luxury of a compiler, a linker, or an import table.
+Shellcode is not magic. It is careful, patient engineering: finding a DLL by walking linked lists, matching function names by computing hashes, building data structures one DWORD at a time, and calling the same Windows APIs that every normal program uses -- just without the luxury of a compiler, a linker, or an import table.
 
-The machine does not care whether instructions come from a `.exe` on disk or from a buffer in memory. It executes what it is told. Understanding that reality -- at the register level, at the byte level -- is what separates someone who *uses* tools from someone who *understands* them.
-
-Go experiment. Modify the examples. The patterns you have learned are composable -- every new payload is a remix of the same building blocks.
-
-The CPU is waiting. Go write something.
+The machine does not care whether instructions come from a `.exe` on disk or from a buffer in memory. It executes what it is told.
 
 ---
 
@@ -3301,37 +3257,67 @@ The CPU is waiting. Go write something.
 
 ### Certifications
 
-| Certification | Full Name | Focus Area |
-|:---:|---|---|
-| **CWEE** | Certified Web Exploitation Expert | Web Application Security |
-| **CPTS** | Certified Penetration Testing Specialist | Penetration Testing |
-| **CWES** | Certified Web Exploitation Specialist | Web Exploitation |
-| **CJCA** | Certified Junior Cybersecurity Analyst | Security Analysis |
-| **CRTM** | Certified Red Team Member | Red Team Operations |
-| **CRTE** | Certified Red Team Expert | Active Directory |
-| **CRTP** | Certified Red Team Professional | AD Exploitation |
-| **CRTO** | Certified Red Team Operator | C2 and Red Teaming |
-| **eWPTX** | eLearnSecurity Web Penetration Tester eXtreme | Advanced Web Testing |
-| **eCPPT** | eLearnSecurity Certified Professional Penetration Tester | Professional Pentesting |
-| **eMAPT** | eLearnSecurity Mobile Application Penetration Tester | Mobile Security |
-
-<div align="center"><svg viewBox="0 0 750 250" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: Consolas, monospace;">
-  <rect width="750" height="250" rx="8" fill="#1e1e2e"/>
-  <rect x="100" y="20" width="550" height="1" rx="1" fill="#313244"/>
-
-  <!-- Farewell message -->
-  <text x="375" y="60" text-anchor="middle" fill="#cdd6f4" font-size="14">Thank you for reading this far.</text>
-  <text x="375" y="85" text-anchor="middle" fill="#cdd6f4" font-size="14">If you made it here, you now have the tools to write</text>
-  <text x="375" y="110" text-anchor="middle" fill="#cdd6f4" font-size="14">any Windows shellcode from scratch.</text>
-
-  <rect x="200" y="130" width="350" height="1" rx="1" fill="#313244"/>
-
-  <text x="375" y="165" text-anchor="middle" fill="#a6e3a1" font-size="16" font-weight="bold">Keep learning. Keep building. Stay curious.</text>
-
-  <rect x="200" y="185" width="350" height="1" rx="1" fill="#313244"/>
-
-  <text x="375" y="220" text-anchor="middle" fill="#6c7086" font-size="13">-- SadlyRemo</text>
-  <text x="375" y="242" text-anchor="middle" fill="#6c7086" font-size="10">Reverse Engineering and Exploit Development</text>
+<div align="center"><svg viewBox="0 0 750 210" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <linearGradient id="cbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e17"/><stop offset="100%" stop-color="#111827"/></linearGradient>
+    <linearGradient id="bdg-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="100%" stop-color="#0f2340"/></linearGradient>
+    <linearGradient id="bdg-r" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5f1e2e"/><stop offset="100%" stop-color="#3f0f1a"/></linearGradient>
+    <linearGradient id="bdg-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1e5f3a"/><stop offset="100%" stop-color="#0f3f20"/></linearGradient>
+  </defs>
+  <rect width="750" height="210" rx="10" fill="url(#cbg)"/>
+  <!-- Row 1 -->
+  <rect x="15" y="15" width="118" height="50" rx="8" fill="url(#bdg-r)" stroke="#ff3366" stroke-width="1.5"/>
+  <text x="74" y="36" text-anchor="middle" fill="#ff3366" font-size="15" font-weight="bold">CWEE</text>
+  <text x="74" y="54" text-anchor="middle" fill="#8b949e" font-size="7">Web Exploitation Expert</text>
+  <rect x="143" y="15" width="118" height="50" rx="8" fill="url(#bdg-b)" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="202" y="36" text-anchor="middle" fill="#00d4ff" font-size="15" font-weight="bold">CPTS</text>
+  <text x="202" y="54" text-anchor="middle" fill="#8b949e" font-size="7">Penetration Testing Specialist</text>
+  <rect x="271" y="15" width="118" height="50" rx="8" fill="url(#bdg-r)" stroke="#ff3366" stroke-width="1.5"/>
+  <text x="330" y="36" text-anchor="middle" fill="#ff3366" font-size="15" font-weight="bold">CWES</text>
+  <text x="330" y="54" text-anchor="middle" fill="#8b949e" font-size="7">Web Exploitation Specialist</text>
+  <rect x="399" y="15" width="118" height="50" rx="8" fill="url(#bdg-g)" stroke="#00ff88" stroke-width="1.5"/>
+  <text x="458" y="36" text-anchor="middle" fill="#00ff88" font-size="15" font-weight="bold">CJCA</text>
+  <text x="458" y="54" text-anchor="middle" fill="#8b949e" font-size="7">Junior Cybersecurity Analyst</text>
+  <rect x="527" y="15" width="100" height="50" rx="8" fill="url(#bdg-r)" stroke="#ff6b35" stroke-width="1.5"/>
+  <text x="577" y="36" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">CRTM</text>
+  <text x="577" y="54" text-anchor="middle" fill="#8b949e" font-size="7">Red Team Member</text>
+  <rect x="637" y="15" width="100" height="50" rx="8" fill="url(#bdg-r)" stroke="#ff6b35" stroke-width="1.5"/>
+  <text x="687" y="36" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">CRTE</text>
+  <text x="687" y="54" text-anchor="middle" fill="#8b949e" font-size="7">Red Team Expert</text>
+  <!-- Row 2 -->
+  <rect x="15" y="78" width="118" height="50" rx="8" fill="url(#bdg-b)" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="74" y="99" text-anchor="middle" fill="#00d4ff" font-size="15" font-weight="bold">CRTP</text>
+  <text x="74" y="117" text-anchor="middle" fill="#8b949e" font-size="7">Red Team Professional</text>
+  <rect x="143" y="78" width="118" height="50" rx="8" fill="url(#bdg-r)" stroke="#ff6b35" stroke-width="1.5"/>
+  <text x="202" y="99" text-anchor="middle" fill="#ff6b35" font-size="15" font-weight="bold">CRTO</text>
+  <text x="202" y="117" text-anchor="middle" fill="#8b949e" font-size="7">Red Team Operator</text>
+  <rect x="271" y="78" width="118" height="50" rx="8" fill="url(#bdg-b)" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="330" y="99" text-anchor="middle" fill="#00d4ff" font-size="15" font-weight="bold">eWPTX</text>
+  <text x="330" y="117" text-anchor="middle" fill="#8b949e" font-size="7">Web Pentester eXtreme</text>
+  <rect x="399" y="78" width="118" height="50" rx="8" fill="url(#bdg-g)" stroke="#00ff88" stroke-width="1.5"/>
+  <text x="458" y="99" text-anchor="middle" fill="#00ff88" font-size="15" font-weight="bold">eCPPT</text>
+  <text x="458" y="117" text-anchor="middle" fill="#8b949e" font-size="7">Professional Pentester</text>
+  <rect x="527" y="78" width="210" height="50" rx="8" fill="url(#bdg-b)" stroke="#00d4ff" stroke-width="1.5"/>
+  <text x="632" y="99" text-anchor="middle" fill="#00d4ff" font-size="15" font-weight="bold">eMAPT</text>
+  <text x="632" y="117" text-anchor="middle" fill="#8b949e" font-size="7">Mobile Application Pentester</text>
+  <!-- Divider -->
+  <rect x="100" y="145" width="550" height="1" rx="1" fill="#1e3a5f" opacity="0.5"/>
+  <!-- Attribution -->
+  <text x="375" y="175" text-anchor="middle" fill="#e0e7ff" font-size="14">SadlyRemo</text>
+  <text x="375" y="198" text-anchor="middle" fill="#8b949e" font-size="10">Reverse Engineering and Exploit Development</text>
 </svg></div>
 
-*Written by SadlyRemo -- for educational purposes only.*
+<div align="center"><svg viewBox="0 0 750 100" width="750" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Segoe UI', Arial, sans-serif;">
+  <defs>
+    <linearGradient id="gline" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00d4ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00ff88" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#00d4ff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="750" height="100" rx="10" fill="#0a0e17"/>
+  <rect x="75" y="15" width="600" height="1" fill="url(#gline)"/>
+  <text x="375" y="52" text-anchor="middle" fill="#00ff88" font-size="18" font-weight="bold">Go build something the CPU has never seen before.</text>
+  <rect x="75" y="72" width="600" height="1" fill="url(#gline)"/>
+  <text x="375" y="93" text-anchor="middle" fill="#4a5568" font-size="11">The machine is waiting.</text>
+</svg></div>
